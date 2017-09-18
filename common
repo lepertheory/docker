@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+
+GIT_REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+GIT_BRANCH="$(cd "${GIT_REPO}" && git symbolic-ref --short HEAD 2> /dev/null || echo -n '')"
+
+DOCKER_REPO='574271486042.dkr.ecr.us-east-1.amazonaws.com'
+DOCKER_IMAGE="$(basename "$(cd "$(dirname "${BASH_SOURCE[1]}")" && pwd)")"
+DOCKER_TAG="${GIT_BRANCH:-development}"
+IMAGE_NAME="${DOCKER_IMAGE}:${DOCKER_TAG}"
+AWS_IMAGE_NAME="${DOCKER_REPO}/${IMAGE_NAME}"

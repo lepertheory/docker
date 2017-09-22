@@ -1,15 +1,18 @@
 FROM builder:${GIT_BRANCH:-master}
 
-COPY heimdal-4.7.0-fix-no-cdefs.patch /root/
+COPY heimdal-7.4.0.tar.gz ????-heimdal-7.4.0-*.patch /root/
 
 RUN apk add --no-cache libc-dev \
-                       ncurses-dev && \
+                       ncurses-dev \
+                       patch && \
     cd ~ && \
-    wget 'https://github.com/heimdal/heimdal/releases/download/heimdal-7.4.0/heimdal-7.4.0.tar.gz' && \
     tar -xvf 'heimdal-7.4.0.tar.gz' && \
-    cd 'heimdal-7.4.0' # && \
-    #patch -p1 < ~/heimdal-7.4.0-fix-no-cdefs.patch && \
-    #./configure && \
-    #make
+    cd 'heimdal-7.4.0' && \
+    for patch in $(ls -1 ~/????-heimdal-7.4.0-*.patch | sort); do \
+      patch -p1 < "${patch}"; \
+    done && \
+    ./configure --prefix=/opt/heimdal \
+                --without-otp && \
+    make CFLAGS='-Wno-cpp'
 
 CMD ["/usr/bin/env", "bash"]

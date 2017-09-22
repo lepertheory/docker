@@ -1,0 +1,25 @@
+Only in heimdal-7.4.0.new: 0002-heimdal-7.4.0-fix-system-include-warnings.patch
+diff -ur heimdal-7.4.0/lib/ipc/hi_locl.h heimdal-7.4.0.new/lib/ipc/hi_locl.h
+--- heimdal-7.4.0/lib/ipc/hi_locl.h	2017-07-10 23:14:16.000000000 -0600
++++ heimdal-7.4.0.new/lib/ipc/hi_locl.h	2017-09-22 14:15:55.000000000 -0600
+@@ -41,7 +41,7 @@
+ #include <sys/un.h>
+ #endif
+ 
+-#include <sys/poll.h>
++#include <poll.h>
+ 
+ #include <ctype.h>
+ #include <stdio.h>
+diff -ur heimdal-7.4.0/lib/krb5/krb5_locl.h heimdal-7.4.0.new/lib/krb5/krb5_locl.h
+--- heimdal-7.4.0/lib/krb5/krb5_locl.h	2017-07-10 23:16:35.000000000 -0600
++++ heimdal-7.4.0.new/lib/krb5/krb5_locl.h	2017-09-22 14:15:55.000000000 -0600
+@@ -44,7 +44,7 @@
+ #include <ctype.h>
+ 
+ #ifdef HAVE_POLL_H
+-#include <sys/poll.h>
++#include <poll.h>
+ #endif
+ 
+ #include <krb5-types.h>

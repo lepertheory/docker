@@ -1,4 +1,4 @@
-FROM builder:${GIT_BRANCH:-master}
+FROM alpine:latest
 
 RUN apk add --no-cache bash
 

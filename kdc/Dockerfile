@@ -1,18 +1,11 @@
-FROM builder:${GIT_BRANCH:-master}
+FROM lepertheory:${GIT_BRANCH:-master}
 
-COPY heimdal-7.4.0.tar.gz ????-heimdal-7.4.0-*.patch /root/
+COPY krb5.conf /etc/
 
-RUN apk add --no-cache libc-dev \
-                       ncurses-dev \
-                       patch && \
-    cd ~ && \
-    tar -xvf 'heimdal-7.4.0.tar.gz' && \
-    cd 'heimdal-7.4.0' && \
-    for patch in $(ls -1 ~/????-heimdal-7.4.0-*.patch | sort); do \
-      patch -p1 < "${patch}"; \
-    done && \
-    ./configure --prefix=/opt/heimdal \
-                --without-otp && \
-    make CFLAGS='-Wno-cpp'
+RUN apk add --no-cache heimdal \
+                       heimdal-dev \
+                       heimdal-doc \
+                       heimdal-libs && \
+    mkdir /var/heimdal
 
 CMD ["/usr/bin/env", "bash"]

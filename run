@@ -12,4 +12,8 @@ if [[ -z "${DIRECTORY}" ]]; then
   exit 1
 fi
 
-docker run -it "$(getTaggedDockerImageName "${DIRECTORY}")" "${@}"
+docker run --interactive \
+           --tty \
+           --hostname="$(getDockerImageName "${DIRECTORY}").${DNS_DOMAIN}" \
+           "$(getTaggedDockerImageName "${DIRECTORY}")" \
+           "${@}"

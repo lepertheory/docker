@@ -3,6 +3,7 @@
 set -e
 set -o pipefail
 
+DNS_DOMAIN='lepertheory.net'
 DOCKER_REPO='574271486042.dkr.ecr.us-east-1.amazonaws.com'
 AWS_IMAGE_NAME="${DOCKER_REPO}/${IMAGE_NAME}"
 

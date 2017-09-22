@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "${SCRIPT_DIR}"/common
+
+DIRECTORY="${1}"
+if [[ -z "${DIRECTORY}" ]]; then
+  echo 'DIRECTORY is requried.' 2>&1
+  exit 1
+fi
+
+AWS_IMAGE_NAME="$(getAwsImageName "${DIRECTORY}")"
+docker tag "$(getTaggedDockerImageName "${DIRECTORY}")" "${AWS_IMAGE_NAME}"
+docker push "${AWS_IMAGE_NAME}"

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "${SCRIPT_DIR}"/common
+
+DIRECTORY="${1}"; shift
+if [[ -z "${DIRECTORY}" ]]; then
+  echo 'DIRECTORY is required.' 2>&1
+  exit 1
+fi
+
+docker run -it "$(getTaggedDockerImageName "${DIRECTORY}")" "${@}"

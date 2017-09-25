@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+
+DNS_DOMAIN='lepertheory.net'
+DOCKER_REPO='574271486042.dkr.ecr.us-east-1.amazonaws.com'
+AWS_IMAGE_NAME="${DOCKER_REPO}/${IMAGE_NAME}"
+
+getAwsImageName()
+{
+  set -e
+  set -o pipefail
+
+  local DIRECTORY="${1}"
+  if [[ -z "${DIRECTORY}" ]]; then
+    echo 'DIRECTORY is required.' 1>&2
+    exit 1
+  fi
+
+  echo "${DOCKER_REPO}/$(getTaggedDockerImageName "${DIRECTORY}")"
+}
+
+getDockerImageName()
+{
+  set -e
+  set -o pipefail
+
+  local DIRECTORY="${1}"
+  if [[ -z "${DIRECTORY}" ]]; then
+    echo 'DIRECTORY is required.' 1>&2
+    exit 1
+  fi
+
+  basename "$(cd "${DIRECTORY}" && pwd)"
+}
+
+getDockerTag()
+{
+  set -e
+  set -o pipefail
+
+  getGitBranch
+}
+
+getGitBranch()
+{
+  set -e
+  set -o pipefail
+
+  cd "$(getGitRepo)"
+  git symbolic-ref --short HEAD
+}
+
+getGitRepo()
+{
+  set -e
+  set -o pipefail
+
+  cd "$(dirname "${BASH_SOURCE[0]}")"
+  git rev-parse --show-toplevel
+}
+
+getTaggedDockerImageName()
+{
+  set -e
+  set -o pipefail
+
+  local DIRECTORY="${1}"
+  if [[ -z "${DIRECTORY}" ]]; then
+    echo 'DIRECTORY is required.' 1>&2
+    exit 1
+  fi
+
+  echo "$(getDockerImageName "${DIRECTORY}"):$(getDockerTag)"
+}
+

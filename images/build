@@ -26,6 +26,13 @@ build_command+=(--label REPO_SOURCE="$(getGitRepoPath "${DIRECTORY}")")
 if [[ -f "${BASE_DOCKERFILE}" ]]; then
   build_command+=(--label BASE_DOCKERFILE="$(getGitRepoPath "${BASE_DOCKERFILE}")")
 fi
+while [[ "${1}" == '--dockerArg' ]]; do
+  shift
+  docker_command+=("${1}")
+  shift
+done
 build_command+=("${DIRECTORY}")
 
+
+echo "docker_command: ${@}"
 exec "${build_command[@]}"

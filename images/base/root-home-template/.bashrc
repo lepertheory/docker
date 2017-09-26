@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 export CLICOLOR=1
-export EDITOR=vim
 export HISTCONTROL=ignoredups:erasedups
 export HISTSIZE=100000
 export HISTFILESIZE="${HISTSIZE}"

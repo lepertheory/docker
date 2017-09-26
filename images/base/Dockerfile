@@ -1,12 +1,27 @@
 FROM alpine:latest
 
+# Command-line config.
+ARG INSTALL_DOCS
+
+# Static config. Feel free to make it not static, and fiercly scold anyone referring to the values without the keys.
 ENV ROOT_HOME=/root
-
-RUN apk add --no-cache bash=4.3.48-r1 \
-                       less=487-r0
-
-COPY root/* "${ROOT_HOME}"
-
 WORKDIR "${ROOT_HOME}"
+COPY packages*.apk "${ROOT_HOME}"/
 
-CMD ["/usr/bin/env", "bash"]
+# So we can get wild with scripting.
+RUN apk add --no-cache --virtual bootstrap $(cat packages-bootstrap.apk)
+
+# Now let's get wild with scripting.
+ENTRYPOINT ["/usr/bin/env", "bash"]
+
+RUN apk add --no-cache --virtual base $(<packages.apk) && \
+    if [[ "${INSTALL_DOCS}" != 'false' ]]; then \
+      apk add --no-cache --virtual docs $(<packages-docs.apk) \
+                                        $(sed -En 's/([^=]+)=(.*)/\1-doc=\2/p' < packages.apk           | tr -d '\n' ' ') \
+                                        $(sed -En 's/([^=]+)=(.*)/\1-doc=\2/p' < bootstrap-packages.apk | tr -d '\n' ' '); \
+    fi
+
+ARG ROOT_HOME_TEMPLATE=root-home-template
+COPY "${ROOT_HOME_TEMPLATE}"/* "${ROOT_HOME}"/
+
+ENTRYPOINT ["/usr/bin/env", "bash"]

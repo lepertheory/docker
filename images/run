@@ -29,8 +29,6 @@ docker_command+=(--hostname=$(getDockerImageName "${DIRECTORY}").${DNS_DOMAIN})
 docker_command+=("$(getTaggedDockerImageName "${DIRECTORY}")")
 docker_command+=("${@}")
 
-echo "${docker_command[@]}"
-
 if [[ -t 0 ]]; then
   exec "${docker_command[@]}"
 else

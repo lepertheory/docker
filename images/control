@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "${SCRIPT_DIR}"/common
+
+if [[ -t 0 ]]; then
+  docker exec --interactive --tty --env TERM="${TERM}" controller "${@}"
+else
+  docker exec --interactive --env TERM="${TERM}" controller "${@}" <&0
+fi

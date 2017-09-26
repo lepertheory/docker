@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "${SCRIPT_DIR}"/common
+
+
+
+exec "${SCRIPT_DIR}"/run "${SCRIPT_DIR}"/controller --dockerArg -d \
+                                                    --dockerArg --name=controller \
+                                                    --dockerArg --rm

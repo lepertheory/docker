@@ -1,4 +1,5 @@
-FROM python3:${GIT_BRANCH:-master}
+ARG GIT_BRANCH=master
+FROM python3:${GIT_BRANCH}
 
 ENV BASHRC="${ROOT_HOME}"/.bashrc
 

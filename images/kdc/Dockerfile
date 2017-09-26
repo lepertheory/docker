@@ -1,4 +1,5 @@
-FROM lepertheory:${GIT_BRANCH:-master}
+ARG GIT_BRANCH=master
+FROM lepertheory:${GIT_BRANCH}
 
 COPY krb5.conf /etc/
 

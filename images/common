@@ -32,7 +32,7 @@ getBaseImage()
     exit 1
   fi
 
-  eval "GIT_BRANCH=\"$(getGitBranch)\"; echo \"$(head -n1 "${DIRECTORY}"/Dockerfile | sed -E 's/FROM\s+//')\""
+  eval "GIT_BRANCH=\"$(getGitBranch)\"; echo \"$(grep -E '^FROM ' "${DIRECTORY}"/Dockerfile | sed -E 's/FROM\s+//')\""
 }
 
 getDockerfile()

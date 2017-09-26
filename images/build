@@ -13,4 +13,6 @@ if [[ -z "${DIRECTORY}" ]]; then
 fi
 
 export GIT_BRANCH="$(getGitBranch)"
-docker build --tag "$(getTaggedDockerImageName "${DIRECTORY}")" "${DIRECTORY}"
+docker build --tag "$(getTaggedDockerImageName "${DIRECTORY}")" \
+             --label REPO_SOURCE="$(getGitRepoPath "${DIRECTORY}")" \
+             "${DIRECTORY}"

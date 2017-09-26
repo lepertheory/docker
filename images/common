@@ -5,7 +5,7 @@ set -o pipefail
 
 DNS_DOMAIN='lepertheory.net'
 DOCKER_REPO='574271486042.dkr.ecr.us-east-1.amazonaws.com'
-AWS_IMAGE_NAME="${DOCKER_REPO}/${IMAGE_NAME}"
+IMAGES_BASE='images'
 
 getAwsImageName()
 {
@@ -33,6 +33,25 @@ getBaseImage()
   fi
 
   eval "GIT_BRANCH=\"$(getGitBranch)\"; echo \"$(head -n1 "${DIRECTORY}"/Dockerfile | sed -E 's/FROM\s+//')\""
+}
+
+getDockerfile()
+{
+  set -e
+  set -o pipefail
+
+  local TAGGED_IMAGE_NAME="${1}"
+  if [[ -z "${TAGGED_IMAGE_NAME}" ]]; then
+    echo 'TAGGED_IMAGE_NAME is required.' 1>&2
+    exit 1
+  fi
+
+  local POTENTIAL_DOCKERFILE="$(getGitRepo)/${IMAGES_BASE}/${TAGGED_IMAGE_NAME%%:*}/Dockerfile"
+  if [[ -f "${POTENTIAL_DOCKERFILE}" ]]; then
+    echo "${POTENTIAL_DOCKERFILE}"
+  else
+    return 1
+  fi
 }
 
 getDockerImageName()
@@ -81,6 +100,37 @@ getDockerImageEnvironmentVariableByTaggedDockerImageName()
     jq --raw-output '.[0].Config.Env[] | select(startswith("'"${ENVIRONMENT_VARIABLE}"'=")) | split("=")[1:] | join("=")'
 }
 
+getDockerImageLabelByTaggedDockerImageName()
+{
+  set -e
+  set -o pipefail
+
+  local TAGGED_DOCKER_IMAGE_NAME="${1}"
+  local LABEL="${2}"
+  if [[ -z "${TAGGED_DOCKER_IMAGE_NAME}" ]] || [[ -z "${LABEL}" ]]; then
+    echo 'TAGGED_DOCKER_IMAGE_NAME and LABEL are required.' 1>&2
+    exit 1
+  fi
+
+  docker inspect "${TAGGED_DOCKER_IMAGE_NAME}" | \
+    jq --raw-output '.[0].Config.Labels.'"${LABEL}"
+}
+
+getDockerImageLabelByDirectory()
+{
+  set -e
+  set -o pipefail
+
+  local DIRECTORY="${1}"
+  local LABEL="${2}"
+  if [[ -z "${DIRECTORY}" ]] || [[ -z "${LABEL}" ]]; then
+    echo 'DIRECTORY and LABEL are required.' 1>&2
+    exit 1
+  fi
+
+  getDockerImageLabelByTaggedDockerImageName "$(getTaggedDockerImageName "${DIRECTORY}")" "${LABEL}"
+}
+
 getDockerTag()
 {
   set -e
@@ -96,6 +146,20 @@ getGitBranch()
 
   cd "$(getGitRepo)"
   git symbolic-ref --short HEAD
+}
+
+getGitRepoPath()
+{
+  set -e
+  set -o pipefail
+
+  CHECK_PATH="${1}"
+  if [[ -z "${CHECK_PATH}" ]]; then
+    echo 'CHECK_PATH is required.' 1>&2
+    exit 1
+  fi
+
+  realpath --relative-to="$(getGitRepo)" "${CHECK_PATH}"
 }
 
 getGitRepo()
@@ -121,6 +185,6 @@ getTaggedDockerImageName()
   echo "$(getDockerImageName "${DIRECTORY}"):$(getDockerTag)"
 }
 
-if (( ${#} > 0 )); then
+if (( ${#} > 1 )); then
   "${@}"
 fi

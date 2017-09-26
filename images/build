@@ -4,35 +4,6 @@ set -e
 set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-. "${SCRIPT_DIR}"/common 
+. "${SCRIPT_DIR}"/common
 
-DIRECTORY="${1}"
-if [[ -z "${DIRECTORY}" ]]; then
-  echo 'DIRECTORY is required.' 2>&1
-  exit 1
-fi
-
-BASE_IMAGE="$(getBaseImage "${DIRECTORY}")"
-BASE_DOCKERFILE="$(getDockerfile "${BASE_IMAGE}" || echo -n)"
-
-if [[ -f "${BASE_DOCKERFILE}" ]]; then
-  "${0}" "$(dirname "${BASE_DOCKERFILE}")"
-fi
-
-build_command=(docker build)
-build_command+=(--build-arg GIT_BRANCH="$(getGitBranch)")
-build_command+=(--tag "$(getTaggedDockerImageName "${DIRECTORY}")")
-build_command+=(--label REPO_SOURCE="$(getGitRepoPath "${DIRECTORY}")")
-if [[ -f "${BASE_DOCKERFILE}" ]]; then
-  build_command+=(--label BASE_DOCKERFILE="$(getGitRepoPath "${BASE_DOCKERFILE}")")
-fi
-while [[ "${1}" == '--dockerArg' ]]; do
-  shift
-  docker_command+=("${1}")
-  shift
-done
-build_command+=("${DIRECTORY}")
-
-
-echo "docker_command: ${@}"
-exec "${build_command[@]}"
+buildDockerImage "${@}"

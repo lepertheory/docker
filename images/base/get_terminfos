@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+COMPILED_TERMINFO_DIR='/usr/share/terminfo'
+terminfos=( )
+while IFS= read -r -d '' entry; do
+  terminfos+=("${entry}")
+done < <(find "${COMPILED_TERMINFO_DIR}" -name '*256*' -and \( -iname '*screen*' \
+                                                               -or -iname '*xterm*' \
+                                                               -or -iname '*putty*' \) \
+                                         -print0)
+
+SOURCE_TERMINFO_DIR="${SCRIPT_DIR}"/terminfo_source
+for compiled_terminfo in "${terminfos[@]}"; do
+  mkdir -p "${SOURCE_TERMINFO_DIR}"
+  
+done

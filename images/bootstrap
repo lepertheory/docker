@@ -1,13 +1,22 @@
 #!/usr/bin/env bash
 
+#
+# Run this to get a persistent docker image running, called "controller". It serves to run programs faster, and provide a nice
+# isolated place for dependencies to live.
+#
+
 set -e
 set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "${SCRIPT_DIR}"/common
 
+buildDockerImage "${SCRIPT_DIR}/${BASE_DOCKER_NAME}"
+buildDockerImage "${SCRIPT_DIR}/${CONTROLLER_DOCKER_NAME}"
 
-
-exec "${SCRIPT_DIR}"/run "${SCRIPT_DIR}"/controller --dockerArg -d \
-                                                    --dockerArg --name=controller \
-                                                    --dockerArg --rm
+if isDockerContainerNameRunning "${CONTROLLER_DOCKER_NAME}"; then
+  docker stop "${CONTROLLER_DOCKER_NAME}"
+fi
+"${SCRIPT_DIR}"/run "${SCRIPT_DIR}"/"${CONTROLLER_DOCKER_NAME}" --dockerArg -d \
+                                                                --dockerArg --name="${CONTROLLER_DOCKER_NAME}" \
+                                                                --dockerArg --rm

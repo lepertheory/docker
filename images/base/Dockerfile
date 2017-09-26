@@ -17,11 +17,9 @@ ENTRYPOINT ["/usr/bin/env", "bash"]
 RUN apk add --no-cache --virtual base $(<packages.apk) && \
     if [[ "${INSTALL_DOCS}" != 'false' ]]; then \
       apk add --no-cache --virtual docs $(<packages-docs.apk) \
-                                        $(sed -En 's/([^=]+)=(.*)/\1-doc=\2/p' < packages.apk           | tr -d '\n' ' ') \
-                                        $(sed -En 's/([^=]+)=(.*)/\1-doc=\2/p' < bootstrap-packages.apk | tr -d '\n' ' '); \
+                                        $(sed -En 's/^([^=]+)=(.*)$/\1-doc=\2/p' < packages.apk) \
+                                        $(sed -En 's/^([^=]+)=(.*)$/\1-doc=\2/p' < packages-bootstrap.apk); \
     fi
 
 ARG ROOT_HOME_TEMPLATE=root-home-template
 COPY "${ROOT_HOME_TEMPLATE}"/* "${ROOT_HOME}"/
-
-ENTRYPOINT ["/usr/bin/env", "bash"]

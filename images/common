@@ -29,6 +29,10 @@ buildDockerImage()
     buildDockerImage "$(dirname "${BASE_DOCKERFILE}")"
   fi
 
+  if [[ -x "${DIRECTORY}"/build_pre ]]; then
+    "${DIRECTORY}"/build_pre
+  fi
+
   local build_command=(docker build)
   local build_command+=(--build-arg GIT_BRANCH="$(getGitBranch)")
   local build_command+=(--tag "$(getTaggedDockerImageName "${DIRECTORY}")")

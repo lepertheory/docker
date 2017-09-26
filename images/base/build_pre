@@ -15,7 +15,10 @@ done < <(find "${COMPILED_TERMINFO_DIR}" -name '*256*' -and \( -iname '*screen*'
                                          -print0)
 
 SOURCE_TERMINFO_DIR="${SCRIPT_DIR}"/terminfo_source
+mv "${SOURCE_TERMINFO_DIR}" "${SOURCE_TERMINFO_DIR}.bak"
 for compiled_terminfo in "${terminfos[@]}"; do
   mkdir -p "${SOURCE_TERMINFO_DIR}"
-  
+  compiled_terminfo_filename="$(basename "${compiled_terminfo}")"
+  infocmp "${compiled_terminfo_filename}" > "${SOURCE_TERMINFO_DIR}/"${compiled_terminfo_filename}".tic"
 done
+rm -rf "${SOURCE_TERMINFO_DIR}.bak"

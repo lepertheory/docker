@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+. "${SCRIPT_DIR}"/../common
+
+echo -n "--volume=${HOME}/.aws-docker:$(getDockerImageEnvironmentVariableByDirectory "${SCRIPT_DIR}" 'ROOT_HOME')"/.aws

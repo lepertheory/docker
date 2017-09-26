@@ -21,6 +21,20 @@ getAwsImageName()
   echo "${DOCKER_REPO}/$(getTaggedDockerImageName "${DIRECTORY}")"
 }
 
+getBaseImage()
+{
+  set -e
+  set -o pipefail
+
+  local DIRECTORY="${1}"
+  if [[ -z "${DIRECTORY}" ]]; then
+    echo 'DIRECTORY is required.' 1>&2
+    exit 1
+  fi
+
+  eval "GIT_BRANCH=\"$(getGitBranch)\"; echo \"$(head -n1 "${DIRECTORY}"/Dockerfile | sed -E 's/FROM\s+//')\""
+}
+
 getDockerImageName()
 {
   set -e
@@ -33,6 +47,38 @@ getDockerImageName()
   fi
 
   basename "$(cd "${DIRECTORY}" && pwd)"
+}
+
+getDockerImageEnvironmentVariableByDirectory()
+{
+  set -e
+  set -o pipefail
+
+  local DIRECTORY="${1}"
+  local ENVIRONMENT_VARIABLE="${2}"
+  if [[ -z "${DIRECTORY}" ]] || [[ -z "${ENVIRONMENT_VARIABLE}" ]]; then
+    echo 'DIRECTORY and ENVIRONMENT_VARIABLE are required.' 1>&2
+    exit 1
+  fi
+
+  getDockerImageEnvironmentVariableByTaggedDockerImageName "$(getTaggedDockerImageName "${DIRECTORY}")" \
+                                                           "${ENVIRONMENT_VARIABLE}"
+}
+
+getDockerImageEnvironmentVariableByTaggedDockerImageName()
+{
+  set -e
+  set -o pipefail
+
+  local TAGGED_DOCKER_IMAGE_NAME="${1}"
+  local ENVIRONMENT_VARIABLE="${2}"
+  if [[ -z "${TAGGED_DOCKER_IMAGE_NAME}" ]] || [[ -z "${ENVIRONMENT_VARIABLE}" ]]; then
+    echo 'TAGGED_DOCKER_IMAGE_NAME and ENVIRONMENT_VARIABLE are required.' 1>&2
+    exit 1
+  fi
+
+  docker inspect "${TAGGED_DOCKER_IMAGE_NAME}" | \
+    jq --raw-output '.[0].Config.Env[] | select(startswith("'"${ENVIRONMENT_VARIABLE}"'=")) | split("=")[1:] | join("=")'
 }
 
 getDockerTag()
@@ -75,3 +121,6 @@ getTaggedDockerImageName()
   echo "$(getDockerImageName "${DIRECTORY}"):$(getDockerTag)"
 }
 
+if (( ${#} > 0 )); then
+  "${@}"
+fi

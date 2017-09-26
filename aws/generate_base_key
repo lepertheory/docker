@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+
+PLAINTEXT_KEY_FILE="${1}"
+AWS_PUBLIC_KEY_FILE="${2}"
+ENCRYPTED_KEY_FILE="${3}"
+if [[ -z "${PLAINTEXT_KEY_FILE}" ]] || [[ -z "${AWS_PUBLIC_KEY_FILE}" ]] || [[ -z "${ENCRYPTED_KEY_FILE}" ]]; then
+  echo "Usage: $(basename "${0}") PLAINTEXT_KEY_FILE AWS_PUBLIC_KEY_FILE ENCRYPTED_KEY_FILE" 1>&2
+  exit 1
+fi
+
+openssl rsautl -encrypt \
+               -in <(openssl dgst -sha256 -binary "${PLAINTEXT_KEY_FILE}") \
+               -oaep \
+               -inkey "${AWS_PUBLIC_KEY_FILE}" \
+               -keyform DER \
+               -pubin \
+               -out "${ENCRYPTED_KEY_FILE}"

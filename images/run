@@ -12,8 +12,19 @@ if [[ -z "${DIRECTORY}" ]]; then
   exit 1
 fi
 
-docker run --interactive \
-           --tty \
-           --hostname="$(getDockerImageName "${DIRECTORY}").${DNS_DOMAIN}" \
-           "$(getTaggedDockerImageName "${DIRECTORY}")" \
-           "${@}"
+docker_command=(docker run)
+docker_command+=(--interactive)
+docker_command+=(--tty)
+if [[ -x "${DIRECTORY}/extra-docker-args" ]]; then
+  docker_command+=($("${DIRECTORY}"/extra-docker-args))
+fi
+while [[ "${1}" == '--dockerArg' ]]; do
+  shift
+  docker_command+=("${1}")
+  shift
+done
+docker_command+=(--hostname=$(getDockerImageName "${DIRECTORY}").${DNS_DOMAIN})
+docker_command+=("$(getTaggedDockerImageName "${DIRECTORY}")")
+docker_command+=("${@}")
+
+exec "${docker_command[@]}"

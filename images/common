@@ -37,6 +37,7 @@ buildDockerImage()
   local build_command+=(--build-arg GIT_BRANCH="$(getGitBranch)")
   local build_command+=(--tag "$(getTaggedDockerImageName "${DIRECTORY}")")
   local build_command+=(--label REPO_SOURCE="$(getGitRepoPath "${DIRECTORY}")")
+  local build_command+=(--name "$(getDockerImageName "${DIRECTORY}")")
   if [[ -f "${BASE_DOCKERFILE}" ]]; then
     build_command+=(--label BASE_DOCKERFILE="$(getGitRepoPath "${BASE_DOCKERFILE}")")
   fi

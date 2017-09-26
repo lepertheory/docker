@@ -13,6 +13,20 @@ if [[ -z "${DIRECTORY}" ]]; then
 fi
 
 export GIT_BRANCH="$(getGitBranch)"
-docker build --tag "$(getTaggedDockerImageName "${DIRECTORY}")" \
-             --label REPO_SOURCE="$(getGitRepoPath "${DIRECTORY}")" \
-             "${DIRECTORY}"
+
+BASE_IMAGE="$(getBaseImage "${DIRECTORY}")"
+BASE_DOCKERFILE="$(getDockerfile "${BASE_IMAGE}" || echo -n)"
+
+if [[ -f "${BASE_DOCKERFILE}" ]]; then
+  "${0}" "$(dirname "${BASE_DOCKERFILE}")"
+fi
+
+build_command=(docker build)
+build_command+=(--tag "$(getTaggedDockerImageName "${DIRECTORY}")")
+build_command+=(--label REPO_SOURCE="$(getGitRepoPath "${DIRECTORY}")")
+if [[ -f "${BASE_DOCKERFILE}" ]]; then
+  build_command+=(--label BASE_DOCKERFILE="$(getGitRepoPath "${BASE_DOCKERFILE}")")
+fi
+build_command+=("${DIRECTORY}")
+
+exec "${build_command[@]}"

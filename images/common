@@ -7,9 +7,14 @@ DEBUG=$(true)
 DNS_DOMAIN='lepertheory.net'
 DOCKER_REPO='574271486042.dkr.ecr.us-east-1.amazonaws.com'
 IMAGES_BASE='images'
-DOCKER_ROOT_HOME="${HOME}/.docker-home"
+DOCKER_ROOT_HOME="${HOME}/.aws-docker"
 BASE_DOCKER_NAME='base'
 CONTROLLER_DOCKER_NAME='controller'
+
+runJq()
+{
+  "$(getGitRepo)"/"${IMAGES_BASE}"/run "$(getGitRepo)"/"${IMAGES_BASE}"/"${CONTROLLER_DOCKER_NAME}" <&0
+}
 
 buildDockerImage()
 {
@@ -24,9 +29,14 @@ buildDockerImage()
   shift
 
   local BASE_IMAGE="$(getBaseImage "${DIRECTORY}")"
-  local BASE_DOCKERFILE="$(getDockerfile "${BASE_IMAGE}" || echo -n)"
-  if [[ -f "${BASE_DOCKERFILE}" ]]; then
-    buildDockerImage "$(dirname "${BASE_DOCKERFILE}")"
+  if [[ "${BASE_IMAGE}" != 'alpine:latest' ]]; then
+    local BASE_DOCKERFILE="$(getDockerfile "${BASE_IMAGE}" || echo -n)"
+    if [[ -f "${BASE_DOCKERFILE}" ]]; then
+      buildDockerImage "$(dirname "${BASE_DOCKERFILE}")"
+    else
+      echo "Dockerfile ${BASE_DOCKERFILE} not found."
+      exit 1
+    fi
   fi
 
   if [[ -x "${DIRECTORY}"/build_pre ]]; then
@@ -37,7 +47,6 @@ buildDockerImage()
   local build_command+=(--build-arg GIT_BRANCH="$(getGitBranch)")
   local build_command+=(--tag "$(getTaggedDockerImageName "${DIRECTORY}")")
   local build_command+=(--label REPO_SOURCE="$(getGitRepoPath "${DIRECTORY}")")
-  local build_command+=(--name "$(getDockerImageName "${DIRECTORY}")")
   if [[ -f "${BASE_DOCKERFILE}" ]]; then
     build_command+=(--label BASE_DOCKERFILE="$(getGitRepoPath "${BASE_DOCKERFILE}")")
   fi
@@ -86,7 +95,7 @@ ensureImageExists()
     exit 2
   fi
 
-  
+
 }
 
 getAwsImageName()
@@ -195,7 +204,7 @@ getDockerImageEnvironmentVariableByTaggedDockerImageName()
   fi
 
   docker inspect "${TAGGED_DOCKER_IMAGE_NAME}" | \
-    jq --raw-output '.[0].Config.Env[] | select(startswith("'"${ENVIRONMENT_VARIABLE}"'=")) | split("=")[1:] | join("=")'
+    $(runJq) --raw-output '.[0].Config.Env[] | select(startswith("'"${ENVIRONMENT_VARIABLE}"'=")) | split("=")[1:] | join("=")'
 }
 
 getDockerImageLabelByTaggedDockerImageName()
@@ -211,7 +220,7 @@ getDockerImageLabelByTaggedDockerImageName()
   fi
 
   docker inspect "${TAGGED_DOCKER_IMAGE_NAME}" | \
-    jq --raw-output '.[0].Config.Labels.'"${LABEL}"
+    $(RUN_JQ) --raw-output '.[0].Config.Labels.'"${LABEL}"
 }
 
 getDockerImageLabelByDirectory()

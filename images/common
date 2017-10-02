@@ -4,7 +4,8 @@ set -e
 set -o pipefail
 
 if [[ -n COMMON_29348759287345978 ]]; then
-
+  return
+fi
 
 DEBUG=$(true)
 DNS_DOMAIN='lepertheory.net'

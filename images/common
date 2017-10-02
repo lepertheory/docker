@@ -99,7 +99,9 @@ ensureImageExists()
     exit 2
   fi
 
-
+  if [[ -z "$(docker images -q "${IMAGE_NAME_AND_TAG}")" ]]; then
+    buildDockerImage "$(getImageDirectory "${IMAGE_NAME}")"
+  fi
 }
 
 getAwsImageName()
@@ -163,6 +165,20 @@ getDockerContainerInfoByName()
   NAME_ID_IMAGE=($(docker ps --no-trunc --format '{{.Names}} {{.ID}} {{.Image}}' | \
                    grep -E '^'"${CONTAINER_NAME}"'\s+'))
   echo "${NAME_ID_IMAGE[@]}"
+}
+
+getDockerImageDirectory()
+{
+  set -e
+  set -o pipefail
+
+  local IMAGE_NAME="${1}"
+  if [[ -z "${IMAGE_NAME}" ]]; then
+    echo 'IMAGE_NAME is required.' 1>&2
+    exit 1
+  fi
+
+  echo "$(getDockerImagesBase)/${IMAGE_NAME}"
 }
 
 getDockerImageName()
@@ -240,6 +256,14 @@ getDockerImageLabelByDirectory()
   fi
 
   getDockerImageLabelByTaggedDockerImageName "$(getTaggedDockerImageName "${DIRECTORY}")" "${LABEL}"
+}
+
+getDockerImagesBase()
+{
+  set -e
+  set -o pipefail
+
+  echo "$(getGitRepo)/${IMAGES_BASE}"
 }
 
 getDockerTag()

@@ -3,6 +3,9 @@
 set -e
 set -o pipefail
 
+if [[ -n COMMON_29348759287345978 ]]; then
+
+
 DEBUG=$(true)
 DNS_DOMAIN='lepertheory.net'
 DOCKER_REPO='574271486042.dkr.ecr.us-east-1.amazonaws.com'

@@ -5,6 +5,8 @@ set -o pipefail
 
 if [[ -n COMMON_29348759287345978 ]]; then
   return
+else
+  COMMON_29348759287345978=1
 fi
 
 DEBUG=$(true)

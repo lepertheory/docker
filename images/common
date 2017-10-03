@@ -252,7 +252,7 @@ getDockerImageLabelByTaggedDockerImageName()
   fi
 
   docker inspect "${TAGGED_DOCKER_IMAGE_NAME}" | \
-    $(RUN_JQ) --raw-output '.[0].Config.Labels.'"${LABEL}"
+    $(runJq) --raw-output '.[0].Config.Labels.'"${LABEL}"
 }
 
 getDockerImageLabelByDirectory()
@@ -345,6 +345,37 @@ isDockerContainerNameRunning()
 
   local CONTAINER_INFO=($(getDockerContainerInfoByName "${CONTAINER_NAME}"))
   return $(( ${#CONTAINER_INFO[@]} != 3 ))
+}
+
+runInDockerContainer()
+{
+  set -e
+  set -o pipefail
+
+  local CONTAINER_NAME="${1}"
+  if [[ -z "${CONTAINER_NAME}" ]]; then
+    echo 'CONTAINER_NAME is required.' 1>&2
+    exit 1
+  fi
+
+  ensureContainerExists "${CONTAINER_NAME}"
+
+  local -a docker_command=(docker)
+  if isDockerContainerNameRunning "${CONTAINER_NAME}"; then
+    docker_command+=(exec)
+  else
+    docker_command+=(run)
+  fi
+
+  if [[ -t 0 ]]; then
+    docker_command+=(--tty)
+    docker_command+=(--env TERM="${TERM}")
+  fi
+
+  # Not sure why this isn't conditional.
+  docker_command+=(--interactive)
+
+  getDockerImageDirectory
 }
 
 runJq()

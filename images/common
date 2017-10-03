@@ -3,13 +3,13 @@
 set -e
 set -o pipefail
 
-if [[ -n COMMON_29348759287345978 ]]; then
+if [[ -n "${COMMON_29348759287345978}" ]]; then
   return
 else
   COMMON_29348759287345978=1
 fi
 
-DEBUG=$(true)
+DEBUG=$((true))
 DNS_DOMAIN='lepertheory.net'
 DOCKER_REPO='574271486042.dkr.ecr.us-east-1.amazonaws.com'
 IMAGES_BASE='images'
@@ -29,15 +29,12 @@ buildDockerImage()
   fi
   shift
 
-  local BASE_IMAGE="$(getBaseImage "${DIRECTORY}")"
-  if [[ "${BASE_IMAGE}" != 'alpine:latest' ]]; then
-    local BASE_DOCKERFILE="$(getDockerfile "${BASE_IMAGE}" || echo -n)"
-    if [[ -f "${BASE_DOCKERFILE}" ]]; then
-      buildDockerImage "$(dirname "${BASE_DOCKERFILE}")"
-    else
-      echo "Dockerfile ${BASE_DOCKERFILE} not found."
-      exit 1
-    fi
+  local BASE_DOCKERFILE="$(getParentDockerImageSource "${DIRECTORY}")"
+  if [[ -f "${BASE_DOCKERFILE}" ]]; then
+    buildDockerImage "$(dirname "${BASE_DOCKERFILE}")"
+  else
+    echo "Dockerfile ${BASE_DOCKERFILE} not found."
+    exit 2
   fi
 
   if [[ -x "${DIRECTORY}"/build_pre ]]; then
@@ -62,6 +59,25 @@ buildDockerImage()
     echo "build_command: ${build_command[@]}"
   fi
   "${build_command[@]}"
+}
+
+getParentDockerImageSource()
+{
+  set -e
+  set -o pipefail
+
+  local DIRECTORY="${1}"
+  if [[ -z "${DIRECTORY}" ]]; then
+    echo 'DIRECTORY is required.' 1>&2
+    exit 1
+  fi
+
+  local BASE_IMAGE="$(getBaseImage "${DIRECTORY}")"
+  if [[ "${BASE_IMAGE}" == 'alpine:latest' ]]; then
+    return 0
+  else
+    echo "$(getDockerfile "${BASE_IMAGE}" || echo -n)"
+  fi
 }
 
 ensureContainerIsRunningInBackground()
@@ -90,9 +106,9 @@ ensureContainerExists()
     exit 1
   fi
 
-  if [[ -z "$(docker ps --all --quiet)" ]]; then
-
-  fi
+  #if [[ -z "$(docker ps --all --quiet)" ]]; then
+  #
+  #fi
 }
 
 ensureImageExists()
@@ -179,6 +195,19 @@ getDockerContainerInfoByName()
   NAME_ID_IMAGE=($(docker ps --no-trunc --format '{{.Names}} {{.ID}} {{.Image}}' | \
                    grep -E '^'"${CONTAINER_NAME}"'\s+'))
   echo "${NAME_ID_IMAGE[@]}"
+}
+
+getDockerImageSources()
+{
+  set -e
+  set -o pipefail
+
+  local docker_image_sources=( )
+  while IFS= read -r -d '' dir; do
+    docker_image_sources+=("${dir}")
+  done < <(find "$(getDockerImagesBase)" -maxdepth 1 -mindepth 1 -type d -print0)
+
+  echo "${docker_image_sources[@]}"
 }
 
 getDockerImageDirectory()
@@ -384,6 +413,8 @@ runJq()
 {
   "$(getDockerImagesBase)"/run "$(getDockerImagesBase)/${CONTROLLER_DOCKER_NAME}" <&0
 }
+
+#topoSort
 
 if [[ "${0}" == "${BASH_SOURCE[0]}" ]]; then
   "${@}"

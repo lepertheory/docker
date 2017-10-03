@@ -15,11 +15,6 @@ DOCKER_ROOT_HOME="${HOME}/.aws-docker"
 BASE_DOCKER_NAME='base'
 CONTROLLER_DOCKER_NAME='controller'
 
-runJq()
-{
-  "$(getGitRepo)"/"${IMAGES_BASE}"/run "$(getGitRepo)"/"${IMAGES_BASE}"/"${CONTROLLER_DOCKER_NAME}" <&0
-}
-
 buildDockerImage()
 {
   set -e
@@ -78,7 +73,24 @@ ensureContainerIsRunningInBackground()
     exit 1
   fi
 
-  ensureImageExists
+  ensureContainerExists "${TAGGED_IMAGE_NAME}"
+  ensureImageExists "${TAGGED_IMAGE_NAME}"
+}
+
+ensureContainerExists()
+{
+  set -e
+  set -o pipefail
+
+  local TAGGED_IMAGE_NAME="${1}"
+  if [[ -z "${TAGGED_IMAGE_NAME}" ]]; then
+    echo 'TAGGED_IMAGE_NAME is required.' 1>&2
+    exit 1
+  fi
+
+  if [[ -z "$(docker ps --all --quiet)" ]]; then
+
+  fi
 }
 
 ensureImageExists()
@@ -333,6 +345,11 @@ isDockerContainerNameRunning()
 
   local CONTAINER_INFO=($(getDockerContainerInfoByName "${CONTAINER_NAME}"))
   return $(( ${#CONTAINER_INFO[@]} != 3 ))
+}
+
+runJq()
+{
+  "$(getDockerImagesBase)"/run "$(getDockerImagesBase)/${CONTROLLER_DOCKER_NAME}" <&0
 }
 
 if [[ "${0}" == "${BASH_SOURCE[0]}" ]]; then

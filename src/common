@@ -3,9 +3,10 @@
 #
 # Vocabulary:
 #
-# Container: A running image.
-# Context:   All the files that can be accessed while an image is being built. Must include Dockerfile.
-# Image:     Static file built from a context.
+# Container:  A running image.
+# Context:    All the files that can be accessed while an image is being built. Must include Dockerfile.
+# Image:      Static file built from a context.
+# Image name: Uniquely identifies a built image. Format is repository:tag
 #
 # TODO: Maybe allowing multiple Dockerfiles in a single context is a good idea. For right now, even if it is, neither
 #       this script nor I will help you. Haha, suffer!

@@ -1,50 +1,229 @@
 #!/usr/bin/env bash
 
+#
+# Vocabulary:
+#
+# Container: A running image.
+# Context:   All the files that can be accessed while an image is being built. Must include Dockerfile.
+# Image:     Static file built from a context.
+#
+# TODO: Maybe allowing multiple Dockerfiles in a single context is a good idea. For right now, even if it is, neither
+#       this script nor I will help you. Haha, suffer!
+#
+
 set -e
 set -o pipefail
 
+# Include guard.
 if [[ -n "${COMMON_29348759287345978}" ]]; then
   return
 else
-  COMMON_29348759287345978=1
+  declare -r COMMON_29348759287345978=1
 fi
 
-DEBUG=$((true))
-DNS_DOMAIN='lepertheory.net'
-DOCKER_REPO='574271486042.dkr.ecr.us-east-1.amazonaws.com'
-IMAGES_BASE='images'
-DOCKER_ROOT_HOME="${HOME}/.aws-docker"
-BASE_DOCKER_NAME='base'
-CONTROLLER_DOCKER_NAME='controller'
-AWS_PROFILE_NAME='home'
-AWS_REGION='us-east-1'
+# Config that actually belongs here (i.e. config about this repo).
+declare -r CONTEXTS_BASE='contexts'
 
+# Config that doesn't belong here.
+declare -r AWK_EXECUTABLE='awk'
+declare -r AWS_EXECUTABLE='aws'
+declare -r AWS_PROFILE_NAME='home'
+declare -r AWS_REGION='us-east-1'
+declare -r CONTROLLER_IMAGE_NAME='controller'
+declare -r DEBUG_FILE_DESCRIPTOR=2
+declare -r DEBUG_SHELL_COMMANDS='true'
+declare -r DNS_DOMAIN='lepertheory.net'
+declare -r DOCKER_REGISTRY='574271486042.dkr.ecr.us-east-1.amazonaws.com'
+declare -r GIT_EXECUTABLE='git'
+declare -r JQ_EXECUTABLE='jq'
+declare -r LOCAL_AWS_CONFIG="${HOME}/.aws-docker"
+declare -r ERROR_FILE_DESCRIPTOR=2
+
+declare -A EXECUTABLES
+EXECUTABLES[awk]="$(which awk)"
+EXECUTABLES[aws]="$(which aws)"
+EXECUTABLES[git]="$(which git)"
+EXECUTABLES[jq]="$(which jq)"
+
+#
+# Log into the AWS docker registry.
+#
 awsDockerLogin()
 {
   set -e
   set -o pipefail
 
-  eval $(aws ecr --profile="${AWS_PROFILE_NAME}" get-login --no-include-email --region="${AWS_REGION}")
+  run $(run $(run aws) ecr get-login --no-include-email)
 }
 
-buildDockerImage()
+#
+# Get the current user's account ID. This seems like a terrible way, but I can't figure out anything better right now.
+#
+getAwsAccountId()
 {
   set -e
   set -o pipefail
 
-  local DIRECTORY="${1}"
-  if [[ -z "${DIRECTORY}" ]]; then
-    echo 'DIRECTORY is required.' 1>&2
+  run aws iam get-user | runJq --raw-output '.User.Arn' | runAwk -F: '{ print $5 }'
+}
+
+#
+# Get arguments needed to use an alternate AWS CLI profile.
+#
+getAwsProfileArguments()
+{
+  set -e
+  set -o pipefail
+
+  if [[ -n "${AWS_PROFILE_NAME}" ]]; then
+    echo -n "--profile=${AWS_PROFILE_NAME}"
+  fi
+}
+
+#
+# Get the image that another image is constructed from.
+#
+getBaseImage()
+{
+  set -e
+  set -o pipefail
+
+  local CONTEXT="${1}"
+  if [[ -z "${CONTEXT}" ]]; then
+    echo 'CONTEXT is required.' 1>&2
+    exit 1
+  fi
+
+  local GIT_BRANCH="$(getGitBranch)"
+  eval "GIT_BRANCH=\"$(getGitBranch)\"; echo \"$(grep -E '^FROM ' "${DIRECTORY}"/Dockerfile | sed -E 's/FROM\s+//')\""
+}
+
+#
+# Get the currently checked-out Git branch.
+#
+getGitBranch()
+{
+  set -e
+  set -o pipefail
+
+  run cd "$(getGitRepo)"
+  run git symbolic-ref --short HEAD
+}
+
+#
+# Get the root directory of the Git repo this script lives in.
+#
+getGitRepo()
+{
+  set -e
+  set -o pipefail
+
+  run cd "$(run dirname "${BASH_SOURCE[0]}")"
+  run git rev-parse --show-toplevel
+}
+
+#
+# Run a command, optionally logging the command itself.
+#
+# ARGV... Just what you'd enter on the command-line.
+#
+run()
+{
+  set -e
+  set -o pipefail
+
+  if (( ${#} < 1 )); then
+    echo 'A command must be supplied.' 1>&${ERROR_FILE_DESCRIPTOR}
+    exit 1
+  fi
+
+  local -a command
+  for arg in "${@}"; do
+    local first=$(( ${#command[@]} == 0 ))
+
+    # Log run commands.
+    if [[ "${DEBUG_SHELL_COMMANDS}" == 'true' ]]; then
+      if (( ${first} )); then
+        echo -n "$(caller) executing: " 1>&${DEBUG_FILE_DESCRIPTOR}
+      else
+        echo -n ' ' 1>&${DEBUG_FILE_DESCRIPTOR}
+      fi
+    fi
+
+    # Allow direction to specific executable.
+    #echo "first: ${first}  EXECUTABLES[${arg}]: ${EXECUTABLES[${arg}]}" 1>&2
+    if (( ${first} )) && [[ -n "${EXECUTABLES[${arg}]}" ]]; then
+      command+=("${EXECUTABLES[${arg}]}")
+    else
+      command+=("${arg}")
+    fi
+
+    printf '%q' "${command[-1]}" 1>&${DEBUG_FILE_DESCRIPTOR}
+  done
+
+  echo 1>&${DEBUG_FILE_DESCRIPTOR}
+
+  "${command[@]}"
+}
+
+#
+# Run an AWS CLI command.
+#
+runAws()
+{
+  set -e
+  set -o pipefail
+
+  local aws_command_base_arguments=("${AWS_EXECUTABLE}")
+
+  # You don't want this unless you're running multiple profiles.
+  local AWS_PROFILE_ARGUMENTS=($(run getAwsProfileArguments))
+  if (( ${#AWS_PROFILE_ARGUMENTS} > 0)); then
+    aws_command_base_arguments+=("${AWS_PROFILE_ARGUMENTS[@]}")
+  fi
+
+  # This is probably required. I don't know, or care at this point.
+  if [[ -n "${AWS_REGION}" ]]; then
+    aws_command_base_arguments+=("--region=${AWS_REGION}")
+  fi
+
+  # If you remove this, the rest of this script won't know wtf.
+  aws_command_base_arguments+=(--output=json)
+
+  run "${aws_command_base_arguments[@]}" "${@}"
+}
+
+
+
+
+
+
+
+
+#
+# Build an image from a context.
+#
+# FIXME: Untested.
+#
+buildImage()
+{
+  set -e
+  set -o pipefail
+
+  local CONTEXT="${1}"
+  if [[ -z "${CONTEXT}" ]]; then
+    echo 'CONTEXT is required.' 1>&${ERROR_FILE_DESCRIPTOR}
     exit 1
   fi
   shift
 
+  # HERE
   local BASE_DOCKERFILE="$(getParentDockerImageSource "${DIRECTORY}")"
   if [[ -n "${BASE_DOCKERFILE}" ]]; then
     if [[ -f "${BASE_DOCKERFILE}" ]]; then
       buildDockerImage "$(dirname "${BASE_DOCKERFILE}")"
     else
-      echo "Dockerfile ${BASE_DOCKERFILE} not found."
+      echo "Dockerfile ${BASE_DOCKERFILE} not found." 1>&${ERROR_FILE_DESCRIPTOR}
       exit 2
     fi
   fi
@@ -73,14 +252,18 @@ buildDockerImage()
   "${build_command[@]}"
 }
 
-getParentDockerImageSource()
+
+
+
+
+getParentImage()
 {
   set -e
   set -o pipefail
 
-  local DIRECTORY="${1}"
-  if [[ -z "${DIRECTORY}" ]]; then
-    echo 'DIRECTORY is required.' 1>&2
+  local CONTEXT="${1}"
+  if [[ -z "${CONTEXT}" ]]; then
+    echo 'CONTEXT is required.' 1>&2
     exit 1
   fi
 
@@ -158,20 +341,6 @@ getAwsImageName()
   fi
 
   echo "${DOCKER_REPO}/$(getTaggedDockerImageName "${DIRECTORY}")"
-}
-
-getBaseImage()
-{
-  set -e
-  set -o pipefail
-
-  local DIRECTORY="${1}"
-  if [[ -z "${DIRECTORY}" ]]; then
-    echo 'DIRECTORY is required.' 1>&2
-    exit 1
-  fi
-
-  eval "GIT_BRANCH=\"$(getGitBranch)\"; echo \"$(grep -E '^FROM ' "${DIRECTORY}"/Dockerfile | sed -E 's/FROM\s+//')\""
 }
 
 getDockerfile()
@@ -329,16 +498,7 @@ getDockerTag()
   getGitBranch
 }
 
-getGitBranch()
-{
-  set -e
-  set -o pipefail
-
-  cd "$(getGitRepo)"
-  git symbolic-ref --short HEAD
-}
-
-getGitRepoPath()
+getGitRootFromPath()
 {
   set -e
   set -o pipefail
@@ -350,15 +510,6 @@ getGitRepoPath()
   fi
 
   realpath --relative-to="$(getGitRepo)" "${CHECK_PATH}"
-}
-
-getGitRepo()
-{
-  set -e
-  set -o pipefail
-
-  cd "$(dirname "${BASH_SOURCE[0]}")"
-  git rev-parse --show-toplevel
 }
 
 getTaggedDockerImageName()
@@ -420,13 +571,6 @@ runInDockerContainer()
 
   getDockerImageDirectory
 }
-
-runJq()
-{
-  "$(getDockerImagesBase)"/run "$(getDockerImagesBase)/${CONTROLLER_DOCKER_NAME}" <&0
-}
-
-#topoSort
 
 if [[ "${0}" == "${BASH_SOURCE[0]}" ]]; then
   "${@}"

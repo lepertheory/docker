@@ -39,6 +39,7 @@ declare -r JQ_EXECUTABLE='jq'
 declare -r LOCAL_AWS_CONFIG="${HOME}/.aws-docker"
 declare -r ERROR_FILE_DESCRIPTOR=2
 
+# This also probably doesn't belong here.
 declare -A EXECUTABLES
 EXECUTABLES[awk]="$(which awk)"
 EXECUTABLES[aws]="$(which aws)"
@@ -53,7 +54,7 @@ awsDockerLogin()
   set -e
   set -o pipefail
 
-  run $(run $(run aws) ecr get-login --no-include-email)
+  run $(runAws ecr get-login --no-include-email)
 }
 
 #
@@ -64,7 +65,7 @@ getAwsAccountId()
   set -e
   set -o pipefail
 
-  run aws iam get-user | runJq --raw-output '.User.Arn' | runAwk -F: '{ print $5 }'
+  runAws iam get-user | run jq --raw-output '.User.Arn' | run awk -F: '{ print $5 }'
 }
 
 #
@@ -88,14 +89,14 @@ getBaseImage()
   set -e
   set -o pipefail
 
-  local CONTEXT="${1}"
+  local -r CONTEXT="${1}"
   if [[ -z "${CONTEXT}" ]]; then
     echo 'CONTEXT is required.' 1>&2
     exit 1
   fi
 
-  local GIT_BRANCH="$(getGitBranch)"
-  eval "GIT_BRANCH=\"$(getGitBranch)\"; echo \"$(grep -E '^FROM ' "${DIRECTORY}"/Dockerfile | sed -E 's/FROM\s+//')\""
+  local -r GIT_BRANCH="$(getGitBranch)"
+  eval "echo \"$(run grep -E '^FROM ' "${CONTEXT}"/Dockerfile | run sed -E 's/FROM\s+//')\""
 }
 
 #
@@ -139,29 +140,28 @@ run()
 
   local -a command
   for arg in "${@}"; do
-    local first=$(( ${#command[@]} == 0 ))
-
-    # Log run commands.
-    if [[ "${DEBUG_SHELL_COMMANDS}" == 'true' ]]; then
-      if (( ${first} )); then
-        echo -n "$(caller) executing: " 1>&${DEBUG_FILE_DESCRIPTOR}
-      else
-        echo -n ' ' 1>&${DEBUG_FILE_DESCRIPTOR}
-      fi
-    fi
 
     # Allow direction to specific executable.
-    #echo "first: ${first}  EXECUTABLES[${arg}]: ${EXECUTABLES[${arg}]}" 1>&2
-    if (( ${first} )) && [[ -n "${EXECUTABLES[${arg}]}" ]]; then
+    if (( ${#command[@]} == 0 )) && [[ -n "${EXECUTABLES[${arg}]}" ]]; then
       command+=("${EXECUTABLES[${arg}]}")
     else
       command+=("${arg}")
     fi
 
-    printf '%q' "${command[-1]}" 1>&${DEBUG_FILE_DESCRIPTOR}
   done
 
-  echo 1>&${DEBUG_FILE_DESCRIPTOR}
+  # Log run commands.
+  if [[ "${DEBUG_SHELL_COMMANDS}" == 'true' ]]; then
+    local -a log_output
+    for arg in "${command[@]}"; do
+      if (( ${#log_output[@]} == 0 )); then
+         log_output+=("$(caller) executing:")
+      fi
+    
+      log_output+=("$(printf '%q' "${arg}")")
+    done
+    echo "${log_output[@]}" 1>&${DEBUG_FILE_DESCRIPTOR}
+  fi
 
   "${command[@]}"
 }
@@ -174,7 +174,7 @@ runAws()
   set -e
   set -o pipefail
 
-  local aws_command_base_arguments=("${AWS_EXECUTABLE}")
+  local aws_command_base_arguments=(aws)
 
   # You don't want this unless you're running multiple profiles.
   local AWS_PROFILE_ARGUMENTS=($(run getAwsProfileArguments))
@@ -203,14 +203,12 @@ runAws()
 #
 # Build an image from a context.
 #
-# FIXME: Untested.
-#
 buildImage()
 {
   set -e
   set -o pipefail
 
-  local CONTEXT="${1}"
+  local -r CONTEXT="${1}"
   if [[ -z "${CONTEXT}" ]]; then
     echo 'CONTEXT is required.' 1>&${ERROR_FILE_DESCRIPTOR}
     exit 1
@@ -261,7 +259,7 @@ getParentImage()
   set -e
   set -o pipefail
 
-  local CONTEXT="${1}"
+  local -r CONTEXT="${1}"
   if [[ -z "${CONTEXT}" ]]; then
     echo 'CONTEXT is required.' 1>&2
     exit 1
@@ -573,5 +571,5 @@ runInDockerContainer()
 }
 
 if [[ "${0}" == "${BASH_SOURCE[0]}" ]]; then
-  "${@}"
+  run "${@}"
 fi

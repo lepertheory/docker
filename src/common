@@ -97,7 +97,7 @@ getBaseImage()
   fi
 
   local -r GIT_BRANCH="$(getGitBranch)"
-  eval "echo \"$(run grep -E '^FROM ' "${CONTEXT}"/Dockerfile | run sed -E 's/FROM\s+//')\""
+  eval "echo \"$(run cat "${CONTEXT}"/Dockerfile | run sed -En 's/^\s*FROM\s+//p')\""
 }
 
 #

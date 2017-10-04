@@ -12,6 +12,8 @@ if [[ -z "${DIRECTORY}" ]]; then
   exit 1
 fi
 
+awsDockerLogin
+
 AWS_IMAGE_NAME="$(getAwsImageName "${DIRECTORY}")"
 docker tag "$(getTaggedDockerImageName "${DIRECTORY}")" "${AWS_IMAGE_NAME}"
 docker push "${AWS_IMAGE_NAME}"

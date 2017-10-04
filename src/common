@@ -16,6 +16,16 @@ IMAGES_BASE='images'
 DOCKER_ROOT_HOME="${HOME}/.aws-docker"
 BASE_DOCKER_NAME='base'
 CONTROLLER_DOCKER_NAME='controller'
+AWS_PROFILE_NAME='home'
+AWS_REGION='us-east-1'
+
+awsDockerLogin()
+{
+  set -e
+  set -o pipefail
+
+  eval $(aws ecr --profile="${AWS_PROFILE_NAME}" get-login --no-include-email --region="${AWS_REGION}")
+}
 
 buildDockerImage()
 {
@@ -30,11 +40,13 @@ buildDockerImage()
   shift
 
   local BASE_DOCKERFILE="$(getParentDockerImageSource "${DIRECTORY}")"
-  if [[ -f "${BASE_DOCKERFILE}" ]]; then
-    buildDockerImage "$(dirname "${BASE_DOCKERFILE}")"
-  else
-    echo "Dockerfile ${BASE_DOCKERFILE} not found."
-    exit 2
+  if [[ -n "${BASE_DOCKERFILE}" ]]; then
+    if [[ -f "${BASE_DOCKERFILE}" ]]; then
+      buildDockerImage "$(dirname "${BASE_DOCKERFILE}")"
+    else
+      echo "Dockerfile ${BASE_DOCKERFILE} not found."
+      exit 2
+    fi
   fi
 
   if [[ -x "${DIRECTORY}"/build_pre ]]; then

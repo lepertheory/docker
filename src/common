@@ -74,7 +74,7 @@ buildImage()
   local git_branch; git_branch="$(run getGitBranch)"; local -r GIT_BRANCH="${git_branch}"
   local docker_tag; docker_tag="$(run getDockerTag)"; local -r DOCKER_TAG="${docker_tag}"
   local -r ABSOLUTE_CONTEXT="${ABSOLUTE_CONTEXTS_BASE}/${REPOSITORY_NAME}"
-  local -r REPO_SOURCE="${CONTEXTS_BASE}/${CONTEXT}"
+  local -r REPO_SOURCE="${CONTEXTS_BASE}/${REPOSITORY_NAME}"
 
   # Build parent if it's ours.
   local base_image_name; base_image_name="$(run getBaseImage "${ABSOLUTE_CONTEXT}")"; local -r BASE_IMAGE_NAME="${base_image_name}"
@@ -97,6 +97,7 @@ buildImage()
     # FIXME: The test doesn't match the value. We test for absolute path, then set a relative one.
     build_command+=(--label BASE_DOCKERFILE="${CONTEXTS_BASE}/${BASE_DOCKER_REPOSITORY}"/Dockerfile)
   fi
+  # TODO: Make this not stupid.
   while [[ "${1}" == '--dockerArg' ]]; do
     shift
     build_command+=("${1}")
@@ -105,6 +106,38 @@ buildImage()
   build_command+=("${ABSOLUTE_CONTEXT}")
 
   run "${build_command[@]}"
+}
+
+createContainer()
+{
+  local -r REPOSITORY="${1}"
+  if [[ -z "${REPOSITORY}" ]]; then
+    echo 'REPOSITORY is required.' 1>&${ERROR_FILE_DESCRIPTOR}
+    exit 1
+  fi
+  shift
+  local -r TAG="${1}"
+  if [[ -z "${TAG}" ]]; then
+    echo 'TAG is required.' 1>&${ERROR_FILE_DESCRIPTOR}
+    exit 1
+  fi
+  shift
+
+  local absolute_contexts_base; absolute_contexts_base="$(run getContextsBase)"; local -r ABSOLUTE_CONTEXTS_BASE="${absolute_contexts_base}"
+  local -r ABSOLUTE_EXTRA_DOCKER_ARGS="${ABSOLUTE_CONTEXTS_BASE}/${REPOSITORY}"/extra-docker-args
+  local -r IMAGE_NAME="${REPOSITORY}:${TAG}"
+
+  local create_command=(docker create)
+  create_command+=(--hostname="${REPOSITORY}")
+  create_command+=(--name="${REPOSITORY}")
+  create_command+=(--interactive --tty)
+  if [[ -x "${ABSOLUTE_EXTRA_DOCKER_ARGS}" ]]; then
+    create_command+=($(run "${ABSOLUTE_EXTRA_DOCKER_ARGS}" "${IMAGE_NAME}"))
+  fi
+  create_command+=("${@}")
+  create_command+=("${IMAGE_NAME}")
+  
+  run "${create_command[@]}"
 }
 
 #
@@ -217,6 +250,31 @@ getGitRepo()
 }
 
 #
+# Get an environment variable set while building an image.
+#
+# IMAGE_NAME:           See vocabulary, repository:tag.
+# ENVIRONMENT_VARIABLE: The name of the environment variable to retrieve.
+#
+# Returns: The environment variable's value.
+#
+getImageEnvironmentVariable()
+{
+  local -r IMAGE_NAME="${1}"
+  if [[ -z "${IMAGE_NAME}" ]]; then
+    echo 'IMAGE_NAME is required.' 1>&${ERROR_FILE_DESCRIPTOR}
+    exit 1
+  fi
+  local -r ENVIRONMENT_VARIABLE="${2}"
+  if [[ -z "${ENVIRONMENT_VARIABLE}" ]]; then
+    echo 'ENVIRONMENT_VARIABLE is required.' 1>&${ERROR_FILE_DESCRIPTOR}
+    exit 1
+  fi
+
+  run docker inspect "${IMAGE_NAME}" | \
+    run jq --raw-output '.[0].Config.Env[] | select(startswith("'"${ENVIRONMENT_VARIABLE}"'=")) | split("=")[1:] | join("=")'
+}
+
+#
 # Run a command, optionally logging the command itself.
 #
 # ARGV... Just what you'd enter on the command-line. The first element may be overridden by values in the global
@@ -274,6 +332,21 @@ runAws()
 
   run "${aws_command_base_arguments[@]}" "${@}"
 }
+
+#
+# Run a command in a running container.
+#
+#runInContainer()
+#{
+#}
+
+#
+# Start a container from an image.
+#
+#startContainer()
+#{
+#  
+#}
 
 #getParentImage()
 #{
@@ -438,6 +511,7 @@ runAws()
 #  basename "$(cd "${DIRECTORY}" && pwd)"
 #}
 #
+
 #getDockerImageEnvironmentVariableByDirectory()
 #{
 #  set -e

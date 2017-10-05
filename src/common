@@ -108,6 +108,14 @@ buildImage()
   run "${build_command[@]}"
 }
 
+#
+# Create a container from a local image.
+#
+# REPOSITORY: Base name.
+# TAG:        Usually Git branch.
+#
+# Returns: Output of docker create command.
+#
 createContainer()
 {
   local -r REPOSITORY="${1}"
@@ -331,6 +339,22 @@ runAws()
   aws_command_base_arguments+=(--output=json)
 
   run "${aws_command_base_arguments[@]}" "${@}"
+}
+
+#
+# Start a container that has been created.
+#
+# NAME: A container name accepted by Docker.
+#
+startContainer()
+{
+  local -r NAME="${1}"
+  if [[ -z "${NAME}" ]]; then
+    echo 'NAME is required.' 1>&${ERROR_FILE_DESCRIPTOR}
+    exit 1
+  fi
+
+  run docker start --attach --interactive "${NAME}"
 }
 
 #

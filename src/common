@@ -59,7 +59,58 @@ awsDockerLogin()
 }
 
 #
+# Build an image from a local (within CONTEXT_BASE) repository name.
+#
+buildImage()
+{
+  local -r REPOSITORY_NAME="${1}"
+  if [[ -z "${REPOSITORY_NAME}" ]]; then
+    echo 'REPOSITORY_NAME is required.' 1>&${ERROR_FILE_DESCRIPTOR}
+    exit 1
+  fi
+  shift
+
+  local absolute_contexts_base; absolute_contexts_base="$(run getContextsBase)"; local -r ABSOLUTE_CONTEXTS_BASE="${absolute_contexts_base}"
+  local git_branch; git_branch="$(run getGitBranch)"; local -r GIT_BRANCH="${git_branch}"
+  local docker_tag; docker_tag="$(run getDockerTag)"; local -r DOCKER_TAG="${docker_tag}"
+  local -r ABSOLUTE_CONTEXT="${ABSOLUTE_CONTEXTS_BASE}/${REPOSITORY_NAME}"
+  local -r REPO_SOURCE="${CONTEXTS_BASE}/${CONTEXT}"
+
+  # Build parent if it's ours.
+  local base_image_name; base_image_name="$(run getBaseImage "${ABSOLUTE_CONTEXT}")"; local -r BASE_IMAGE_NAME="${base_image_name}"
+  local base_docker_repository; base_docker_repository="$(run getDockerRepository "${BASE_IMAGE_NAME}")"; local -r BASE_DOCKER_REPOSITORY="${base_docker_repository}"
+  local -r ABSOLUTE_BASE_CONTEXT="${ABSOLUTE_CONTEXTS_BASE}/${BASE_DOCKER_REPOSITORY}"
+  local -r ABSOLUTE_BASE_DOCKERFILE="${ABSOLUTE_BASE_CONTEXT}"/Dockerfile
+  if [[ -f "${ABSOLUTE_BASE_DOCKERFILE}" ]]; then
+    run buildImage "${BASE_DOCKER_REPOSITORY}"
+  fi
+
+  if [[ -x "${ABSOLUTE_CONTEXT}"/build_pre ]]; then
+    "${ABSOLUTE_CONTEXT}"/build_pre
+  fi
+
+  local build_command=(docker build)
+  local build_command+=(--build-arg GIT_BRANCH="${GIT_BRANCH}")
+  local build_command+=(--tag "${REPOSITORY_NAME}:${DOCKER_TAG}")
+  local build_command+=(--label REPO_SOURCE="${REPO_SOURCE}")
+  if [[ -f "${ABSOLUTE_BASE_DOCKERFILE}" ]]; then
+    # FIXME: The test doesn't match the value. We test for absolute path, then set a relative one.
+    build_command+=(--label BASE_DOCKERFILE="${CONTEXTS_BASE}/${BASE_DOCKER_REPOSITORY}"/Dockerfile)
+  fi
+  while [[ "${1}" == '--dockerArg' ]]; do
+    shift
+    build_command+=("${1}")
+    shift
+  done
+  build_command+=("${ABSOLUTE_CONTEXT}")
+
+  run "${build_command[@]}"
+}
+
+#
 # Get the current user's account ID. This seems like a terrible way, but I can't figure out anything better right now.
+#
+# Returns: The current profile's AWS account ID.
 #
 getAwsAccountId()
 {
@@ -68,6 +119,8 @@ getAwsAccountId()
 
 #
 # Get arguments needed to use an alternate AWS CLI profile.
+#
+# Returns: Command-line arguments to specify the AWS CLI configuration profile to use.
 #
 getAwsProfileArguments()
 {
@@ -100,7 +153,7 @@ getBaseImage()
 #
 # Get the directory contexts are stored in.
 #
-# Returns: A directory.
+# Returns: An absolute path.
 #
 getContextsBase()
 {
@@ -114,6 +167,8 @@ getContextsBase()
 #
 # IMAGE_NAME: A string formatted as "repository[:tag]"
 #
+# Returns: "repository"
+#
 getDockerRepository()
 {
   local -r IMAGE_NAME="${1}"
@@ -123,6 +178,16 @@ getDockerRepository()
   fi
 
   echo "${IMAGE_NAME%%:*}"
+}
+
+#
+# Get the tag to apply to images.
+#
+# Return: A docker tag, probably the git branch.
+#
+getDockerTag()
+{
+  getGitBranch
 }
 
 #
@@ -141,7 +206,7 @@ getGitBranch()
 #
 # Get the root directory of the Git repo this script lives in.
 #
-# Returns: A directory.
+# Returns: An absolute path.
 #
 getGitRepo()
 {
@@ -216,64 +281,6 @@ runAws()
 
 
 
-
-#
-# Build an image from a context.
-#
-buildImage()
-{
-  local -r CONTEXT="${1}"
-  if [[ -z "${CONTEXT}" ]]; then
-    echo 'CONTEXT is required.' 1>&${ERROR_FILE_DESCRIPTOR}
-    exit 1
-  fi
-  shift
-
-  local contexts_base; contexts_base="$(run getContextsBase)"; local -r CONTEXTS_BASE="${contexts_base}"
-
-  # Build parent if it's ours.
-  local base_image_name; base_image_name="$(run getBaseImage "${CONTEXT}")"; local -r BASE_IMAGE_NAME="${base_image_name}"
-  local base_docker_repository; base_docker_repository="$(run getDockerRepository "${BASE_IMAGE_NAME}")"; local -r BASE_DOCKER_REPOSITORY="${base_docker_repository}"
-  local -r BASE_CONTEXT="${CONTEXTS_BASE}/${BASE_DOCKER_REPOSITORY}"
-  local -r BASE_DOCKERFILE="${BASE_CONTEXT}"/Dockerfile
-  if [[ -f "${BASE_DOCKERFILE}" ]]; then
-    run buildImage "${BASE_CONTEXT}"
-  fi
-
-  # HERE
-  #local BASE_DOCKERFILE="$(getParentDockerImageSource "${DIRECTORY}")"
-  #if [[ -n "${BASE_DOCKERFILE}" ]]; then
-  #  if [[ -f "${BASE_DOCKERFILE}" ]]; then
-  #    buildDockerImage "$(dirname "${BASE_DOCKERFILE}")"
-  #  else
-  #    echo "Dockerfile ${BASE_DOCKERFILE} not found." 1>&${ERROR_FILE_DESCRIPTOR}
-  #    exit 2
-  #  fi
-  #fi
-
-  #if [[ -x "${DIRECTORY}"/build_pre ]]; then
-  #  "${DIRECTORY}"/build_pre
-  #fi
-
-  #local build_command=(docker build)
-  #local build_command+=(--build-arg GIT_BRANCH="$(getGitBranch)")
-  #local build_command+=(--tag "$(getTaggedDockerImageName "${DIRECTORY}")")
-  #local build_command+=(--label REPO_SOURCE="$(getGitRepoPath "${DIRECTORY}")")
-  #if [[ -f "${BASE_DOCKERFILE}" ]]; then
-  #  build_command+=(--label BASE_DOCKERFILE="$(getGitRepoPath "${BASE_DOCKERFILE}")")
-  #fi
-  #while [[ "${1}" == '--dockerArg' ]]; do
-  #  shift
-  #  build_command+=("${1}")
-  #  shift
-  #done
-  #build_command+=("${DIRECTORY}")
-  #
-  #if [[ ${DEBUG} ]]; then
-  #  echo "build_command: ${build_command[@]}"
-  #fi
-  #"${build_command[@]}"
-}
 
 
 
@@ -511,14 +518,6 @@ getDockerImagesBase()
   set -o pipefail
 
   echo "$(getGitRepo)/${IMAGES_BASE}"
-}
-
-getDockerTag()
-{
-  set -e
-  set -o pipefail
-
-  getGitBranch
 }
 
 getGitRootFromPath()

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/local/bin/bash
 
 #
 # Vocabulary:
@@ -14,6 +14,7 @@
 
 set -e
 set -o pipefail
+shopt -s inherit_errexit
 
 # Include guard.
 if [[ -n "${COMMON_29348759287345978}" ]]; then
@@ -52,10 +53,9 @@ EXECUTABLES[jq]="$(which jq)"
 #
 awsDockerLogin()
 {
-  set -e
-  set -o pipefail
+  local docker_login_command; docker_login_command=($(runAws ecr get-login --no-include-email))
 
-  run $(runAws ecr get-login --no-include-email)
+  run "${docker_login_command[@]}"
 }
 
 #
@@ -63,9 +63,6 @@ awsDockerLogin()
 #
 getAwsAccountId()
 {
-  set -e
-  set -o pipefail
-
   runAws iam get-user | run jq --raw-output '.User.Arn' | run awk -F: '{ print $5 }'
 }
 
@@ -74,81 +71,107 @@ getAwsAccountId()
 #
 getAwsProfileArguments()
 {
-  set -e
-  set -o pipefail
-
   if [[ -n "${AWS_PROFILE_NAME}" ]]; then
     echo -n "--profile=${AWS_PROFILE_NAME}"
   fi
 }
 
 #
-# Get the image that another image is constructed from.
+# Get the image required to build an image from a context.
+#
+# CONTEXT: The context for the image you want to build.
+#
+# Returns: An image name.
 #
 getBaseImage()
 {
-  set -e
-  set -o pipefail
-
   local -r CONTEXT="${1}"
   if [[ -z "${CONTEXT}" ]]; then
-    echo 'CONTEXT is required.' 1>&2
+    echo 'CONTEXT is required.' 1>&${ERROR_FILE_DESCRIPTOR}
     exit 1
   fi
 
-  local -r GIT_BRANCH="$(getGitBranch)"
-  eval "echo \"$(run cat "${CONTEXT}"/Dockerfile | run sed -En 's/^\s*FROM\s+//p')\""
+  local git_branch; git_branch="$(getGitBranch)"; local -r GIT_BRANCH="${git_branch}"
+  local base_image_raw; base_image_raw="$(run sed -En 's/^\s*FROM\s+//p' "${CONTEXT}"/Dockerfile)"; local -r BASE_IMAGE_RAW="${base_image_raw}"
+  local -ar REPLACEMENTS_APPLIED="("${BASE_IMAGE_RAW}")"
+  echo "${REPLACEMENTS_APPLIED}"
+}
+
+#
+# Get the directory contexts are stored in.
+#
+# Returns: A directory.
+#
+getContextsBase()
+{
+  local git_repo; git_repo="$(run getGitRepo)"; local -r GIT_REPO="${git_repo}"
+
+  echo "${GIT_REPO}/${CONTEXTS_BASE}"
+}
+
+#
+# This is silly, but Docker calls these things repositories.
+#
+# IMAGE_NAME: A string formatted as "repository[:tag]"
+#
+getDockerRepository()
+{
+  local -r IMAGE_NAME="${1}"
+  if [[ -z "${IMAGE_NAME}" ]]; then
+    echo 'IMAGE NAME is required.' 1>&${ERROR_FILE_DESCRIPTOR}
+    exit 1
+  fi
+
+  echo "${IMAGE_NAME%%:*}"
 }
 
 #
 # Get the currently checked-out Git branch.
 #
+# Returns: A short branch name.
+#
 getGitBranch()
 {
-  set -e
-  set -o pipefail
+  local git_repo; git_repo="$(run getGitRepo)"; local -r GIT_REPO="${git_repo}"
 
-  run cd "$(getGitRepo)"
+  run cd "${GIT_REPO}"
   run git symbolic-ref --short HEAD
 }
 
 #
 # Get the root directory of the Git repo this script lives in.
 #
+# Returns: A directory.
+#
 getGitRepo()
 {
-  set -e
-  set -o pipefail
+  local script_dir; script_dir="$(run dirname "${BASH_SOURCE[0]}")"; local -r SCRIPT_DIR="${script_dir}"
 
-  run cd "$(run dirname "${BASH_SOURCE[0]}")"
+  run cd "${SCRIPT_DIR}"
   run git rev-parse --show-toplevel
 }
 
 #
 # Run a command, optionally logging the command itself.
 #
-# ARGV... Just what you'd enter on the command-line.
+# ARGV... Just what you'd enter on the command-line. The first element may be overridden by values in the global
+#           associative array EXECUTABLES.
 #
 run()
 {
-  set -e
-  set -o pipefail
-
   if (( ${#} < 1 )); then
     echo 'A command must be supplied.' 1>&${ERROR_FILE_DESCRIPTOR}
     exit 1
   fi
 
+  # Build the command to be run, applying replacement to the first element.
   local -a command
   for arg in "${@}"; do
-
-    # Allow direction to specific executable.
     if (( ${#command[@]} == 0 )) && [[ -n "${EXECUTABLES[${arg}]}" ]]; then
       command+=("${EXECUTABLES[${arg}]}")
     else
       command+=("${arg}")
     fi
-
   done
 
   # Log run commands.
@@ -156,9 +179,8 @@ run()
     local -a log_output
     for arg in "${command[@]}"; do
       if (( ${#log_output[@]} == 0 )); then
-         log_output+=("$(caller) executing:")
+        log_output+=("$(caller) executing:")
       fi
-    
       log_output+=("$(printf '%q' "${arg}")")
     done
     echo "${log_output[@]}" 1>&${DEBUG_FILE_DESCRIPTOR}
@@ -172,16 +194,10 @@ run()
 #
 runAws()
 {
-  set -e
-  set -o pipefail
-
   local aws_command_base_arguments=(aws)
 
   # You don't want this unless you're running multiple profiles.
-  local AWS_PROFILE_ARGUMENTS=($(run getAwsProfileArguments))
-  if (( ${#AWS_PROFILE_ARGUMENTS} > 0)); then
-    aws_command_base_arguments+=("${AWS_PROFILE_ARGUMENTS[@]}")
-  fi
+  aws_command_base_arguments+=($(run getAwsProfileArguments))
 
   # This is probably required. I don't know, or care at this point.
   if [[ -n "${AWS_REGION}" ]]; then
@@ -206,9 +222,6 @@ runAws()
 #
 buildImage()
 {
-  set -e
-  set -o pipefail
-
   local -r CONTEXT="${1}"
   if [[ -z "${CONTEXT}" ]]; then
     echo 'CONTEXT is required.' 1>&${ERROR_FILE_DESCRIPTOR}
@@ -216,39 +229,50 @@ buildImage()
   fi
   shift
 
-  # HERE
-  local BASE_DOCKERFILE="$(getParentDockerImageSource "${DIRECTORY}")"
-  if [[ -n "${BASE_DOCKERFILE}" ]]; then
-    if [[ -f "${BASE_DOCKERFILE}" ]]; then
-      buildDockerImage "$(dirname "${BASE_DOCKERFILE}")"
-    else
-      echo "Dockerfile ${BASE_DOCKERFILE} not found." 1>&${ERROR_FILE_DESCRIPTOR}
-      exit 2
-    fi
-  fi
+  local contexts_base; contexts_base="$(run getContextsBase)"; local -r CONTEXTS_BASE="${contexts_base}"
 
-  if [[ -x "${DIRECTORY}"/build_pre ]]; then
-    "${DIRECTORY}"/build_pre
-  fi
-
-  local build_command=(docker build)
-  local build_command+=(--build-arg GIT_BRANCH="$(getGitBranch)")
-  local build_command+=(--tag "$(getTaggedDockerImageName "${DIRECTORY}")")
-  local build_command+=(--label REPO_SOURCE="$(getGitRepoPath "${DIRECTORY}")")
+  # Build parent if it's ours.
+  local base_image_name; base_image_name="$(run getBaseImage "${CONTEXT}")"; local -r BASE_IMAGE_NAME="${base_image_name}"
+  local base_docker_repository; base_docker_repository="$(run getDockerRepository "${BASE_IMAGE_NAME}")"; local -r BASE_DOCKER_REPOSITORY="${base_docker_repository}"
+  local -r BASE_CONTEXT="${CONTEXTS_BASE}/${BASE_DOCKER_REPOSITORY}"
+  local -r BASE_DOCKERFILE="${BASE_CONTEXT}"/Dockerfile
   if [[ -f "${BASE_DOCKERFILE}" ]]; then
-    build_command+=(--label BASE_DOCKERFILE="$(getGitRepoPath "${BASE_DOCKERFILE}")")
+    run buildImage "${BASE_CONTEXT}"
   fi
-  while [[ "${1}" == '--dockerArg' ]]; do
-    shift
-    build_command+=("${1}")
-    shift
-  done
-  build_command+=("${DIRECTORY}")
-  
-  if [[ ${DEBUG} ]]; then
-    echo "build_command: ${build_command[@]}"
-  fi
-  "${build_command[@]}"
+
+  # HERE
+  #local BASE_DOCKERFILE="$(getParentDockerImageSource "${DIRECTORY}")"
+  #if [[ -n "${BASE_DOCKERFILE}" ]]; then
+  #  if [[ -f "${BASE_DOCKERFILE}" ]]; then
+  #    buildDockerImage "$(dirname "${BASE_DOCKERFILE}")"
+  #  else
+  #    echo "Dockerfile ${BASE_DOCKERFILE} not found." 1>&${ERROR_FILE_DESCRIPTOR}
+  #    exit 2
+  #  fi
+  #fi
+
+  #if [[ -x "${DIRECTORY}"/build_pre ]]; then
+  #  "${DIRECTORY}"/build_pre
+  #fi
+
+  #local build_command=(docker build)
+  #local build_command+=(--build-arg GIT_BRANCH="$(getGitBranch)")
+  #local build_command+=(--tag "$(getTaggedDockerImageName "${DIRECTORY}")")
+  #local build_command+=(--label REPO_SOURCE="$(getGitRepoPath "${DIRECTORY}")")
+  #if [[ -f "${BASE_DOCKERFILE}" ]]; then
+  #  build_command+=(--label BASE_DOCKERFILE="$(getGitRepoPath "${BASE_DOCKERFILE}")")
+  #fi
+  #while [[ "${1}" == '--dockerArg' ]]; do
+  #  shift
+  #  build_command+=("${1}")
+  #  shift
+  #done
+  #build_command+=("${DIRECTORY}")
+  #
+  #if [[ ${DEBUG} ]]; then
+  #  echo "build_command: ${build_command[@]}"
+  #fi
+  #"${build_command[@]}"
 }
 
 

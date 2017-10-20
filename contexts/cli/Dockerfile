@@ -6,7 +6,7 @@ RUN apk add --no-cache jq \
                        tmux \
                        vim
 
-VOLUME /mnt/repo
+VOLUME /mnt/root
 
 # Run in the background by default.
 CMD ["-c", "trap 'exit 0' SIGTERM SIGINT; sleep infinity & wait"]

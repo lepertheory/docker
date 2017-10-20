@@ -1,4 +1,4 @@
-#!/usr/local/bin/bash
+#!/usr/bin/env bash
 
 #
 # Vocabulary:
@@ -14,7 +14,9 @@
 
 set -e
 set -o pipefail
-shopt -s inherit_errexit
+if (( ${BASH_VERSINFO[0]} > 4 || (${BASH_VERSINFO[0]} == 4 && ${BASH_VERSINFO[1]} >= 4) )); then
+	shopt -s inherit_errexit
+fi
 
 # Include guard.
 if [[ -n "${COMMON_29348759287345978}" ]]; then

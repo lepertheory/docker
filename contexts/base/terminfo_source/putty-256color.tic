@@ -1,4 +1,4 @@
-#	Reconstructed via infocmp from file: /Users/david.corby/.terminfo/70/putty-256color
+#	Reconstructed via infocmp from file: /usr/share/terminfo/p/putty-256color
 putty-256color|PuTTY 0.58 with xterm 256-colors,
 	am, bce, bw, ccc, hs, mir, msgr, xenl, xon,
 	colors#256, it#8, ncv#22, pairs#32767,

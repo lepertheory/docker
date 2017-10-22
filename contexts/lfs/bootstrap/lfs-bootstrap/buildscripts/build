@@ -9,11 +9,9 @@ SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SCRIPT_NAME
 readonly SCRIPT_PATH
 
-readonly LFS="${1}"
-readonly LFS_TGT="${2}"
-readonly PACKAGE="${3}"
-readonly ARCHIVE="${4}"
-readonly ARCHIVE_ROOT="${5:-${PACKAGE}}"
+readonly PACKAGE="${1}"
+readonly ARCHIVE="${2}"
+readonly ARCHIVE_ROOT="${3:-${PACKAGE}}"
 
 cd "${LFS}"/sources
 
@@ -22,4 +20,4 @@ tar -xf "${ARCHIVE}"
 
 cd "${ARCHIVE_ROOT}"
 echo "Building ${PACKAGE}"
-"${SCRIPT_PATH}/${PACKAGE}" "${LFS}" "${LFS_TGT}"
+"${SCRIPT_PATH}/${PACKAGE}"

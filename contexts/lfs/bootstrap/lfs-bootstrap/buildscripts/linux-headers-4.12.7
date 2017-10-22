@@ -4,9 +4,6 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-readonly LFS="${1}"
-readonly LFS_TGT="${2}"
-
 make mrproper
 
 make INSTALL_HDR_PATH=dest headers_install

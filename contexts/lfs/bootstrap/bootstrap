@@ -5,21 +5,9 @@ set -o pipefail
 
 declare -r SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 declare -r REPO_DIR="$(cd "$(cd "${SCRIPT_DIR}" && git rev-parse --show-toplevel)" && pwd)"
-declare -r BUILD_TMP_DIR="${REPO_DIR}"/build-tmp
-declare -r BOOTSTRAP_TMP_DIR="${BUILD_TMP_DIR}"/lfs/bootstrap
-
-cleanup()
-{
-	if [[ -n "${apt_offline_temp_dir}" ]]; then
-		rm -rf "${apt_offline_temp_dir}"
-	fi
-}
-trap cleanup EXIT
-
-mkdir -p "${BOOTSTRAP_TMP_DIR}"
 
 cd "${SCRIPT_DIR}"
 
-docker build --tag=lfs/bootstrap/ubuntu:master        ubuntu
-docker build --tag=lfs/bootstrap/apt-offline:master   apt-offline
-#docker build --tag=lfs/bootstrap/host-toolkit:master --build-arg=UPDATE_PACKAGES="${1:-false}" host-toolkit
+docker build --tag=lfs/bootstrap/ubuntu:master         ubuntu
+docker build --tag=lfs/bootstrap/apt-offline:master    apt-offline
+docker build --tag=lfs/bootstrap/host-toolchain:master host-toolchain

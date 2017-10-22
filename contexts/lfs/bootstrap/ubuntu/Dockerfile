@@ -46,3 +46,5 @@ RUN set -xe \
 # overwrite this with 'CMD []' in a dependent Dockerfile
 SHELL ["/bin/bash", "-c"]
 CMD ["/bin/bash"]
+ONBUILD SHELL ["/bin/bash", "-c"]
+ONBUILD CMD ["/bin/bash"]

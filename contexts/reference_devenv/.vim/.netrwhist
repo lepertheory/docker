@@ -1,0 +1,9 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =7
+let g:netrw_dirhist_1='/home/ubuntu/docker/contexts/lfs/bootstrap/host-toolchain'
+let g:netrw_dirhist_2='/home/ubuntu/docker/contexts/lfs/bootstrap'
+let g:netrw_dirhist_3='/home/ubuntu/docker/contexts/lfs/bootstrap/lfs-bootstrap/buildscripts'
+let g:netrw_dirhist_4='/home/ubuntu/docker/contexts/lfs/bootstrap/host-toolchain'
+let g:netrw_dirhist_5='/home/ubuntu/docker/contexts/lfs/bootstrap/ubuntu'
+let g:netrw_dirhist_6='/home/ubuntu/docker/contexts/lfs/bootstrap/host-toolchain/apt-offline'
+let g:netrw_dirhist_7='/home/ubuntu/docker/contexts/lfs/bootstrap/apt-offline'

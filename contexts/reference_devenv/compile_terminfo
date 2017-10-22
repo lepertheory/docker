@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+
+echo "1: ${1}"
+for terminfo_source in "${1}"/*.tic; do
+  tic "${terminfo_source}"
+done

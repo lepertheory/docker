@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+
+BASE_PACKAGES=($(<packages.apk))
+#apk add --no-cache --virtual base "${BASE_PACKAGES[@]}"
+apk add --no-cache "${BASE_PACKAGES[@]}"
+
+if (${INSTALL_DOCS}); then
+  DOC_PACKAGES=($(<packages-docs.apk) \
+                $(sed -En 's/^([^=]+)=(.*)$/\1-doc=\2/p' <(cat packages.apk packages-bootstrap.apk)))
+  #apk add --no-cache --virtual docs "${DOC_PACKAGES[@]}"
+  apk add --no-cache "${DOC_PACKAGES[@]}"
+fi

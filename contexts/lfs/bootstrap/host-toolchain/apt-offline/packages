@@ -1,8 +1,8 @@
 binutils
 bison
 bzip2
+g++
 gawk
-gcc
 m4
 make
 patch

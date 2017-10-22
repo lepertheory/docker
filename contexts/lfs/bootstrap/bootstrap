@@ -1,13 +1,50 @@
 #!/usr/bin/env bash
 
-set -e
-set -o pipefail
+#
+# FROM: src/thirdparty/LFS-BOOK-8.1-systemd-NOCHUNKS.html
+#
+# REF: LFS
+#
+# FROM: :LFS
+# Find 'REF: LFS' to see what led here. In this case, it's right above, but you should always be
+# able to use this command to find the source of a reference:
+#
+#   grep --recursive --extended-regexp --binary-files=without-match '^# REF: LFS$'
+#
+# Or shorter:
+#
+#   grep -rEI '^# REF: LFS$'
+#
+# REF: Chapter 1
+# Done manually.
+#
 
-declare -r SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-declare -r REPO_DIR="$(cd "$(cd "${SCRIPT_DIR}" && git rev-parse --show-toplevel)" && pwd)"
+set -o errexit
+set -o pipefail
+set -o nounset
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)";                       readonly SCRIPT_DIR
+REPO_DIR="$(cd "$(cd "${SCRIPT_DIR}" && git rev-parse --show-toplevel)" && pwd)"; readonly REPO_DIR
+CONTEXT_DIR="${REPO_DIR}"/contexts;                                               readonly CONTEXT_DIR
+TAG_BASE="${1}";                                                                  readonly TAG_BASE
+GIT_BRANCH="$(git symbolic-ref HEAD)"; GIT_BRANCH="${GIT_BRANCH##refs/heads/}";   readonly GIT_BRANCH
+
+bootstrap_context ()
+{
+	local -r CONTEXT="${1}"
+	local -r TAG="${2}"
+
+	echo "Building ${CONTEXT}"
+
+	local -r BOOTSTRAP_SCRIPT="${CONTEXT}"/bootstrap
+	if [[ -e "${BOOTSTRAP_SCRIPT}" ]]; then
+		"${BOOTSTRAP_SCRIPT}" "${TAG}"
+	else
+		docker build --tag="${TAG}" "${context}"
+	fi
+}
 
 cd "${SCRIPT_DIR}"
-
-docker build --tag=lfs/bootstrap/ubuntu:master         ubuntu
-docker build --tag=lfs/bootstrap/apt-offline:master    apt-offline
-docker build --tag=lfs/bootstrap/host-toolchain:master host-toolchain
+for context in ubuntu apt-offline host-toolchain lfs-bootstrap; do
+	bootstrap_context "${context}" "${TAG_BASE}/${context}:${GIT_BRANCH}"
+done

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+SCRIPT_NAME="$(basename      "${BASH_SOURCE[0]}")"
+SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_NAME
+readonly SCRIPT_PATH
+
+readonly LFS="${1}"
+readonly LFS_TGT="${2}"
+readonly PACKAGE="${3}"
+readonly ARCHIVE="${4}"
+readonly ARCHIVE_ROOT="${5:-${PACKAGE}}"
+
+cd "${LFS}"/sources
+
+echo "Unpacking ${ARCHIVE}"
+tar -xf "${ARCHIVE}" 
+
+cd "${ARCHIVE_ROOT}"
+echo "Building ${PACKAGE}"
+"${SCRIPT_PATH}/${PACKAGE}" "${LFS}" "${LFS_TGT}"

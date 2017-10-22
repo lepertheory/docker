@@ -1,102 +1,89 @@
 FROM lfs/bootstrap/host-toolchain:master
 
 #
-# 2.6
+# REF: Chapter 2.3
+# REF: Chapter 2.4
+# REF: Chapter 2.5
+#
+# These are unnecessary when building on Docker.
+#
+
+#
+# REF: Chapter 2.6
 #
 ARG LFS=/mnt/lfs
 
 #
-# 2.7 - Not needed.
+# REF: Chapter 2.7 
+#
+# Not needed when building on Docker.
 #
 
 #
-# 3.1
+# REF: Chapter 3.1
 #
 COPY sources/* "${LFS}"/sources/
 RUN chmod -v a+wt "${LFS}"/sources
 
 #
-# 3.2 - Follow book, leave in the ${SCRIPT_PATH}/../sources.
+# REF: Chapter 3.2
+# REF: Chapter 3.3
+#
+# Only necessary when upgrading the book, or there are patches. If you update, leave the files in
+# the ${SCRIPT_PATH}/../sources directory.
 #
 
 #
-# 3.3 - Follow book
+# REF: Chapter 4.1
+#
+# Just an intro.
 #
 
+#
+# REF: Chapter 4.2
+#
 RUN mkdir -v "${LFS}"/tools
 RUN ln -sv "${LFS}"/tools /
 
+#
+# REF: Chapter 4.3
+#
 RUN groupadd lfs \
  && useradd --shell=/bin/bash --gid=lfs --create-home --skel=/dev/null lfs
-
 RUN chown -v lfs:lfs "${LFS}"/{tools,sources}
-
 USER lfs:lfs
-COPY lfs_home/* /home/lfs/
+WORKDIR /home/lfs
 
-WORKDIR "${LFS}"/sources
+#
+# REF: Chapter 4.4
+#
+COPY lfs_home/* ./
 
-RUN tar -xf binutils-2.29.tar.bz2
-RUN cd binutils-2.29                        \
- && mkdir -v build                          \
- && cd build                                \
- && ../configure --prefix=/tools            \
-                 --with-sysroot="${LFS}"    \
-                 --with-lib-path=/tools/lib \
-                 --target="${LFS_TGT}"      \
-                 --disable-nls              \
-                 --disable-werror
-RUN cd binutils-2.29/build && make
-RUN if [[ "$(uname -m)" == 'x86_64' ]]; then \
-      mkdir -v /tools/lib                    \
- &&   ln -sv lib /tools/lib64                \
-  ; fi
-RUN cd binutils-2.29/build && make install
+#
+# REF: Chapter 4.5
+# REF: Chapter 4.6
+# REF: Chapter 5.1
+# REF: Chapter 5.2
+# REF: Chapter 5.3
+#
+# Informational only.
+#
+COPY buildscripts/build ./buildscripts/
 
-RUN tar -xf gcc-7.2.0.tar.xz
-RUN cd gcc-7.2.0                                          \
- && tar -xf ../mpfr-3.1.5.tar.xz && mv -v mpfr-3.1.5 mpfr \
- && tar -xf ../gmp-6.1.2.tar.xz  && mv -v gmp-6.1.2  gmp  \
- && tar -xf ../mpc-1.0.3.tar.gz  && mv -v mpc-1.0.3  mpc
-RUN cd gcc-7.2.0 \
- && for file in gcc/config/{linux,i386/linux{,64}}.h; do                    \
-      cp -uv "${file}"{,.orig}                                              \
- &&   sed -e 's@/lib\(64\)\?\(32\)\?/ld@/tools&@g'                          \
-          -e 's@/usr@/tools@g' "${file}".orig                  >  "${file}" \
- &&   echo                                                     >> "${file}" \
- &&   echo '#undef STANDARD_STARTFILE_PREFIX_1'                >> "${file}" \
- &&   echo '#undef STANDARD_STARTFILE_PREFIX_2'                >> "${file}" \
- &&   echo '#define STANDARD_STARTFILE_PREFIX_1 "/tools/lib/"' >> "${file}" \
- &&   echo '#define STANDARD_STARTFILE_PREFIX_2 ""'            >> "${file}" \
- &&   touch "${file}".orig                                                  \
-  ; done
-RUN cd gcc-7.2.0                                                    \
- && if [[ "$(uname -m)" == 'x86_x64' ]]; then                       \
-      sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64 \
-  ; fi
-RUN cd gcc-7.2.0                                                \
- && mkdir -v build                                              \
- && cd build                                                    \
- && ../configure --target="${LFS_TGT}"                          \
-                 --prefix=/tools                                \
-                 --with-glibc-version=2.11                      \
-                 --with-sysroot="${LFS}"                        \
-                 --with-newlib                                  \
-                 --without-headers                              \
-                 --with-local-prefix=/tools                     \
-                 --with-native-system-header-dir=/tools/include \
-                 --disable-nls                                  \
-                 --disable-shared                               \
-                 --disable-multilib                             \
-                 --disable-decimal-float                        \
-                 --disable-threads                              \
-                 --disable-libatomic                            \
-                 --disable-libgomp                              \
-                 --disable-libmpx                               \
-                 --disable-libquadmath                          \
-                 --disable-libssp                               \
-                 --disable-libvtv                               \
-                 --disable-libstdcxx                            \
-                 --enable-languages=c,c++
-RUN cd gcc-7.2.0/build && make
-RUN cd gcc-7.2.0/build && make install
+#
+# REF: Chapter 5.4
+#
+COPY buildscripts/binutils-2.29 ./buildscripts/
+RUN buildscripts/build "${LFS}" "${LFS_TGT}" binutils-2.29 binutils-2.29.tar.bz2
+
+#
+# REF: Chapter 5.5
+#
+COPY buildscripts/gcc-7.2.0 ./buildscripts/
+RUN buildscripts/build "${LFS}" "${LFS_TGT}" gcc-7.2.0 gcc-7.2.0.tar.xz
+
+#
+# REF: Chapter 5.6
+#
+COPY buildscripts/linux-headers-4.12.7 ./buildscripts/
+RUN buildscripts/build "${LFS}" "${LFS_TGT}" linux-headers-4.12.7 linux-4.12.7.tar.xz linux-4.12.7

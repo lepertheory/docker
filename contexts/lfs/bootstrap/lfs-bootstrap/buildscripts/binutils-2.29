@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+readonly LFS="${1}"
+readonly LFS_TGT="${2}"
+
+mkdir -v build
+cd build
+
+../configure --prefix=/tools            \
+             --with-sysroot="${LFS}"    \
+             --with-lib-path=/tools/lib \
+             --target="${LFS_TGT}"      \
+             --disable-nls              \
+             --disable-werror
+
+make
+
+if [[ "$(uname --machine)" == 'x86_64' ]]; then
+	mkdir -v /tools/lib
+  ln -sv lib /tools/lib64
+fi
+
+make install

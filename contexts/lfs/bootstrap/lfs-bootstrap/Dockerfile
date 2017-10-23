@@ -167,4 +167,4 @@ RUN . .bashrc && buildscripts/build dejagnu-1.6 dejagnu-1.6.tar.gz
 #
 COPY sources/check-0.11.0.tar.gz "${LFS}"/sources/
 COPY buildscripts/check-0.11.0 ./buildscripts/
-RUN . .bashrc && buildscripts/build check-0.11.0
+RUN . .bashrc && buildscripts/build check-0.11.0 check-0.11.0.tar.gz

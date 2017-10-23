@@ -129,3 +129,10 @@ RUN . .bashrc && buildscripts/build libstdc++-7.2.0 gcc-7.2.0.tar.xz
 #
 COPY buildscripts/binutils-2.29-pass2 ./buildscripts/
 RUN . .bashrc && buildscripts/build binutils-2.29-pass2 binutils-2.29.tar.bz2
+
+#
+# FROM: :LFS
+# REF: Chapter5.10
+#
+COPY buildscripts/gcc-7.2.0-pass2 ./buildscripts/
+RUN . .bashrc && buildscripts/build gcc-7.2.0-pass2 gcc-7.2.0.tar.xz

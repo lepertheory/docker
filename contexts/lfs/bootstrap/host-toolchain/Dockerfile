@@ -11,6 +11,9 @@ RUN PACKAGES=($(<"${APT_OFFLINE}"/packages)) \
            /var/cache/apt/archives/*         \
            /var/lib/apt/lists/*
 
+RUN rm /bin/sh \
+ && ln -s /bin/bash /bin/sh
+
 FROM scratch
 COPY --from=staging / /
 SHELL ["/bin/bash", "-c"]

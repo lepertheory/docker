@@ -336,3 +336,18 @@ RUN . .bashrc && buildscripts/build util-linux-2.30.1 util-linux-2.30.1.tar.xz
 COPY sources/xz-5.2.3.tar.xz "${LFS}"/sources/
 COPY buildscripts/xz-5.2.3 ./buildscripts/
 RUN . .bashrc && buildscripts/build xz-5.2.3 xz-5.2.3.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter5.36
+#
+RUN strip --strip-debug /tools/lib/*                 \
+  ; /usr/bin/strip --strip-unneeded /tools/{,s}bin/* \
+  ; rm -rf /tools/{,share}/{info,man,doc}
+
+#
+# FROM: :LFS
+# REF: Chapter5.37
+#
+USER root
+RUN chown -R root:root "${LFS}"/tools

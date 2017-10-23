@@ -13,6 +13,7 @@ RUN PACKAGES=($(<"${APT_OFFLINE}"/packages)) \
 
 RUN rm /bin/sh \
  && ln -s /bin/bash /bin/sh
+ && update-alternatives --set awk /usr/bin/gawk
 
 FROM scratch
 COPY --from=staging / /

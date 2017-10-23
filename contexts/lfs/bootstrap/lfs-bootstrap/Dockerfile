@@ -144,3 +144,11 @@ RUN . .bashrc && buildscripts/build gcc-7.2.0-pass2 gcc-7.2.0.tar.xz
 COPY sources/tcl-core8.6.7-src.tar.gz "${LFS}"/sources
 COPY buildscripts/tcl-core-8.6.7 ./buildscripts/
 RUN . .bashrc && buildscripts/build tcl-core-8.6.7 tcl-core8.6.7-src.tar.gz
+
+#
+# FROM: :LFS
+# REF: Chapter5.12
+#
+COPY sources/expect5.45.tar.gz "${LFS}"/sources
+COPY buildscripts/expect-5.45 ./buildscripts/
+RUN . .bashrc && buildscripts/build expect-5.45 expect5.45.tar.gz

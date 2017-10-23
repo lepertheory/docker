@@ -224,3 +224,11 @@ RUN . .bashrc && buildscripts/build diffutils-3.6 diffutils-3.6.tar.xz
 COPY sources/file-5.31.tar.gz "${LFS}"/sources/
 COPY buildscripts/file-5.31 ./buildscripts/
 RUN . .bashrc && buildscripts/build file-5.31 file-5.31.tar.gz
+
+#
+# FROM: :LFS
+# REF: Chapter5.22
+#
+COPY sources/findutils-4.6.0.tar.gz "${LFS}"/sources/
+COPY buildscripts/findutils-4.6.0 ./buildscripts/
+RUN . .bashrc && buildscripts/build findutils-4.6.0 findutils-4.6.0.tar.gz

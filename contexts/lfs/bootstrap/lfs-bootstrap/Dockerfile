@@ -200,3 +200,11 @@ RUN . .bashrc && buildscripts/build bison-3.0.4 bison-3.0.4.tar.xz
 COPY sources/bzip2-1.0.6.tar.gz "${LFS}"/sources/
 COPY buildscripts/bzip2-1.0.6 ./buildscripts/
 RUN . .bashrc && buildscripts/build bzip2-1.0.6 bzip2-1.0.6.tar.gz
+
+#
+# FROM: :LFS
+# REF: Chapter5.19
+#
+COPY sources/coreutils-8.27.tar.xz "${LFS}"/sources/
+COPY buildscripts/coreutils-8.27 ./buildscripts/
+RUN . .bashrc && buildscripts/build coreutils-8.27 coreutils-8.27.tar.xz

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+./configure --prefix=/tools --without-bash-malloc
+make
+make tests
+make install
+
+ln -sv bash /tools/bin/sh

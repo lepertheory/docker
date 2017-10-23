@@ -176,3 +176,19 @@ RUN . .bashrc && buildscripts/build check-0.11.0 check-0.11.0.tar.gz
 COPY sources/ncurses-6.0.tar.gz "${LFS}"/sources/
 COPY buildscripts/ncurses-6.0 ./buildscripts/
 RUN . .bashrc && buildscripts/build ncurses-6.0 ncurses-6.0.tar.gz
+
+#
+# FROM: :LFS
+# REF: Chapter5.16
+#
+COPY sources/bash-4.4.tar.gz "${LFS}"/sources/
+COPY buildscripts/bash-4.4 ./buildscripts/
+RUN . .bashrc && buildscripts/build bash-4.4 bash-4.4.tar.gz
+
+#
+# FROM: :LFS
+# REF: Chapter5.17
+#
+COPY sources/bison-3.0.4.tar.xz "${LFS}"/sources/
+COPY buildscripts/bison-3.0.4 ./buildscripts/
+RUN . .bashrc && buildscripts/build bison-3.0.4 bison-3.0.4.tar.xz

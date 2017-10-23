@@ -86,18 +86,18 @@ COPY buildscripts/build ./buildscripts/
 # REF: Chapter5.4
 #
 COPY buildscripts/binutils-2.29 ./buildscripts/
-RUN buildscripts/build binutils-2.29 binutils-2.29.tar.bz2
+RUN . .bashrc && buildscripts/build binutils-2.29 binutils-2.29.tar.bz2
 
 #
 # FROM: :LFS
 # REF: Chapter5.5
 #
 COPY buildscripts/gcc-7.2.0 ./buildscripts/
-RUN buildscripts/build gcc-7.2.0 gcc-7.2.0.tar.xz
+RUN . .bashrc && buildscripts/build gcc-7.2.0 gcc-7.2.0.tar.xz
 
 #
 # FROM: :LFS
 # REF: Chapter5.6
 #
 COPY buildscripts/linux-headers-4.12.7 ./buildscripts/
-RUN buildscripts/build linux-headers-4.12.7 linux-4.12.7.tar.xz linux-4.12.7
+RUN . .bashrc && buildscripts/build linux-headers-4.12.7 linux-4.12.7.tar.xz linux-4.12.7

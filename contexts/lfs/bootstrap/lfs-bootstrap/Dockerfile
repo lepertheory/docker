@@ -27,7 +27,8 @@ ENV LFS="${LFS}"
 # FROM: :LFS
 # REF: Chapter3.1
 #
-RUN mkdir -v      "${LFS}"/sources \
+RUN mkdir -v      "${LFS}"         \
+ && mkdir -v      "${LFS}"/sources \
  && chmod -v a+wt "${LFS}"/sources
 
 #
@@ -93,7 +94,10 @@ RUN . .bashrc && buildscripts/build binutils-2.29 binutils-2.29.tar.bz2
 # FROM: :LFS
 # REF: Chapter5.5
 #
-COPY sources/gcc-7.2.0.tar.xz "${LFS}"/sources/
+COPY sources/gcc-7.2.0.tar.xz  \
+     sources/mpfr-3.1.5.tar.xz \
+     sources/gmp-6.1.2.tar.xz  \
+     sources/mpc-1.0.3.tar.gz  "${LFS}"/sources/
 COPY buildscripts/gcc-7.2.0 ./buildscripts/
 RUN . .bashrc && buildscripts/build gcc-7.2.0 gcc-7.2.0.tar.xz
 
@@ -109,6 +113,6 @@ RUN . .bashrc && buildscripts/build linux-headers-4.12.7 linux-4.12.7.tar.xz lin
 # FROM: :LFS
 # REF: Chapter5.7
 #
-COPY sources/glibc-2.26.tar.xz
+COPY sources/glibc-2.26.tar.xz "${LFS}"/sources/
 COPY buildscripts/glibc-2.26 ./buildscripts/
 RUN . .bashrc && buildscripts/build glibc-2.26 glibc-2.26.tar.xz

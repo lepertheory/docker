@@ -208,3 +208,11 @@ RUN . .bashrc && buildscripts/build bzip2-1.0.6 bzip2-1.0.6.tar.gz
 COPY sources/coreutils-8.27.tar.xz "${LFS}"/sources/
 COPY buildscripts/coreutils-8.27 ./buildscripts/
 RUN . .bashrc && buildscripts/build coreutils-8.27 coreutils-8.27.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter5.20
+#
+COPY sources/diffutils-3.6.tar.xz "${LFS}"/sources/
+COPY buildscripts/diffutils-3.6 ./buildscripts/
+RUN . .bashrc && buildscripts/build diffutils-3.6 diffutils-3.6.tar.xz

@@ -296,3 +296,11 @@ RUN . .bashrc && buildscripts/build patch-2.7.5 patch-2.7.5.tar.xz
 COPY sources/perl-5.26.0.tar.xz "${LFS}"/sources/
 COPY buildscripts/perl-5.26.0 ./buildscripts/
 RUN . .bashrc && buildscripts/build perl-5.26.0 perl-5.26.0.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter5.31
+#
+COPY sources/sed-4.4.tar.xz "${LFS}"/sources/
+COPY buildscripts/sed-4.4 ./buildscripts/
+RUN . .bashrc && buildscripts/build sed-4.4 sed-4.4.tar.xz

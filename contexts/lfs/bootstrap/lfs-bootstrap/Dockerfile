@@ -248,3 +248,11 @@ RUN . .bashrc && buildscripts/build gawk-4.1.4 gawk-4.1.4.tar.xz
 COPY sources/gettext-0.19.8.1.tar.xz "${LFS}"/sources/
 COPY buildscripts/gettext-0.19.8.1 ./buildscripts/
 RUN . .bashrc && buildscripts/build gettext-0.19.8.1 gettext-0.19.8.1.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter5.25
+#
+COPY sources/grep-3.1.tar.xz "${LFS}"/sources/
+COPY buildscripts/grep-3.1 ./buildscripts/
+RUN . .bashrc && buildscripts/build grep-3.1 grep-3.1.tar.xz

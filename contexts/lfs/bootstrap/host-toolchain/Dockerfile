@@ -12,7 +12,7 @@ RUN PACKAGES=($(<"${APT_OFFLINE}"/packages)) \
            /var/lib/apt/lists/*
 
 RUN rm /bin/sh \
- && ln -s /bin/bash /bin/sh
+ && ln -s /bin/bash /bin/sh \
  && update-alternatives --set awk /usr/bin/gawk
 
 FROM scratch

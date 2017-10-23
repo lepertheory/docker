@@ -27,8 +27,8 @@ ENV LFS="${LFS}"
 # FROM: :LFS
 # REF: Chapter3.1
 #
-COPY sources/* "${LFS}"/sources/
-RUN chmod -v a+wt "${LFS}"/sources
+RUN mkdir -v      "${LFS}"/sources \
+ && chmod -v a+wt "${LFS}"/sources
 
 #
 # FROM: :LFS
@@ -85,6 +85,7 @@ COPY buildscripts/build ./buildscripts/
 # FROM: :LFS
 # REF: Chapter5.4
 #
+COPY sources/binutils-2.29.tar.bz2 "${LFS}"/sources/
 COPY buildscripts/binutils-2.29 ./buildscripts/
 RUN . .bashrc && buildscripts/build binutils-2.29 binutils-2.29.tar.bz2
 
@@ -92,6 +93,7 @@ RUN . .bashrc && buildscripts/build binutils-2.29 binutils-2.29.tar.bz2
 # FROM: :LFS
 # REF: Chapter5.5
 #
+COPY sources/gcc-7.2.0.tar.xz "${LFS}"/sources/
 COPY buildscripts/gcc-7.2.0 ./buildscripts/
 RUN . .bashrc && buildscripts/build gcc-7.2.0 gcc-7.2.0.tar.xz
 
@@ -99,5 +101,14 @@ RUN . .bashrc && buildscripts/build gcc-7.2.0 gcc-7.2.0.tar.xz
 # FROM: :LFS
 # REF: Chapter5.6
 #
+COPY sources/linux-4.2.7.tar.xz "${LFS}"/sources/
 COPY buildscripts/linux-headers-4.12.7 ./buildscripts/
 RUN . .bashrc && buildscripts/build linux-headers-4.12.7 linux-4.12.7.tar.xz linux-4.12.7
+
+#
+# FROM: :LFS
+# REF: Chapter5.7
+#
+COPY sources/glibc-2.26.tar.xz
+COPY buildscripts/glibc-2.26 ./buildscripts/
+RUN . .bashrc && buildscripts/build glibc-2.26 glibc-2.26.tar.xz

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+cd gettext-tools
+
+EMACS=no \
+./configure --prefix=/tools --disable-shared
+make --directory=gnulib-lib
+make --directory=intl pluralx.c
+make --directory=src  msgfmt
+make --directory=src  msgmerge
+make --directory=src  xgettext
+
+cp -v src/{msgfmt,msgmerge,xgettext} /tools/bin

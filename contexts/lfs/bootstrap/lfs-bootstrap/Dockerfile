@@ -232,3 +232,19 @@ RUN . .bashrc && buildscripts/build file-5.31 file-5.31.tar.gz
 COPY sources/findutils-4.6.0.tar.gz "${LFS}"/sources/
 COPY buildscripts/findutils-4.6.0 ./buildscripts/
 RUN . .bashrc && buildscripts/build findutils-4.6.0 findutils-4.6.0.tar.gz
+
+#
+# FROM: :LFS
+# REF: Chapter5.23
+#
+COPY sources/gawk-4.1.4.tar.xz "${LFS}"/sources/
+COPY buildscripts/gawk-4.1.4 ./buildscripts/
+RUN . .bashrc && buildscripts/build gawk-4.1.4 gawk-4.1.4.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter5.24
+#
+COPY sources/gettext-0.19.8.1.tar.xz "${LFS}"/sources/
+COPY buildscripts/gettext-0.19.8.1 ./buildscripts/
+RUN . .bashrc && buildscripts/build gettext-0.19.8.1 gettext-0.19.8.1.tar.xz

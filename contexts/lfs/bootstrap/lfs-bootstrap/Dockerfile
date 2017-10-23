@@ -288,3 +288,11 @@ RUN . .bashrc && buildscripts/build make-4.2.1 make-4.2.1.tar.bz2
 COPY sources/patch-2.7.5.tar.xz "${LFS}"/sources/
 COPY buildscripts/patch-2.7.5 ./buildscripts/
 RUN . .bashrc && buildscripts/build patch-2.7.5 patch-2.7.5.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter5.30
+#
+COPY sources/perl-5.26.0.tar.xz "${LFS}"/sources/
+COPY buildscripts/perl-5.26.0 ./buildscripts/
+RUN . .bashrc && buildscripts/build perl-5.26.0 perl-5.26.0.tar.xz

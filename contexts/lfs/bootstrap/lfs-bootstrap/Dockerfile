@@ -141,7 +141,7 @@ RUN . .bashrc && buildscripts/build gcc-7.2.0-pass2 gcc-7.2.0.tar.xz
 # FROM: :LFS
 # REF: Chapter5.11
 #
-COPY sources/tcl-core8.6.7-src.tar.gz "${LFS}"/sources
+COPY sources/tcl-core8.6.7-src.tar.gz "${LFS}"/sources/
 COPY buildscripts/tcl-core-8.6.7 ./buildscripts/
 RUN . .bashrc && buildscripts/build tcl-core-8.6.7 tcl-core8.6.7-src.tar.gz
 
@@ -149,6 +149,22 @@ RUN . .bashrc && buildscripts/build tcl-core-8.6.7 tcl-core8.6.7-src.tar.gz
 # FROM: :LFS
 # REF: Chapter5.12
 #
-COPY sources/expect5.45.tar.gz "${LFS}"/sources
+COPY sources/expect5.45.tar.gz "${LFS}"/sources/
 COPY buildscripts/expect-5.45 ./buildscripts/
 RUN . .bashrc && buildscripts/build expect-5.45 expect5.45.tar.gz
+
+#
+# FROM: :LFS
+# REF: Chapter5.13
+#
+COPY sources/dejagnu-1.6.tar.gz "${LFS}"/sources/
+COPY buildscripts/dejagnu-1.6 ./buildscripts/
+RUN . .bashrc && buildscripts/build dejagnu-1.6 dejagnu-1.6.tar.gz
+
+#
+# FROM: :LFS
+# REF: Chapter5.14
+#
+COPY sources/check-0.11.0.tar.gz "${LFS}"/sources/
+COPY buildscripts/check-0.11.0 ./buildscripts/
+RUN . .bashrc && buildscripts/build check-0.11.0

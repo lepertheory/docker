@@ -256,3 +256,11 @@ RUN . .bashrc && buildscripts/build gettext-0.19.8.1 gettext-0.19.8.1.tar.xz
 COPY sources/grep-3.1.tar.xz "${LFS}"/sources/
 COPY buildscripts/grep-3.1 ./buildscripts/
 RUN . .bashrc && buildscripts/build grep-3.1 grep-3.1.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter5.26
+#
+COPY sources/gzip-1.8.tar.xz "${LFS}"/sources/
+COPY buildscripts/gzip-1.8 ./buildscripts/
+RUn . .bashrc && buildscripts/build gzip-1.8 gzip-1.8.tar.xz

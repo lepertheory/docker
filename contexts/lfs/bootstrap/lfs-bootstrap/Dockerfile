@@ -105,7 +105,7 @@ RUN . .bashrc && buildscripts/build gcc-7.2.0 gcc-7.2.0.tar.xz
 # FROM: :LFS
 # REF: Chapter5.6
 #
-COPY sources/linux-4.2.7.tar.xz "${LFS}"/sources/
+COPY sources/linux-4.12.7.tar.xz "${LFS}"/sources/
 COPY buildscripts/linux-headers-4.12.7 ./buildscripts/
 RUN . .bashrc && buildscripts/build linux-headers-4.12.7 linux-4.12.7.tar.xz linux-4.12.7
 

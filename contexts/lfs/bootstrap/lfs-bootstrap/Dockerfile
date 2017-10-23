@@ -122,3 +122,10 @@ RUN . .bashrc && buildscripts/build glibc-2.26 glibc-2.26.tar.xz
 #
 COPY buildscripts/libstdc++-7.2.0 ./buildscripts/
 RUN . .bashrc && buildscripts/build libstdc++-7.2.0 gcc-7.2.0.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter5.9
+#
+COPY buildscripts/binutils-2.29-pass2 ./buildscripts/
+RUN . .bashrc && buildscripts/build binutils-2.29-pass2 binutils-2.29.tar.bz2

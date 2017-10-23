@@ -11,13 +11,13 @@ readonly SCRIPT_PATH
 
 readonly PACKAGE="${1}"
 readonly ARCHIVE="${2}"
-readonly ARCHIVE_ROOT="${3:-${PACKAGE}}"
 
 cd "${LFS}"/sources
 
 echo "Unpacking ${ARCHIVE}"
-tar -xf "${ARCHIVE}" 
+mkdir -v "${PACKAGE}"
+tar --extract  --strip-components=1 --directory="${PACKAGE}" --file="${ARCHIVE}"
 
-cd "${ARCHIVE_ROOT}"
+cd "${PACKAGE}"
 echo "Building ${PACKAGE}"
 "${SCRIPT_PATH}/${PACKAGE}"

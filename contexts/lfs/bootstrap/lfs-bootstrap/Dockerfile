@@ -107,7 +107,7 @@ RUN . .bashrc && buildscripts/build gcc-7.2.0 gcc-7.2.0.tar.xz
 #
 COPY sources/linux-4.12.7.tar.xz "${LFS}"/sources/
 COPY buildscripts/linux-headers-4.12.7 ./buildscripts/
-RUN . .bashrc && buildscripts/build linux-headers-4.12.7 linux-4.12.7.tar.xz linux-4.12.7
+RUN . .bashrc && buildscripts/build linux-headers-4.12.7 linux-4.12.7.tar.xz
 
 #
 # FROM: :LFS
@@ -116,3 +116,10 @@ RUN . .bashrc && buildscripts/build linux-headers-4.12.7 linux-4.12.7.tar.xz lin
 COPY sources/glibc-2.26.tar.xz "${LFS}"/sources/
 COPY buildscripts/glibc-2.26 ./buildscripts/
 RUN . .bashrc && buildscripts/build glibc-2.26 glibc-2.26.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter5.8
+#
+COPY buildscripts/libstdc++-7.2.0 ./buildscripts/
+RUN . .bashrc && buildscripts/build libstdc++-7.2.0 gcc-7.2.0.tar.xz

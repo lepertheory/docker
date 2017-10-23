@@ -136,3 +136,11 @@ RUN . .bashrc && buildscripts/build binutils-2.29-pass2 binutils-2.29.tar.bz2
 #
 COPY buildscripts/gcc-7.2.0-pass2 ./buildscripts/
 RUN . .bashrc && buildscripts/build gcc-7.2.0-pass2 gcc-7.2.0.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter5.11
+#
+COPY sources/tcl-core8.6.7-src.tar.gz "${LFS}"/sources
+COPY buildscripts/tcl-core-8.6.7 ./buildscripts/
+RUN . .bashrc && buildscripts/build tcl-core-8.6.7 tcl-core8.6.7-src.tar.gz

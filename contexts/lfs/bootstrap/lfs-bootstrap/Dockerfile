@@ -272,3 +272,11 @@ RUN . .bashrc && buildscripts/build gzip-1.8 gzip-1.8.tar.xz
 COPY sources/m4-1.4.18.tar.xz "${LFS}"/sources/
 COPY buildscripts/m4-1.4.18 ./buildscripts/
 RUN . .bashrc && buildscripts/build m4-1.4.18 m4-1.4.18.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter5.28
+#
+COPY sources/make-4.2.1.tar.bz2 "${LFS}"/sources/
+COPY buildscripts/make-4.2.1 ./buildscripts/
+RUN . .bashrc && buildscripts/build make-4.2.1 make-4.2.1.tar.bz2

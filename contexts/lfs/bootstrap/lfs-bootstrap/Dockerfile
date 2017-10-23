@@ -216,3 +216,11 @@ RUN . .bashrc && buildscripts/build coreutils-8.27 coreutils-8.27.tar.xz
 COPY sources/diffutils-3.6.tar.xz "${LFS}"/sources/
 COPY buildscripts/diffutils-3.6 ./buildscripts/
 RUN . .bashrc && buildscripts/build diffutils-3.6 diffutils-3.6.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter5.21
+#
+COPY sources/file-5.31.tar.gz "${LFS}"/sources/
+COPY buildscripts/file-5.31 ./buildscripts/
+RUN . .bashrc && buildscripts/build file-5.31 file-5.31.tar.gz

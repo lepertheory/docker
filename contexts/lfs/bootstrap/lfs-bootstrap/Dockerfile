@@ -1,4 +1,4 @@
-FROM lfs/bootstrap/host-toolchain:master
+FROM lfs/bootstrap/host-toolchain:master AS staging
 
 #
 # FROM: :LFS
@@ -351,3 +351,14 @@ RUN strip --strip-debug /tools/lib/*                 \
 #
 USER root
 RUN chown -R root:root "${LFS}"/tools
+
+#
+# Now we try to cram this thing down to size.
+#
+RUN rm -rf /home/lfs/buildscripts \
+           /mnt/lfs/sources
+
+FROM scratch
+COPY --from=staging / /
+SHELL ["/bin/bash", "-c"]
+CMD ["/bin/bash"]

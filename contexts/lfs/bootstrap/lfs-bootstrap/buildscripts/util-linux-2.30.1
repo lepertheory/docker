@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+./configure --prefix=/tools                \
+            --without-python               \
+            --disable-makeinstall-chown    \
+            --without-systemdsystemunitdir \
+            --without-ncurses              \
+            PKG_CONFIG=''
+make
+make install

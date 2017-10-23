@@ -320,3 +320,11 @@ RUN . .bashrc && buildscripts/build tar-1.29 tar-1.29.tar.xz
 COPY sources/texinfo-6.4.tar.xz "${LFS}"/sources/
 COPY buildscripts/texinfo-6.4 ./buildscripts/
 RUN . .bashrc && buildscripts/build texinfo-6.4 texinfo-6.4.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter5.34
+#
+COPY sources/util-linux-2.30.1.tar.xz "${LFS}"/sources/
+COPY buildscripts/util-linux-2.30.1 ./buildscripts/
+RUN . .bashrc && buildscripts/build util-linux-2.30.1 util-linux-2.30.1.tar.xz

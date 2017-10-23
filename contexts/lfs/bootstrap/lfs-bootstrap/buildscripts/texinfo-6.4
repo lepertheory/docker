@@ -6,6 +6,5 @@ set -o nounset
 
 ./configure --prefix=/tools
 make
-# Fails. See book. Test #95: --listed-incremental and --one-file-system FAILED (listed04.at:29)
-#make check
+make check
 make install

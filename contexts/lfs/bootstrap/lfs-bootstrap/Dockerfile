@@ -312,3 +312,11 @@ RUN . .bashrc && buildscripts/build sed-4.4 sed-4.4.tar.xz
 COPY sources/tar-1.29.tar.xz "${LFS}"/sources/
 COPY buildscripts/tar-1.29 ./buildscripts/
 RUN . .bashrc && buildscripts/build tar-1.29 tar-1.29.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter5.33
+#
+COPY sources/texinfo-6.4.tar.xz "${LFS}"/sources/
+COPY buildscripts/texinfo-6.4 ./buildscripts/
+RUN . .bashrc && buildscripts/build texinfo-6.4 texinfo-6.4.tar.xz

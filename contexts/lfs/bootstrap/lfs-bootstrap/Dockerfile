@@ -263,4 +263,12 @@ RUN . .bashrc && buildscripts/build grep-3.1 grep-3.1.tar.xz
 #
 COPY sources/gzip-1.8.tar.xz "${LFS}"/sources/
 COPY buildscripts/gzip-1.8 ./buildscripts/
-RUn . .bashrc && buildscripts/build gzip-1.8 gzip-1.8.tar.xz
+RUN . .bashrc && buildscripts/build gzip-1.8 gzip-1.8.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter5.27
+#
+COPY sources/m4-1.4.18.tar.xz "${LFS}"/sources/
+COPY buildscripts/m4-1.4.18 ./buildscripts/
+RUN . .bashrc && buildscripts/build m4-1.4.18 m4-1.4.18.tar.xz

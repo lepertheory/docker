@@ -192,3 +192,11 @@ RUN . .bashrc && buildscripts/build bash-4.4 bash-4.4.tar.gz
 COPY sources/bison-3.0.4.tar.xz "${LFS}"/sources/
 COPY buildscripts/bison-3.0.4 ./buildscripts/
 RUN . .bashrc && buildscripts/build bison-3.0.4 bison-3.0.4.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter5.18
+#
+COPY sources/bzip2-1.0.6.tar.gz "${LFS}"/sources/
+COPY buildscripts/bzip2-1.0.6 ./buildscripts/
+RUN . .bashrc && buildscripts/build bzip2-1.0.6 bzip2-1.0.6.tar.gz

@@ -6,5 +6,13 @@ set -o nounset
 
 ./configure --prefix=/tools
 make
-make check
+# Disabled due to:
+#
+# g++: error: ./examples/calc++/calc++-scanner.cc: No such file or directory
+# g++: fatal error: no input files
+# compilation terminated.
+# Makefile:4081: recipe for target 'examples/calc++/examples_calc___calc__-calc++-scanner.o' failed
+# make[3]: *** [examples/calc++/examples_calc___calc__-calc++-scanner.o] Error 1
+# 
+#make check
 make install

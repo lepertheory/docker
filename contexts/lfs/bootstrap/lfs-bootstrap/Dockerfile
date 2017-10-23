@@ -67,12 +67,11 @@ WORKDIR /home/lfs
 #
 # FROM: :LFS
 # REF: Chapter4.4
+# REF: Chapter4.5
 #
 COPY lfs_home/* ./
 
-#
 # FROM: :LFS
-# REF: Chapter4.5
 # REF: Chapter4.6
 # REF: Chapter5.1
 # REF: Chapter5.2

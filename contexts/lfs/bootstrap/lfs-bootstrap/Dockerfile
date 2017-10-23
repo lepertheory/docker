@@ -304,3 +304,11 @@ RUN . .bashrc && buildscripts/build perl-5.26.0 perl-5.26.0.tar.xz
 COPY sources/sed-4.4.tar.xz "${LFS}"/sources/
 COPY buildscripts/sed-4.4 ./buildscripts/
 RUN . .bashrc && buildscripts/build sed-4.4 sed-4.4.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter5.32
+#
+COPY sources/tar-1.29.tar.xz "${LFS}"/sources/
+COPY buildscripts/tar-1.29 ./buildscripts/
+RUN . .bashrc && buildscripts/build tar-1.29 tar-1.29.tar.xz

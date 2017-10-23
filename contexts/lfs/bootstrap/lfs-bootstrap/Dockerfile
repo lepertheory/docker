@@ -168,3 +168,11 @@ RUN . .bashrc && buildscripts/build dejagnu-1.6 dejagnu-1.6.tar.gz
 COPY sources/check-0.11.0.tar.gz "${LFS}"/sources/
 COPY buildscripts/check-0.11.0 ./buildscripts/
 RUN . .bashrc && buildscripts/build check-0.11.0 check-0.11.0.tar.gz
+
+#
+# FROM: :LFS
+# REF: Chapter5.15
+#
+COPY sources/ncurses-6.0.tar.gz "${LFS}"/sources/
+COPY buildscripts/ncurses-6.0 ./buildscripts/
+RUN . .bashrc && buildscripts/build ncurses-6.0 ncurses-6.0.tar.gz

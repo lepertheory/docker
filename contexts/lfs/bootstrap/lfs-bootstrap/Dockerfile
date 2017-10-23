@@ -280,3 +280,11 @@ RUN . .bashrc && buildscripts/build m4-1.4.18 m4-1.4.18.tar.xz
 COPY sources/make-4.2.1.tar.bz2 "${LFS}"/sources/
 COPY buildscripts/make-4.2.1 ./buildscripts/
 RUN . .bashrc && buildscripts/build make-4.2.1 make-4.2.1.tar.bz2
+
+#
+# FROM: :LFS
+# REF: Chapter5.29
+#
+COPY sources/patch-2.7.5.tar.xz "${LFS}"/sources/
+COPY buildscripts/patch-2.7.5 ./buildscripts/
+RUN . .bashrc && buildscripts/build patch-2.7.5 patch-2.7.5.tar.xz

@@ -137,6 +137,15 @@ RUN . .bashrc && buildscripts/build binutils-2.29-pass2 binutils-2.29.tar.bz2
 COPY buildscripts/gcc-7.2.0-pass2 ./buildscripts/
 RUN . .bashrc && buildscripts/build gcc-7.2.0-pass2 gcc-7.2.0.tar.xz
 
+# FROM: Chapter5.10
+#
+# LFS_TGT is no longer referenced after this point.
+# FIXME: x86_64 stuff.
+RUN rm -rfv "${LFS}"/tools/bin/x86_64-lfs-*                 \
+            "${LFS}"/tools/lib/gcc/x86_64-lfs-linux-gnu     \
+            "${LFS}"/tools/libexec/gcc/x86_64-lfs-linux-gnu \
+            "${LFS}"/tools/x86_64-lfs-linux-gnu
+
 #
 # FROM: :LFS
 # REF: Chapter5.11
@@ -356,7 +365,7 @@ RUN chown -R root:root "${LFS}"/tools
 # No longer needed stuff.
 #
 RUN rm -rf /home/lfs/buildscripts \
-           /mnt/lfs/sources
+           "${LFS}"/sources
 
 #
 # FROM: :LFS

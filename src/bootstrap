@@ -6,37 +6,46 @@ set -o nounset
 
 print_error_getting_versions_and_exit ()
 {
-	echo "Got an error trying to get versions. Either someone didn't test this script, or your" \
+  echo "Got an error trying to get versions. Either someone didn't test this script, or your" \
        "is too old." 1>&2
 }
 
 validate_versions ()
 {
-	# Untested dependencies: sed.
-	local -r BASH_REQUIRED=4.3
-	local -r DOCKER_REQUIRED=17.9
-	local -r GIT_REQUIRED=2.7
-	local DOCKER_VERSINFO
-	local GIT_VERSINFO
+  # Untested dependencies: sed.
+  local -ra BASH_REQUIRED=(4 3)
+  local -ra DOCKER_REQUIRED=(17 09)
+  local -ra GIT_REQUIRED=(2 7)
+  local -ra FIND_REQUIRED=(4 7)
+  local -a  DOCKER_VERSINFO
+  local -a  GIT_VERSINFO
+  local -a  FIND_VERSINFO
   
   local -r IFS=.
+  DOCKER_VERSINFO=($(docker info    | sed -rn 's/^Server Version: //p') ); readonly DOCKER_VERSINFO
+  GIT_VERSINFO=(   $(git --version  | sed -rn 's/^git version //p')     ); readonly GIT_VERSINFO
+  FIND_VERSINFO=(  $(find --version | sed -rn 's/^find( \(.*\))?\s+//p')); readonly FIND_VERSINFO 
 
-  DOCKER_VERSINFO=($(docker info | sed -rn 's/^Server Version: //p')); readonly DOCKER_VERSINFO
-	GIT_VERSINFO=($(git --version | sed -rn 's/^git version //p'));      readonly GIT_VERSINFO
-
-	if (( ${BASH_VERSINFO[0]} < 4 )) || (( ${BASH_VERSINFO[0]} == 4 && ${BASH_VERSINFO[1]} < 3 )); then
-		echo "Bash version 4.3 or above required." 1>&2
-		return 1
-	fi
-	if (( ${DOCKER_VERSINFO[0]} < 17 )) \
-		 || (( ${DOCKER_VERSINFO[0]} == 17 && 10#${DOCKER_VERSINFO[1]} < 9 )); then
-		echo "Docker version 17.09 or above required." 1>&2
-		return 2
-	fi
-	if (( ${GIT_VERSINFO[0]} < 2 )) || (( ${GIT_VERSINFO[0]} == 2 && ${GIT_VERSINFO[1]} < 7 )); then
-		echo "Git version 2.7 or above required." 1>&2
-		return 3
-	fi
+  if (( ${BASH_VERSINFO[0]}  < ${BASH_REQUIRED[0]} )) \
+  || (( ${BASH_VERSINFO[0]} == ${BASH_REQUIRED[0]} && ${BASH_VERSINFO[1]} < ${BASH_REQUIRED[1]} )); then
+    echo "Bash version ${BASH_REQUIRED[*]} or above required." 1>&2
+    return 1
+  fi
+  if (( ${DOCKER_VERSINFO[0]}  < ${DOCKER_REQUIRED[0]} )) \
+  || (( ${DOCKER_VERSINFO[0]} == ${DOCKER_REQUIRED[0]} && 10#${DOCKER_VERSINFO[1]} < 10#${DOCKER_REQUIRED[1]} )); then
+    echo "Docker version ${DOCKER_REQUIRED[*]} or above required." 1>&2
+    return 2
+  fi
+  if (( ${GIT_VERSINFO[0]}  < ${GIT_REQUIRED[0]} )) \
+  || (( ${GIT_VERSINFO[0]} == ${GIT_REQUIRED[0]} && ${GIT_VERSINFO[1]} < ${GIT_REQUIRED[1]} )); then
+    echo "Git version ${GIT_REQUIRED[*]} or above required." 1>&2
+    return 3
+  fi
+  if (( ${FIND_VERSINFO[0]}  < ${FIND_REQUIRED[0]} )) \
+  || (( ${FIND_VERSINFO[0]} == ${FIND_REQUIRED[0]} && ${FIND_VERSINFO[1]} < ${FIND_REQUIRED[1]} )); then
+    echo "Find version ${FIND_REQUIRED[*]} or above required." 1>&2
+    return 4
+  fi
 }
 
 validate_versions || exit 64

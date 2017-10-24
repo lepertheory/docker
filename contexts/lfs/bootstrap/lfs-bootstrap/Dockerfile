@@ -353,12 +353,84 @@ USER root
 RUN chown -R root:root "${LFS}"/tools
 
 #
-# Now we try to cram this thing down to size.
+# No longer needed stuff.
 #
 RUN rm -rf /home/lfs/buildscripts \
            /mnt/lfs/sources
 
+#
+# FROM: :LFS
+# REF: Chapter6.1
+#
+# Informational only.
+#
+
+#
+# FROM: :LFS
+# REF: Chapter6.2
+#
+# Docker takes care of this for us.
+#
+
+#
+# FROM: :LFS
+# REF: Chapter6.3
+#
+# Informational only.
+#
+
+#
+# FROM: :LFS
+# REF: Chapter6.4
+# REF: Chapter6.5
+#
+# FIXME: The chroot is from 6.4.
+# NOTE: Also symlinking env into /usr/bin
+#
+COPY passwd group "${LFS}"/etc/
+RUN chroot "${LFS}" /tools/bin/env --ignore-environment                          \
+                                   HOME=/root                                    \
+                                   TERM="${TERM}"                                \
+                                   PS1='\u:\w\$ '                                \
+                                   PATH=/bin:/usr/bin:/sbin:/usr/sbin:/tools/bin \
+                                   /tools/bin/bash --login +h -c '               \
+    mkdir -pv /{bin,boot,etc/{opt,sysconfig},home,lib/firmware,mnt,opt}          \
+ && mkdir -pv /{media/{floppy,cdrom},sbin,srv,var}                               \
+ && install --directory --verbose --mode=0750 /root                              \
+ && install --directory --verbose --mode=1777 /tmp /var/tmp                      \
+ && mkdir -pv /usr/{,local/}{bin,include,lib,sbin,src}                           \
+ && mkdir -pv /usr/{,local/}share/{color,dict,doc,info,locale,man}               \
+ && mkdir -v  /usr/{,local/}share/{misc,terminfo,zoneinfo}                       \
+ && mkdir -v  /usr/libexec                                                       \
+ && mkdir -pv /usr/{,local/}share/man/man{1..8}                                  \
+ && if [[ "$(uname -m)" == 'x86_64' ]]; then                                     \
+      mkdir -v /lib64                                                            \
+  ; fi                                                                           \
+ && mkdir -v /var/{log,mail,spool}                                               \
+ && ln -sv /run /var/run                                                         \
+ && ln -sv /run/lock /var/lock                                                   \
+ && mkdir -pv /var/{opt,cache,lib/{color,misc,locate},local}                     \
+ && ln -sv /tools/bin/{bash,cat,dd,echo,ln,pwd,rm,stty} /bin                     \
+ && ln -sv /tools/bin/{install,perl,env}                /usr/bin                 \
+ && ln -sv /tools/lib/libgcc_s.so{,.1}                  /usr/lib                 \
+ && ln -sv /tools/lib/libstdc++.{a,so{,.6}}             /usr/lib                 \
+ && sed 's/tools/usr/' /tools/lib/libstdc++.la > /usr/lib/libstdc++.la           \
+ && for lib in blkid lzma mount uuid; do                                         \
+      ln -sv /tools/lib/lib"${lib}".{a,so*}             /usr/lib                 \
+ &&   sed 's/tools/usr/' /tools/lib/lib"${lib}".la > /usr/lib/lib"${lib}".la     \
+  ; done                                                                         \
+ && ln -sv bash /bin/sh                                                          \
+ && touch /var/log/{btmp,lastlog,faillog,wtmp}                                   \
+ && chgrp -v utmp /var/log/lastlog                                               \
+ && chmod -v 644  /var/log/lastlog                                               \
+ && chmod -v 600  /var/log/btmp'
+COPY root_home/* "${LFS}"/root/
+
+#
+# Outside of the book, squash image down to size.
+#
 FROM scratch
-COPY --from=staging / /
+COPY --from=staging /mnt/lfs /
 SHELL ["/bin/bash", "-c"]
-CMD ["/bin/bash"]
+ENV HOME=/root
+CMD ["/tools/bin/bash", "+h"]

@@ -4,48 +4,59 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+declare -r FORCE="${1:-false}"
+
 print_error_getting_versions_and_exit ()
 {
   echo "Got an error trying to get versions. Either someone didn't test this script, or your" \
        "is too old." 1>&2
 }
 
+validate_version ()
+{
+  # Passing arrays is a distinctly 4.3+ feature. It's the -n argument, which means a variable is a
+  # "namereference", i.e. pass-by-reference as in other languages.
+  local -r  NAME="${1}"
+  local -nr REQUIRED="${2}"
+  local -nr ACTUAL="${3}"
+
+  for component in "${!REQUIRED[@]}"; do
+    if (( 10#${ACTUAL[${component}]} > 10#${REQUIRED[${component}]} )); then
+      return 0
+    elif (( 10#${ACTUAL[${component}]} < 10#${REQUIRED[${component}]} )); then
+      echo "${NAME} version ${REQUIRED[*]} is required." 1>&2
+      return 1
+    fi
+  done
+
+  # If we get here, every component in $REQUIRED was equal.
+  return 0
+}
+
 validate_versions ()
 {
   # Untested dependencies: sed.
-  local -ra BASH_REQUIRED=(4 3)
-  local -ra DOCKER_REQUIRED=(17 09)
-  local -ra GIT_REQUIRED=(2 7)
-  local -ra FIND_REQUIRED=(4 7)
-  local -a  DOCKER_VERSINFO
-  local -a  GIT_VERSINFO
-  local -a  FIND_VERSINFO
+  local -ra BASH_REQUIRED=(   4  3)
+  local -ra SED_REQUIRED=(    4  2); local -a SED_VERSINFO
+  local -ra DOCKER_REQUIRED=(17 09); local -a DOCKER_VERSINFO
+  local -ra GIT_REQUIRED=(    2  7); local -a GIT_VERSINFO
+  local -ra FIND_REQUIRED=(   4  7); local -a FIND_VERSINFO
+  local -ra GREP_REQUIRED=(   2 25); local -a GREP_VERSINFO
   
   local -r IFS=.
+  SED_VERSINFO=(   $(sed --version  | sed -rn 's/^sed( \(.*\))?\s+//p') ); readonly SED_VERSINFO
   DOCKER_VERSINFO=($(docker info    | sed -rn 's/^Server Version: //p') ); readonly DOCKER_VERSINFO
   GIT_VERSINFO=(   $(git --version  | sed -rn 's/^git version //p')     ); readonly GIT_VERSINFO
-  FIND_VERSINFO=(  $(find --version | sed -rn 's/^find( \(.*\))?\s+//p')); readonly FIND_VERSINFO 
+  FIND_VERSINFO=(  $(find --version | sed -rn 's/^find( \(.*\))?\s+//p')); readonly FIND_VERSINFO
+  GREP_VERSINFO=(  $(grep --version | sed -rn 's/^grep( \(.*\))?\s+//p')); readonly GREP_VERSINFO 
 
-  if (( ${BASH_VERSINFO[0]}  < ${BASH_REQUIRED[0]} )) \
-  || (( ${BASH_VERSINFO[0]} == ${BASH_REQUIRED[0]} && ${BASH_VERSINFO[1]} < ${BASH_REQUIRED[1]} )); then
-    echo "Bash version ${BASH_REQUIRED[*]} or above required." 1>&2
-    return 1
-  fi
-  if (( ${DOCKER_VERSINFO[0]}  < ${DOCKER_REQUIRED[0]} )) \
-  || (( ${DOCKER_VERSINFO[0]} == ${DOCKER_REQUIRED[0]} && 10#${DOCKER_VERSINFO[1]} < 10#${DOCKER_REQUIRED[1]} )); then
-    echo "Docker version ${DOCKER_REQUIRED[*]} or above required." 1>&2
-    return 2
-  fi
-  if (( ${GIT_VERSINFO[0]}  < ${GIT_REQUIRED[0]} )) \
-  || (( ${GIT_VERSINFO[0]} == ${GIT_REQUIRED[0]} && ${GIT_VERSINFO[1]} < ${GIT_REQUIRED[1]} )); then
-    echo "Git version ${GIT_REQUIRED[*]} or above required." 1>&2
-    return 3
-  fi
-  if (( ${FIND_VERSINFO[0]}  < ${FIND_REQUIRED[0]} )) \
-  || (( ${FIND_VERSINFO[0]} == ${FIND_REQUIRED[0]} && ${FIND_VERSINFO[1]} < ${FIND_REQUIRED[1]} )); then
-    echo "Find version ${FIND_REQUIRED[*]} or above required." 1>&2
-    return 4
-  fi
+	# Args 2 and 3 are passing to a function using "namereferences".
+  validate_version bash   BASH_REQUIRED   BASH_VERSINFO
+  validate_version sed    SED_REQUIRED    SED_VERSINFO
+  validate_version docker DOCKER_REQUIRED DOCKER_VERSINFO
+  validate_version git    GIT_REQUIRED    GIT_VERSINFO
+  validate_version find   FIND_REQUIRED   FIND_VERSINFO
+  validate_version grep   GREP_REQUIRED   GREP_VERSINFO
 }
 
 validate_versions || exit 64
@@ -53,7 +64,7 @@ validate_versions || exit 64
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "$(cd "${SCRIPT_DIR}")" && git rev-parse --show-toplevel)" 
 
-"${REPO_DIR}"/contexts/lfs/bootstrap/bootstrap lfs/bootstrap
+"${REPO_DIR}"/contexts/lfs/bootstrap/bootstrap lfs/bootstrap "${FORCE}"
 
 ##
 ## Run this to get a persistent docker image running, called "controller". It serves to run programs faster, and provide a nice

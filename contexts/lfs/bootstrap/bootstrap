@@ -28,23 +28,38 @@ REPO_DIR="$(cd "$(cd "${SCRIPT_DIR}" && git rev-parse --show-toplevel)" && pwd)"
 CONTEXT_DIR="${REPO_DIR}"/contexts;                                               readonly CONTEXT_DIR
 TAG_BASE="${1}";                                                                  readonly TAG_BASE
 GIT_BRANCH="$(git symbolic-ref HEAD)"; GIT_BRANCH="${GIT_BRANCH##refs/heads/}";   readonly GIT_BRANCH
+FORCE="${2:-false}";                                                              readonly FORCE
 
 bootstrap_context ()
 {
-	local -r CONTEXT="${1}"
-	local -r TAG="${2}"
+  local -r CONTEXT="${1}"
+  local -r TAG="${2}"
+  local -r MY_FORCE="${3:-false}"
 
-	echo "Building ${CONTEXT}"
+  local -r CREATED="$(docker inspect --format='{{ .Created }}' "${TAG}" 2>/dev/null || echo -n)"
 
-	local -r BOOTSTRAP_SCRIPT="${CONTEXT}"/bootstrap
-	if [[ -e "${BOOTSTRAP_SCRIPT}" ]]; then
-		"${BOOTSTRAP_SCRIPT}" "${TAG}"
-	else
-		docker build --tag="${TAG}" "${context}"
-	fi
+  if [[ "${MY_FORCE}" == 'true' ]] \
+  || [[ -z "${CREATED}" ]]      \
+  || find "${CONTEXT}" -newermt "${CREATED}" | grep -q .; then
+    echo "Building ${CONTEXT}"
+
+    local -r BOOTSTRAP_SCRIPT="${CONTEXT}"/bootstrap
+    if [[ -e "${BOOTSTRAP_SCRIPT}" ]]; then
+      "${BOOTSTRAP_SCRIPT}" "${TAG}"
+    else
+      docker build --tag="${TAG}" "${context}"
+    fi
+
+    echo "Done building ${CONTEXT}"
+  else
+    echo "${TAG} is newer than any files in ${CONTEXT}."
+  fi
 }
 
 cd "${SCRIPT_DIR}"
-for context in ubuntu apt-offline host-toolchain lfs-bootstrap; do
-	bootstrap_context "${context}" "${TAG_BASE}/${context}:${GIT_BRANCH}"
+for context in ubuntu \
+               apt-offline \
+               host-toolchain \
+               lfs-bootstrap; do
+  bootstrap_context "${context}" "${TAG_BASE}/${context}:${GIT_BRANCH}" "${FORCE}"
 done

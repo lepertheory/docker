@@ -14,6 +14,10 @@ print_error_getting_versions_and_exit ()
 
 validate_version ()
 {
+  set -o errexit
+  set -o pipefail
+  set -o nounset
+
   # Passing arrays is a distinctly 4.3+ feature. It's the -n argument, which means a variable is a
   # "namereference", i.e. pass-by-reference as in other languages.
   local -r  NAME="${1}"
@@ -35,12 +39,16 @@ validate_version ()
 
 validate_versions ()
 {
+  set -o errexit
+  set -o pipefail
+  set -o nounset
+
   # Untested dependencies: sed.
   local -ra BASH_REQUIRED=(   4  3)
   local -ra SED_REQUIRED=(    4  2); local -a SED_VERSINFO
   local -ra DOCKER_REQUIRED=(17 09); local -a DOCKER_VERSINFO
   local -ra GIT_REQUIRED=(    2  7); local -a GIT_VERSINFO
-  local -ra FIND_REQUIRED=(   4  7); local -a FIND_VERSINFO
+  local -ra FIND_REQUIRED=(   4  6); local -a FIND_VERSINFO
   local -ra GREP_REQUIRED=(   2 25); local -a GREP_VERSINFO
   
   local -r IFS=.
@@ -51,12 +59,12 @@ validate_versions ()
   GREP_VERSINFO=(  $(grep --version | sed -rn 's/^grep( \(.*\))?\s+//p')); readonly GREP_VERSINFO 
 
 	# Args 2 and 3 are passing to a function using "namereferences".
-  validate_version bash   BASH_REQUIRED   BASH_VERSINFO
-  validate_version sed    SED_REQUIRED    SED_VERSINFO
-  validate_version docker DOCKER_REQUIRED DOCKER_VERSINFO
-  validate_version git    GIT_REQUIRED    GIT_VERSINFO
-  validate_version find   FIND_REQUIRED   FIND_VERSINFO
-  validate_version grep   GREP_REQUIRED   GREP_VERSINFO
+  validate_version bash   BASH_REQUIRED   BASH_VERSINFO   || return 1
+  validate_version sed    SED_REQUIRED    SED_VERSINFO    || return 2
+  validate_version docker DOCKER_REQUIRED DOCKER_VERSINFO || return 3
+  validate_version git    GIT_REQUIRED    GIT_VERSINFO    || return 4
+  validate_version find   FIND_REQUIRED   FIND_VERSINFO   || return 5
+  validate_version grep   GREP_REQUIRED   GREP_VERSINFO   || return 6
 }
 
 validate_versions || exit 64

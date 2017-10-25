@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+declare -r SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+declare -r TAG="${1}"
+
+main ()
+{
+	local SBUS_TOTAL=0
+  for buildscript in "${SCRIPT_PATH}"/buildscripts/*; do
+		local script_file; script_file="$(basename "${buildscript}")"
+		[[ "${script_file}" == build ]] && continue
+
+		local sbus; sbus="$(sed -rn 's/^# SBUS: ([0-9]+(\.[0-9]+)?)$/\1/p' "${buildscript}")"
+	  local new_sbus; new_sbus="$(echo "${SBUS_TOTAL} + ${sbus}" | bc)"
+    SBUS_TOTAL="${new_sbus}"
+	done
+	readonly SBUS_TOTAL
+
+	echo "${SBUS_TOTAL}" > total_sbus
+
+	docker build --tag="${TAG}" "${SCRIPT_PATH}"
+}
+
+main

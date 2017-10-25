@@ -4,20 +4,64 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-SCRIPT_NAME="$(basename      "${BASH_SOURCE[0]}")"
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly SCRIPT_NAME
 readonly SCRIPT_PATH
 
 readonly PACKAGE="${1}"
 readonly ARCHIVE="${2}"
+readonly SBUS_TOTAL="$(<"${HOME}"/sbus_total)"
+readonly SBUS_DONE="$(<"${HOME}"/sbus_done)"
+readonly SBUS_CURRENT="
+readonly SBU_TIME="${6:0}"
+readonly LOGFILE="${HOME}/${PACKAGE}.log"
+readonly PACKAGE_START_EPOCH_SECONDS=
 
-cd "${LFS}"/sources
+print_dhms ()
+{
+	local -r SECONDS=${1}
+	
+	printf '%01d:%02d:$02d:%02d\r' ((SECONDS / 60 / 60 / 24)) \
+                                 ((SECONDS / 60 / 60 % 24)) \
+                                 ((SECONDS / 60      % 60)) \
+                                 ((SECONDS           % 60))                                
+}
 
-echo "Unpacking ${ARCHIVE}"
-mkdir -v "${PACKAGE}"
-tar --extract  --strip-components=1 --directory="${PACKAGE}" --file="${ARCHIVE}"
+print_estimate ()
+{
+	local -r PERCENT_DONE=$(echo "scale=1;${SBUS_DONE} * 100 / ${SBUS_TOTAL}" | bc)
+	local -r ESTIMATED_TOTAL
 
-cd "${PACKAGE}"
-echo "Building ${PACKAGE}"
-"${SCRIPT_PATH}/${PACKAGE}"
+	echo -n "  ${SBUS_DONE}/${SBUS_TOTAL} (${PERCENT_DONE}}%)  Estimate: "
+}
+
+main ()
+{
+	cd "${LFS}"/sources
+
+	echo "Unpacking ${ARCHIVE}"
+	mkdir -v "${PACKAGE}"
+	tar --extract  --strip-components=1 --directory="${PACKAGE}" --file="${ARCHIVE}"
+
+	local -r SBUFILE="${HOME}"/sbu
+  local    sbu=0
+	if [[ -f "${SBUFILE}" ]]; then
+		sbu=$(<"${SBUFILE}")
+	fi
+	local -r SBU=${sbu}
+
+	cd "${PACKAGE}"
+	echo -n "Building ${PACKAGE}:  SBU: $(print_dhms "${SBU}")"
+	local -r PACKAGE_ESTIMATED_SECONDS=$((SBU * SBUS_CURRENT_PACKAGE))
+  local -r TOTAL_ESTIMATED_SECONDS=$((SBU * SBUS_TOTAL))
+	local -r EPOCH_SECONDS_START=$(date +%s)
+	local -r last_now=0
+	"${SCRIPT_PATH}/${PACKAGE}" | tee "${LOGFILE}" | while IFS= read -r line; do
+		local epoch_seconds_now=$(date +%s)  # Grab it every time in case it affects timing.
+		if ((sbu > 0 && (last_now = 0 || epoch_seconds_now != last_now)); then
+		fi
+	done
+
+	echo "Done building ${ARCHIVE}"
+}
+
+main

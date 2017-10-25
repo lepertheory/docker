@@ -4,6 +4,20 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+declare -r CFLAGS_ARR=(${CFLAGS})
+CFLAGS=''
+for flag in "${CFLAGS_ARR[@]}"; do
+  if [[ "${flag}" == '-Os' ]]; then
+    flag='-O2'
+  fi
+  if [[ -z "${CFLAGS}" ]]; then
+    CFLAGS="${flag}"
+  else
+    CFLAGS+=" ${flag}"
+  fi
+done
+CXXFLAGS="${CFLAGS}"
+
 mkdir -v build
 cd build
 ../configure --prefix=/tools                      \

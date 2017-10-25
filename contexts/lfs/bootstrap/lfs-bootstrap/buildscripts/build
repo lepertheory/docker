@@ -20,4 +20,4 @@ tar --extract  --strip-components=1 --directory="${PACKAGE}" --file="${ARCHIVE}"
 
 cd "${PACKAGE}"
 echo "Building ${PACKAGE}"
-"${SCRIPT_PATH}/${PACKAGE}"
+CFLAGS='-Os -pipe' CXXFLAGS='-Os -pipe' "${SCRIPT_PATH}/${PACKAGE}"

@@ -87,7 +87,7 @@ COPY buildscripts/build ./buildscripts/
 #
 COPY sources/binutils-2.29.tar.bz2 "${LFS}"/sources/
 COPY buildscripts/binutils-2.29 ./buildscripts/
-RUN . .bashrc && buildscripts/build binutils-2.29 binutils-2.29.tar.bz2 
+RUN . .bashrc && buildscripts/build binutils-2.29 binutils-2.29.tar.bz2
 
 #
 # FROM: :LFS

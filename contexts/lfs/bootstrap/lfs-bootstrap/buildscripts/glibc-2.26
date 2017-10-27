@@ -4,6 +4,7 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+# Glibc isn't actually that big, and needs a patch to compile with -Os.
 declare -r CFLAGS_ARR=(${CFLAGS})
 CFLAGS=''
 for flag in "${CFLAGS_ARR[@]}"; do

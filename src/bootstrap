@@ -53,7 +53,7 @@ validate_versions ()
 }
 
 validate_versions
-if ! $?; then
+if [[ ! $? ]]; then
 	exit 64
 fi
 

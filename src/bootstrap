@@ -35,12 +35,7 @@ validate_version ()
 
 validate_versions ()
 {
-	set -o errexit
-	set -o pipefail
-	set -o nounset
-	set -o errtrace
-	
-	#trap 'print_error_getting_versions_and_exit "$(caller)"' ERR
+	trap 'print_error_getting_versions_and_exit "$(caller)"' ERR
 	docker info
 	local SED_VERSION;    SED_VERSION="$(sed --version   | sed -rn 's/^sed( \(.*\))?\s+//p')";   readonly SED_VERSION
 	local DOCKER_VERSION; DOCKER_VERSION="$(docker info  | sed -rn 's/^Server Version: //p')";   readonly DOCKER_VERSION
@@ -54,10 +49,13 @@ validate_versions ()
 	validate_version git     2.7   "${GIT_VERSION}"                          || return 4
 	validate_version find    4.6   "${FIND_VERSION}"                         || return 5
 	validate_version grep    2.25  "${GREP_VERSION}"                         || return 6
-	#trap '' ERR
+	trap '' ERR
 }
 
-validate_versions || exit 64
+validate_versions
+if ! $?; then
+	exit 64
+fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "$(cd "${SCRIPT_DIR}")" && git rev-parse --show-toplevel)" 

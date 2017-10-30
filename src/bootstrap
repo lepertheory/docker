@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -o errexit
+set -o errtrace
 set -o pipefail
 set -o nounset
 
@@ -8,63 +9,52 @@ declare -r FORCE="${1:-false}"
 
 print_error_getting_versions_and_exit ()
 {
-  echo "Got an error trying to get versions. Either someone didn't test this script, or your" \
-       "is too old." 1>&2
+	local -r CALLER="${1}";
+	
+	echo "From: ${CALLER}"
+	echo "Got an error trying to get versions." 1>&2
+	exit 65
 }
 
 validate_version ()
 {
-  set -o errexit
-  set -o pipefail
-  set -o nounset
-
-  # Passing arrays is a distinctly 4.3+ feature. It's the -n argument, which means a variable is a
-  # "namereference", i.e. pass-by-reference as in other languages.
-  local -r  NAME="${1}"
-  local -nr REQUIRED="${2}"
-  local -nr ACTUAL="${3}"
-
-  for component in "${!REQUIRED[@]}"; do
-    if (( 10#${ACTUAL[${component}]} > 10#${REQUIRED[${component}]} )); then
-      return 0
-    elif (( 10#${ACTUAL[${component}]} < 10#${REQUIRED[${component}]} )); then
-      echo "${NAME} version ${REQUIRED[*]} is required." 1>&2
-      return 1
-    fi
-  done
-
-  # If we get here, every component in $REQUIRED was equal.
-  return 0
+	local -r NAME="${1}"
+	local -r REQUIRED="${2}"
+	local -r CURRENT="${3}"
+	
+	IFS=.
+	local -ra REQUIRED_VERSINFO=(${REQUIRED})
+	local -ra CURRENT_VERSINFO=(${CURRENT})
+	for component in "${!REQUIRED_VERSINFO[@]}"; do
+		if (( 10#${REQUIRED_VERSINFO[${component}]} > 10#${CURRENT_VERSINFO[${component}]} )); then
+			echo "${NAME} version ${REQUIRED[*]} is required." 1>&2
+			return 1
+		fi
+	done
 }
 
 validate_versions ()
 {
-  set -o errexit
-  set -o pipefail
-  set -o nounset
-
-  # Untested dependencies: sed.
-  local -ra BASH_REQUIRED=(   4  3)
-  local -ra SED_REQUIRED=(    4  2); local -a SED_VERSINFO
-  local -ra DOCKER_REQUIRED=(17 09); local -a DOCKER_VERSINFO
-  local -ra GIT_REQUIRED=(    2  7); local -a GIT_VERSINFO
-  local -ra FIND_REQUIRED=(   4  6); local -a FIND_VERSINFO
-  local -ra GREP_REQUIRED=(   2 25); local -a GREP_VERSINFO
-  
-  local -r IFS=.
-  SED_VERSINFO=(   $(sed --version  | sed -rn 's/^sed( \(.*\))?\s+//p') ); readonly SED_VERSINFO
-  DOCKER_VERSINFO=($(docker info    | sed -rn 's/^Server Version: //p') ); readonly DOCKER_VERSINFO
-  GIT_VERSINFO=(   $(git --version  | sed -rn 's/^git version //p')     ); readonly GIT_VERSINFO
-  FIND_VERSINFO=(  $(find --version | sed -rn 's/^find( \(.*\))?\s+//p')); readonly FIND_VERSINFO
-  GREP_VERSINFO=(  $(grep --version | sed -rn 's/^grep( \(.*\))?\s+//p')); readonly GREP_VERSINFO 
-
-	# Args 2 and 3 are passing to a function using "namereferences".
-  validate_version bash   BASH_REQUIRED   BASH_VERSINFO   || return 1
-  validate_version sed    SED_REQUIRED    SED_VERSINFO    || return 2
-  validate_version docker DOCKER_REQUIRED DOCKER_VERSINFO || return 3
-  validate_version git    GIT_REQUIRED    GIT_VERSINFO    || return 4
-  validate_version find   FIND_REQUIRED   FIND_VERSINFO   || return 5
-  validate_version grep   GREP_REQUIRED   GREP_VERSINFO   || return 6
+	set -o errexit
+	set -o pipefail
+	set -o nounset
+	set -o errtrace
+	
+	#trap 'print_error_getting_versions_and_exit "$(caller)"' ERR
+	docker info
+	local SED_VERSION;    SED_VERSION="$(sed --version   | sed -rn 's/^sed( \(.*\))?\s+//p')";   readonly SED_VERSION
+	local DOCKER_VERSION; DOCKER_VERSION="$(docker info  | sed -rn 's/^Server Version: //p')";   readonly DOCKER_VERSION
+	local GIT_VERSION;    GIT_VERSION="$(git --version   | sed -rn 's/^git version //p')";       readonly GIT_VERSION
+	local FIND_VERSION;   FIND_VERSION="$(find --version | sed -rn 's/^find( \(.*\))?\s+//p')" ; readonly FIND_VERSION
+	local GREP_VERSION;   GREP_VERSION="$(grep --version | sed -rn 's/^grep( \(.*\))?\s+//p')";  readonly GREP_VERSION
+	
+	validate_version bash    4.3   "${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]}" || return 1
+	validate_version sed     4.2   "${SED_VERSION}"                          || return 2
+	validate_version docker 17.09  "${DOCKER_VERSION}"                       || return 3
+	validate_version git     2.7   "${GIT_VERSION}"                          || return 4
+	validate_version find    4.6   "${FIND_VERSION}"                         || return 5
+	validate_version grep    2.25  "${GREP_VERSION}"                         || return 6
+	#trap '' ERR
 }
 
 validate_versions || exit 64

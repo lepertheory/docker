@@ -5,13 +5,46 @@ set -o errtrace
 set -o nounset
 set -o pipefail
 
-readonly PACKAGE="$1"
-readonly ARCHIVE="$2"
-
 SCRIPT_NAME="$(basename      "${BASH_SOURCE[0]}")"
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SCRIPT_NAME
 readonly SCRIPT_PATH
+
+readonly PACKAGE="$1"
+readonly ARCHIVE="$2"
+
+readonly COMPLETE_SBUS_PATH="$HOME"/complete_sbus
+readonly START_EPOCH_SECONDS_PATH="$HOME"/start_epoch_seconds
+
+get_dhms ()
+{
+  local -ri EPOCH_SECONDS="$1"
+
+  local -ri DAYS=$((EPOCH_SECONDS / 60 / 60 / 24))
+  local -ri HOURS=$((EPOCH_SECONDS / 60 / 60 % 24))
+  local -ri MINUTES=$((EPOCH_SECONDS / 60 % 60))
+  local -ri SECONDS=$((EPOCH_SECONDS % 60))
+
+  if ((DAYS > 0)); then
+    echo -n "${DAYS}d "
+  fi
+
+  printf '%02d:%02d:%02d' "$HOURS" "$MINUTES" "$SECONDS"
+}
+
+get_div10 ()
+{
+  local -r VALUE="$1"
+
+  local retval
+  if ((${#VALUE} == 0)); then
+    echo 0
+  elif ((${#VALUE} == 1)); then
+    echo "0.$VALUE"
+  else
+    echo "${VALUE:0:-1}.${VALUE: -1}"
+  fi
+}
 
 get_package_sbus ()
 {
@@ -20,30 +53,62 @@ get_package_sbus ()
   sed -rn 's/^# SBUS: (.*)/\1/p' "$PACKAGE_PATH"
 }
 
-get_total_sbus ()
+get_sbus_string ()
 {
-  local retval=0
-  for package_path in "$SCRIPT_PATH"/*; do
-    local package; package="$(basename "$package_path")"
-    if [[ "$package" == build ]]; then
-      continue
-    fi
+  local -r SBUS="$1"
 
-    local package_sbus
-    package_sbus="$(get_package_sbus "$package_path")"
-    retval="$(echo "$retval + $package_sbus" | bc)"
-  done
-
-  echo $retval
+  if [[ "$SBUS" == '1' ]]; then
+    echo "$SBUS SBU"
+  else
+    echo "$SBUS SBUS"
+  fi
 }
 
-declare -r SBUS_FILE="$HOME"/total_sbus
+get_x10 ()
+{
+  local -r VALUE="$1"
+
+  if [[ "$VALUE" == *.* ]]; then
+    echo $((${VALUE/./}))
+  else
+    echo "$VALUE"0
+  fi
+}
+
+declare -r TOTAL_SBUS_FILE="$HOME"/total_sbus
+declare -r SBU_SECONDS_FILE="$HOME"/sbu_seconds
 declare -r BUILDSCRIPT="$SCRIPT_PATH/$PACKAGE"
 
-TOTAL_SBUS="$(get_total_sbus)";                         readonly TOTAL_SBUS
-PACKAGE_SBUS="$(get_package_sbus "$BUILDSCRIPT")";      readonly PACKAGE_SBUS
-SBU_SECONDS="$(cat "$HOME"/sbu_seconds || echo 0)";     readonly SBU_SECONDS
-COMPLETE_SBUS="$(cat "$HOME"/complete_sbus || echo 0)"; readonly COMPLETE_SBUS
+TOTAL_SBUS="$(<"$TOTAL_SBUS_FILE")";                                readonly TOTAL_SBUS
+PACKAGE_SBUS="$(get_package_sbus "$BUILDSCRIPT")";                  readonly PACKAGE_SBUS
+SBU_SECONDS="$(cat "$SBU_SECONDS_FILE" 2>/dev/null || echo 0)";     readonly SBU_SECONDS
+COMPLETE_SBUS="$(cat "$COMPLETE_SBUS_PATH" 2>/dev/null || echo 0)"; readonly COMPLETE_SBUS
+START_EPOCH_SECONDS="$(cat "$START_EPOCH_SECONDS_PATH" 2>/dev/null || echo 0)"; readonly START_EPOCH_SECONDS
+
+echo "TOTAL_SBUS: $TOTAL_SBUS  PACKAGE_SBUS: $PACKAGE_SBUS  SBU_SECONDS: $SBU_SECONDS  COMPLETE_SBUS: $COMPLETE_SBUS"
+
+PACKAGE_SBUS_X10="$(get_x10 "$PACKAGE_SBUS")";                            readonly PACKAGE_SBUS_X10
+TOTAL_SBUS_X10="$(get_x10 "$TOTAL_SBUS")";                                readonly TOTAL_SBUS_X10
+COMPLETE_SBUS_X10="$(get_x10 "$COMPLETE_SBUS")";                          readonly COMPLETE_SBUS_X10
+SBUS_COMPLETE_PERCENT_X10=$((COMPLETE_SBUS_X10 * 1000 / TOTAL_SBUS_X10)); readonly SBUS_COMPLETE_PERCENT_X10
+SBUS_COMPLETE_PERCENT="$(get_div10 "$SBUS_COMPLETE_PERCENT_X10")";        readonly SBUS_COMPLETE_PERCENT
+NOW_EPOCH_SECONDS="$(date +%s)";                                          readonly NOW_EPOCH_SECONDS
+
+if ((SBU_SECONDS > 0)); then
+  ESTIMATE_TOTAL_SECONDS=$((SBU_SECONDS * TOTAL_SBUS_X10 / 10)); readonly ESTIMATE_TOTAL_SECONDS
+  ESTIMATE_REMAINING_SECONDS=$((SBU_SECONDS * (TOTAL_SBUS_X10 - COMPLETE_SBUS_X10) / 10))
+  readonly ESTIMATE_REMAINING_SECONDS
+  ELAPSED_SECONDS=$((NOW_EPOCH_SECONDS - START_EPOCH_SECONDS))
+  ELAPSED_TEXT="$(get_dhms "$ELAPSED_SECONDS")"
+  ESTIMATE_TIME_TEXT="$(get_dhms "$ESTIMATE_TOTAL_SECONDS")"
+  PACKAGE_ESTIMATED_SECONDS=$((PACKAGE_SBUS_X10 * SBU_SECONDS / 10))
+
+  PACKAGE_ESTIMATE_TEXT=" $(get_dhms "$PACKAGE_ESTIMATED_SECONDS")"
+  ESTIMATE_TEXT="  $ELAPSED_TEXT/$ESTIMATE_TIME_TEXT"
+else
+  PACKAGE_ESTIMATE_TEXT=''
+  ESTIMATE_TEXT=''
+fi
 
 cd "$LFS"/sources
 
@@ -52,5 +117,20 @@ mkdir -v "$PACKAGE"
 tar --extract  --strip-components=1 --directory="$PACKAGE" --file="$ARCHIVE"
 
 cd "$PACKAGE"
-echo "Building $PACKAGE ($PACKAGE_SBUS SBUS)  $COMPLETE_SBUS/$TOTAL_SBUS Complete"
+echo "Building $PACKAGE ($(get_sbus_string "$PACKAGE_SBUS")$PACKAGE_ESTIMATE_TEXT)  $COMPLETE_SBUS/$TOTAL_SBUS  $SBUS_COMPLETE_PERCENT% Complete${ESTIMATE_TEXT}"
+BUILD_START_EPOCH_SECONDS="$(date +%s)"
+if ((START_EPOCH_SECONDS == 0)); then
+  echo "$BUILD_START_EPOCH_SECONDS" > "$START_EPOCH_SECONDS_PATH"
+fi
 CFLAGS='-Os -pipe' CXXFLAGS='-Os -pipe' "$BUILDSCRIPT" > ~/"$PACKAGE"-build.log
+BUILD_END_EPOCH_SECONDS="$(date +%s)"
+echo "Done building $PACKAGE in $(get_dhms $((BUILD_END_EPOCH_SECONDS - BUILD_START_EPOCH_SECONDS)))"
+
+BUILD_ELAPSED_SECONDS=$((BUILD_END_EPOCH_SECONDS - BUILD_START_EPOCH_SECONDS))
+NEW_COMPLETE_SBUS_X10=$((COMPLETE_SBUS_X10 + PACKAGE_SBUS_X10)); readonly NEW_COMPLETE_SBUS_X10
+NEW_COMPLETE_SBUS="$(get_div10 "$NEW_COMPLETE_SBUS_X10")";       readonly NEW_COMPLETE_SBUS
+
+echo "$NEW_COMPLETE_SBUS" > "$COMPLETE_SBUS_PATH"
+if ((SBU_SECONDS == 0)); then
+  echo "$BUILD_ELAPSED_SECONDS" > "$SBU_SECONDS_FILE"
+fi

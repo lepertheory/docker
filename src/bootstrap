@@ -53,7 +53,7 @@ validate_versions ()
 	validate_version git     2.7   "${GIT_VERSION}"                          || return 4
 	validate_version find    4.6   "${FIND_VERSION}"                         || return 5
 	validate_version grep    2.25  "${GREP_VERSION}"                         || return 6
-  validate_version bc      1.07  "${BC_VERSION}"                           || return 7
+  validate_version bc      1.06  "${BC_VERSION}"                           || return 7
 	trap '' ERR
 }
 

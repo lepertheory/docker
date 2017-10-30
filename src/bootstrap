@@ -26,9 +26,13 @@ validate_version ()
 	local -ra REQUIRED_VERSINFO=(${REQUIRED})
 	local -ra CURRENT_VERSINFO=(${CURRENT})
 	for component in "${!REQUIRED_VERSINFO[@]}"; do
-		if (( 10#${REQUIRED_VERSINFO[${component}]} > 10#${CURRENT_VERSINFO[${component}]} )); then
-			echo "${NAME} version ${REQUIRED[*]} is required." 1>&2
+    local required_component=$((10#${REQUIRED_VERSINFO[$component]}))
+    local current_component=$((10#${CURRENT_VERSINFO[$component]}))
+		if (( required_component > current_component )); then
+			echo "${NAME} version ${REQUIRED_VERSINFO[*]} is required, ${CURRENT_VERSINFO[*]} found." 1>&2
 			return 1
+    elif (( required_component < current_component )); then
+      return 0
 		fi
 	done
 }
@@ -36,7 +40,6 @@ validate_version ()
 validate_versions ()
 {
 	trap 'print_error_getting_versions_and_exit "$(caller)"' ERR
-	docker info
 	local SED_VERSION;    SED_VERSION="$(sed --version   | sed -rn 's/^sed( \(.*\))?\s+//p')";   readonly SED_VERSION
 	local DOCKER_VERSION; DOCKER_VERSION="$(docker info  | sed -rn 's/^Server Version: //p')";   readonly DOCKER_VERSION
 	local GIT_VERSION;    GIT_VERSION="$(git --version   | sed -rn 's/^git version //p')";       readonly GIT_VERSION

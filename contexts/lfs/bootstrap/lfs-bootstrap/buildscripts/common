@@ -31,7 +31,7 @@ get_x10 ()
 	local -r VALUE="$1"
 	
 	if [[ "$VALUE" == *.* ]]; then
-		echo $((${VALUE/./}))
+		echo $((10#${VALUE/./}))
 	else
 		echo "$VALUE"0
 	fi

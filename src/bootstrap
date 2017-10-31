@@ -26,13 +26,13 @@ validate_version ()
 	local -ra REQUIRED_VERSINFO=(${REQUIRED})
 	local -ra CURRENT_VERSINFO=(${CURRENT})
 	for component in "${!REQUIRED_VERSINFO[@]}"; do
-    local required_component=$((10#${REQUIRED_VERSINFO[$component]}))
-    local current_component=$((10#${CURRENT_VERSINFO[$component]}))
+		local required_component=$((10#${REQUIRED_VERSINFO[$component]}))
+		local current_component=$((10#${CURRENT_VERSINFO[$component]}))
 		if (( required_component > current_component )); then
 			echo "${NAME} version ${REQUIRED_VERSINFO[*]} is required, ${CURRENT_VERSINFO[*]} found." 1>&2
 			return 1
-    elif (( required_component < current_component )); then
-      return 0
+		elif (( required_component < current_component )); then
+			return 0
 		fi
 	done
 }
@@ -45,7 +45,6 @@ validate_versions ()
 	local GIT_VERSION;    GIT_VERSION="$(git --version   | sed -rn 's/^git version //p')";       readonly GIT_VERSION
 	local FIND_VERSION;   FIND_VERSION="$(find --version | sed -rn 's/^find( \(.*\))?\s+//p')" ; readonly FIND_VERSION
 	local GREP_VERSION;   GREP_VERSION="$(grep --version | sed -rn 's/^grep( \(.*\))?\s+//p')";  readonly GREP_VERSION
-  local BC_VERSION;     BC_VERSION="$(bc --version     | sed -rn 's/^bc //p')";                readonly BC_VERSION
 	
 	validate_version bash    4.3   "${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]}" || return 1
 	validate_version sed     4.2   "${SED_VERSION}"                          || return 2
@@ -53,7 +52,6 @@ validate_versions ()
 	validate_version git     2.7   "${GIT_VERSION}"                          || return 4
 	validate_version find    4.6   "${FIND_VERSION}"                         || return 5
 	validate_version grep    2.25  "${GREP_VERSION}"                         || return 6
-  validate_version bc      1.06  "${BC_VERSION}"                           || return 7
 	trap '' ERR
 }
 

@@ -79,7 +79,7 @@ COPY lfs_home/* ./
 #
 # Informational only.
 #
-COPY buildscripts/build ./buildscripts/
+COPY buildscripts/build buildscripts/common ./buildscripts/
 
 #
 # FROM: :LFS
@@ -396,7 +396,7 @@ RUN rm -rf /home/lfs/buildscripts \
 # FIXME: The chroot is from 6.4.
 # NOTE: Also symlinking env into /usr/bin
 #
-COPY passwd group "${LFS}"/etc/
+COPY sources/passwd sources/group "${LFS}"/etc/
 RUN chroot "${LFS}" /tools/bin/env --ignore-environment                          \
                                    HOME=/root                                    \
                                    TERM="${TERM}"                                \

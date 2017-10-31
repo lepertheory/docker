@@ -13,6 +13,8 @@ readonly SCRIPT_PATH
 readonly PACKAGE="$1"
 readonly ARCHIVE="$2"
 
+. "$HOME"/buildscripts/common
+
 readonly COMPLETE_SBUS_PATH="$HOME"/complete_sbus
 readonly START_EPOCH_SECONDS_PATH="$HOME"/start_epoch_seconds
 
@@ -32,20 +34,6 @@ get_dhms ()
   printf '%02d:%02d:%02d' "$HOURS" "$MINUTES" "$SECONDS"
 }
 
-get_div10 ()
-{
-  local -r VALUE="$1"
-
-  local retval
-  if ((${#VALUE} == 0)); then
-    echo 0
-  elif ((${#VALUE} == 1)); then
-    echo "0.$VALUE"
-  else
-    echo "${VALUE:0:-1}.${VALUE: -1}"
-  fi
-}
-
 get_package_sbus ()
 {
   local -r PACKAGE_PATH="$1"
@@ -61,17 +49,6 @@ get_sbus_string ()
     echo "$SBUS SBU"
   else
     echo "$SBUS SBUS"
-  fi
-}
-
-get_x10 ()
-{
-  local -r VALUE="$1"
-
-  if [[ "$VALUE" == *.* ]]; then
-    echo $((${VALUE/./}))
-  else
-    echo "$VALUE"0
   fi
 }
 

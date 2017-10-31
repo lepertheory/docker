@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o errtrace
+set -o nounset
+set -o pipefail
+
+get_div10 ()
+{
+	local -r VALUE="$1"
+	
+	local retval
+	if ((${#VALUE} == 0)); then
+		echo 0
+	elif ((${#VALUE} == 1)); then
+		echo 0."$VALUE"
+	else
+		echo "${VALUE:0:-1}.${VALUE: -1}"
+	fi
+}
+
+get_package_sbus ()
+{
+	local -r PACKAGE_PATH="$1"
+	
+	sed -rn 's/^# SBUS: (.*)/\1/p' "$PACKAGE_PATH"
+}
+
+get_x10 ()
+{
+	local -r VALUE="$1"
+	
+	if [[ "$VALUE" == *.* ]]; then
+		echo $((${VALUE/./}))
+	else
+		echo "$VALUE"0
+	fi
+}

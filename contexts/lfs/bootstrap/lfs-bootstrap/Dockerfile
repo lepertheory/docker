@@ -86,7 +86,8 @@ COPY buildscripts/build buildscripts/common ./buildscripts/
 # REF: Chapter5.4
 #
 COPY sources/binutils-2.29.tar.bz2 "${LFS}"/sources/
-COPY buildscripts/binutils-2.29 ./buildscripts/
+COPY buildscripts/binutils-2.29 \
+     buildscripts/binutils-2.29-suppressions* ./buildscripts/
 RUN . .bashrc && buildscripts/build binutils-2.29 binutils-2.29.tar.bz2
 
 #

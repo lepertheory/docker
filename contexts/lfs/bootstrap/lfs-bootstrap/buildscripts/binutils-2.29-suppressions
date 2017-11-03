@@ -1,4 +1,4 @@
-10
+20
 # Yep! We don't have `file` installed yet. Not an issue.
 /mnt/lfs/sources/binutils-2.29/(zlib|binutils|gas|gprof|ld|bfd|opcodes)/configure: line [0-9]+: /usr/bin/file: No such file or directory
 
@@ -23,11 +23,9 @@ In file included from \.\./\.\./bfd/elflink.c:25:0:\n
        width = get_DW_EH_PE_width \(ent->fde_encoding, ptr_size\);\n
                                       \^
 
-In file included from \.\./\.\./(binutils/syslex_wrap.c:25:0:|ld/ldlex-wrapper.c:26:0:)\n
-#(
-(arlex|ldlex|syslex)\.c: In function 'yy_get_next_buffer':\n
-(arlex|ldlex|syslex)\.c:[0-9]+:44: warning: comparison between signed and unsigned integer expressions \[-Wsign-compare\]\n
-#)+
+In file included from \.\./\.\./binutils/syslex_wrap.c:25:0:\n(
+(arlex|syslex)\.c: In function 'yy_get_next_buffer':\n
+(arlex|syslex)\.c:[0-9]+:44: warning: comparison between signed and unsigned integer expressions \[-Wsign-compare\]\n)+
 
 #eelf32_x86_64.c: In function 'gldelf32_x86_64_before_allocation':
 #eelf_x86_64.c: In function 'gldelf_x86_64_before_allocation':

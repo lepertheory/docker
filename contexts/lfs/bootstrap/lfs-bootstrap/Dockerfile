@@ -1,4 +1,5 @@
-FROM lfs/bootstrap/host-toolchain:master AS staging
+ARG GIT_BRANCH
+FROM lfs/bootstrap/host-toolchain:$GIT_BRANCH AS staging
 
 #
 # FROM: :LFS

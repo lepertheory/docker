@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-docker stop $(docker ps -a -q)
-docker rm --force --volumes $(docker ps -a -q)
-docker rmi --force $(docker images -q)
-docker volume rm --force $(docker volume list -q)

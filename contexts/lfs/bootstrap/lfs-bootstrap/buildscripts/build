@@ -110,12 +110,6 @@ CFLAGS='-Os -pipe'                 \
 CXXFLAGS='-Os -pipe'               \
 "$BUILDSCRIPT" 2>&1 > "$BUILD_LOG" \
 | if [[ -f "$SUPPRESSIONS".gawk ]]; then
-	#grep --extended-regexp \
-	#     --invert-match    \
-	#     --line-buffered   \
-	#     --line-regex      \
-	#     --file="$SUPPRESSIONS"
-	#sed --quiet --regexp-extended --unbuffered --file="$SUPPRESSIONS"
 	gawk --assign=SUPPRESSIONS="$SUPPRESSIONS" --file="$SUPPRESSIONS".gawk
 else
 	pwd

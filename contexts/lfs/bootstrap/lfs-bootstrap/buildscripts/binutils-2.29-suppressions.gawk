@@ -3,15 +3,16 @@ function evict_text () {
 		print pop(text)
 }
 
-function filter_text() {
+function filter_text(\
+                     matched, value) {
 	matched = 0
 	value = join(text, "\n")
 	for (i in pattern)
 	{
-		matcher = "^" pattern[i]
-		if (sub(matcher, "", value))
+		if (match(value, "^" pattern[i]))
 		{
-			matched = 1
+			matched = substr(value, 0, RLENGTH)
+			value = substr(value, RLENGTH + 1)
 			break
 		}
 	}

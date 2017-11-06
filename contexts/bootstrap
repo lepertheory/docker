@@ -56,10 +56,12 @@ bootstrap_context ()
 	fi
 }
 
+# TODO: These are just build scripts, rename from bootstrap.
 cd "$SCRIPT_DIR"
 for context in ubuntu-core        \
                apt-offline        \
                lfs-host-toolchain \
-               lfs-bootstrap; do
+               lfs-bootstrap      \
+               lfs; do
 	bootstrap_context "$context"
 done

@@ -372,6 +372,9 @@ RUN chown -R root:root "${LFS}"/tools
 #
 #RUN rm -rf /home/lfs/buildscripts \
 #           "${LFS}"/sources
+RUN rm -rf "$BUILD" \
+ && mkdir -pv /mnt/lfs/root/buildscripts \
+ && cp /home/lfs/buildscripts/{build,common} /mnt/lfs/root/buildscripts
 
 #
 # FROM: :LFS

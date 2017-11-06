@@ -286,8 +286,6 @@ getImageEnvironmentVariable()
 
 #
 # Run a command, optionally logging the command itself.
-#
-# ARGV... Just what you'd enter on the command-line. The first element may be overridden by values in the global
 #           associative array EXECUTABLES.
 #
 run()

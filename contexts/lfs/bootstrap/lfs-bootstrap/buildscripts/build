@@ -106,16 +106,9 @@ fi
 # Redirect build script standard output (only) to a log file, we probably don't need it. Standard
 # error is redirected to the former standard out, and any line matching a regex in the suppressions
 # file is 
-CFLAGS='-Os -pipe'                 \
-CXXFLAGS='-Os -pipe'               \
-"$BUILDSCRIPT" 2>&1 > "$BUILD_LOG" \
-| if [[ -f "$SUPPRESSIONS".gawk ]]; then
-	gawk --assign=SUPPRESSIONS="$SUPPRESSIONS" --file="$SUPPRESSIONS".gawk
-else
-	pwd
-	ls -l "$(dirname "$SUPPRESSIONS")"
-	cat
-fi 1>&2
+CFLAGS='-Os -pipe'   \
+CXXFLAGS='-Os -pipe' \
+"$BUILDSCRIPT" > "$BUILD_LOG" 2>&1
 
 BUILD_END_EPOCH_SECONDS="$(date +%s)"
 

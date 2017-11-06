@@ -46,9 +46,9 @@ bootstrap_context ()
 
     local -r BOOTSTRAP_SCRIPT="${CONTEXT}"/bootstrap
     if [[ -e "${BOOTSTRAP_SCRIPT}" ]]; then
-      "${BOOTSTRAP_SCRIPT}" "${TAG}"
+      "$BOOTSTRAP_SCRIPT" "$TAG" "$GIT_BRANCH"
     else
-      docker build --tag="${TAG}" "${context}"
+      docker build --build-arg=GIT_BRANCH="$GIT_BRANCH" --tag="${TAG}" "${context}"
     fi
 
     echo "Done building ${CONTEXT}"

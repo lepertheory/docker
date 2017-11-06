@@ -17,6 +17,11 @@ readonly ARCHIVE="$2"
 
 readonly COMPLETE_SBUS_PATH="$HOME"/complete_sbus
 readonly START_EPOCH_SECONDS_PATH="$HOME"/start_epoch_seconds
+readonly TOTAL_SBUS_FILE="$HOME"/total_sbus
+readonly SBU_SECONDS_FILE="$HOME"/sbu_seconds
+readonly BUILDSCRIPT="$SCRIPT_PATH/$PACKAGE"
+readonly SUPPRESSIONS="$BUILDSCRIPT"-suppressions
+readonly BUILD_LOG="$HOME/$PACKAGE"-build.log
 
 get_dhms ()
 {
@@ -52,17 +57,11 @@ get_sbus_string ()
   fi
 }
 
-declare -r TOTAL_SBUS_FILE="$HOME"/total_sbus
-declare -r SBU_SECONDS_FILE="$HOME"/sbu_seconds
-declare -r BUILDSCRIPT="$SCRIPT_PATH/$PACKAGE"
-
 TOTAL_SBUS="$(<"$TOTAL_SBUS_FILE")";                                readonly TOTAL_SBUS
 PACKAGE_SBUS="$(get_package_sbus "$BUILDSCRIPT")";                  readonly PACKAGE_SBUS
 SBU_SECONDS="$(cat "$SBU_SECONDS_FILE" 2>/dev/null || echo 0)";     readonly SBU_SECONDS
 COMPLETE_SBUS="$(cat "$COMPLETE_SBUS_PATH" 2>/dev/null || echo 0)"; readonly COMPLETE_SBUS
 START_EPOCH_SECONDS="$(cat "$START_EPOCH_SECONDS_PATH" 2>/dev/null || echo 0)"; readonly START_EPOCH_SECONDS
-
-echo "TOTAL_SBUS: $TOTAL_SBUS  PACKAGE_SBUS: $PACKAGE_SBUS  SBU_SECONDS: $SBU_SECONDS  COMPLETE_SBUS: $COMPLETE_SBUS"
 
 PACKAGE_SBUS_X10="$(get_x10 "$PACKAGE_SBUS")";                            readonly PACKAGE_SBUS_X10
 TOTAL_SBUS_X10="$(get_x10 "$TOTAL_SBUS")";                                readonly TOTAL_SBUS_X10
@@ -94,13 +93,25 @@ mkdir -v "$PACKAGE"
 tar --extract  --strip-components=1 --directory="$PACKAGE" --file="$ARCHIVE"
 
 cd "$PACKAGE"
-echo "Building $PACKAGE ($(get_sbus_string "$PACKAGE_SBUS")$PACKAGE_ESTIMATE_TEXT)  $COMPLETE_SBUS/$TOTAL_SBUS  $SBUS_COMPLETE_PERCENT% Complete${ESTIMATE_TEXT}"
+
+echo "Building $PACKAGE ($(get_sbus_string "$PACKAGE_SBUS")$PACKAGE_ESTIMATE_TEXT)" \
+     " $COMPLETE_SBUS/$TOTAL_SBUS"                                                  \
+     " $SBUS_COMPLETE_PERCENT% Complete${ESTIMATE_TEXT}"
+
 BUILD_START_EPOCH_SECONDS="$(date +%s)"
 if ((START_EPOCH_SECONDS == 0)); then
   echo "$BUILD_START_EPOCH_SECONDS" > "$START_EPOCH_SECONDS_PATH"
 fi
-CFLAGS='-Os -pipe' CXXFLAGS='-Os -pipe' "$BUILDSCRIPT" > ~/"$PACKAGE"-build.log
+
+# Redirect build script standard output (only) to a log file, we probably don't need it. Standard
+# error is redirected to the former standard out, and any line matching a regex in the suppressions
+# file is 
+CFLAGS='-Os -pipe'   \
+CXXFLAGS='-Os -pipe' \
+"$BUILDSCRIPT" > "$BUILD_LOG" 2>&1
+
 BUILD_END_EPOCH_SECONDS="$(date +%s)"
+
 echo "Done building $PACKAGE in $(get_dhms $((BUILD_END_EPOCH_SECONDS - BUILD_START_EPOCH_SECONDS)))"
 
 BUILD_ELAPSED_SECONDS=$((BUILD_END_EPOCH_SECONDS - BUILD_START_EPOCH_SECONDS))

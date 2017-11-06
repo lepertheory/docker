@@ -1,4 +1,5 @@
-FROM lfs/bootstrap/ubuntu:master AS staging
+ARG GIT_BRANCH
+FROM lfs/bootstrap/ubuntu:$GIT_BRANCH AS staging
 
 ARG APT_OFFLINE=/root/apt-offline
 

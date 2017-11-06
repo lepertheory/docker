@@ -19,7 +19,7 @@ if [[ "$TOTAL_SBUS" != "$OLD_SBUS" ]]; then
 	echo "$TOTAL_SBUS" > "$TOTAL_SBUS_FILE"
 fi
 
-docker build --build-arg=GIT_BRANCH="$GIT_BRANCH" \
-             --build-arg=TAG_BASE="$TAG_BASE"     \
-             --tag="$TAG_BASE/$CONTEXT"           \
+docker build --build-arg=GIT_BRANCH="$GIT_BRANCH"   \
+             --build-arg=TAG_BASE="$TAG_BASE"       \
+             --tag="$TAG_BASE/$CONTEXT:$GIT_BRANCH" \
              "$SCRIPT_PATH"

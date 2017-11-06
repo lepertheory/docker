@@ -86,7 +86,7 @@ else
   ESTIMATE_TEXT=''
 fi
 
-cd "$LFS"/sources
+cd "$LFS"/build
 
 echo "Unpacking $ARCHIVE"
 mkdir -v "$PACKAGE"
@@ -108,6 +108,7 @@ fi
 # file is 
 CFLAGS='-Os -pipe'   \
 CXXFLAGS='-Os -pipe' \
+SOURCES="$SOURCES"   \
 "$BUILDSCRIPT" > "$BUILD_LOG" 2>&1
 
 BUILD_END_EPOCH_SECONDS="$(date +%s)"

@@ -9,9 +9,9 @@ set -o nounset
 cat gcc/limitx.h gcc/glimits.h gcc/limity.h \
 > "$(dirname "$("${LFS_TGT}"-gcc -print-libgcc-file-name)")"/include-fixed/limits.h
 
-tar -xf ../mpfr-3.1.5.tar.xz; mv -v mpfr-3.1.5 mpfr
-tar -xf ../gmp-6.1.2.tar.xz;  mv -v gmp-6.1.2  gmp
-tar -xf ../mpc-1.0.3.tar.gz;  mv -v mpc-1.0.3  mpc
+tar -xf "$SOURCES"/mpfr-3.1.5.tar.xz; mv -v mpfr-3.1.5 mpfr
+tar -xf "$SOURCES"/gmp-6.1.2.tar.xz;  mv -v gmp-6.1.2  gmp
+tar -xf "$SOURCES"/mpc-1.0.3.tar.gz;  mv -v mpc-1.0.3  mpc
 
 for file in gcc/config/{linux,i386/linux{,64}}.h; do
 	cp -uv "${file}"{,.orig}

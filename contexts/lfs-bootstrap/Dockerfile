@@ -1,5 +1,6 @@
 ARG GIT_BRANCH
-FROM lfs/bootstrap/host-toolchain:$GIT_BRANCH AS staging
+ARG TAG_BASE
+FROM $TAG_BASE/lfs-host-toolchain:$GIT_BRANCH AS staging
 
 #
 # FROM: :LFS
@@ -394,6 +395,7 @@ RUN rm -rf /home/lfs/buildscripts \
 # FROM: :LFS
 # REF: Chapter6.4
 # REF: Chapter6.5
+# REF: Chapter6.6
 #
 # FIXME: The chroot is from 6.4.
 # NOTE: Also symlinking env into /usr/bin

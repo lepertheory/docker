@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+
+#
+# FROM: src/thirdparty/LFS-BOOK-8.1-systemd-NOCHUNKS.html
+#
+# REF: LFS
+#
+# FROM: :LFS
+# Find 'REF: LFS' to see what led here. In this case, it's right above, but you should always be
+# able to use this command to find the source of a reference:
+#
+#   grep --recursive --extended-regexp --binary-files=without-match '^# REF: LFS$'
+#
+# Or shorter:
+#
+#   grep -rEI '^# REF: LFS$'
+#
+# REF: Chapter1
+# Done manually.
+#
+
+set -o errexit
+set -o errtrace
+set -o nounset
+set -o pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)";                     readonly SCRIPT_DIR
+REPO_DIR="$(cd "$(cd "$SCRIPT_DIR" && git rev-parse --show-toplevel)" && pwd)"; readonly REPO_DIR
+CONTEXT_DIR="$REPO_DIR"/contexts;                                               readonly CONTEXT_DIR
+TAG_BASE="$1";                                                                  readonly TAG_BASE
+GIT_BRANCH="$(git symbolic-ref HEAD)"; GIT_BRANCH="${GIT_BRANCH##refs/heads/}"; readonly GIT_BRANCH
+FORCE="${2:-false}";                                                            readonly FORCE
+
+bootstrap_context ()
+{
+	local -r CONTEXT="$1"
+	
+	local TAG="$TAG_BASE/$CONTEXT:$GIT_BRANCH"; readonly TAG
+	local -r CREATED="$(docker inspect --format='{{ .Created }}' "$TAG" 2>/dev/null || echo -n)"
+	
+	if [[ "$FORCE" == 'true' ]] \
+	|| [[ -z "$CREATED" ]]      \
+	|| find "$CONTEXT" -newermt "$CREATED" | grep -q .; then
+		echo "Building $CONTEXT"
+		
+		local -r BOOTSTRAP_SCRIPT="$CONTEXT"/bootstrap
+		if [[ -e "$BOOTSTRAP_SCRIPT" ]]; then
+			"$BOOTSTRAP_SCRIPT" "$TAG_BASE" "$CONTEXT" "$GIT_BRANCH"
+		else
+			docker build --build-arg=GIT_BRANCH="$GIT_BRANCH" --build-arg=TAG_BASE="$TAG_BASE" --tag="$TAG" "$context"
+		fi
+		
+		echo "Done building $CONTEXT"
+	else
+		echo "$TAG is newer than any files in $CONTEXT."
+	fi
+}
+
+cd "$SCRIPT_DIR"
+for context in ubuntu-core        \
+               apt-offline        \
+               lfs-host-toolchain \
+               lfs-bootstrap; do
+	bootstrap_context "$context"
+done

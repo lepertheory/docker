@@ -61,27 +61,6 @@ if [[ ! $? ]]; then
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_DIR="$(cd "$(cd "${SCRIPT_DIR}")" && git rev-parse --show-toplevel)" 
+REPO_DIR="$(cd "${SCRIPT_DIR}" && git rev-parse --show-toplevel)" 
 
-"${REPO_DIR}"/contexts/lfs/bootstrap/bootstrap lfs/bootstrap "${FORCE}"
-
-##
-## Run this to get a persistent docker image running, called "controller". It serves to run programs faster, and provide a nice
-## isolated place for dependencies to live.
-##
-#
-#set -e
-#set -o pipefail
-#
-#SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-#. "${SCRIPT_DIR}"/common
-#
-#buildDockerImage "${SCRIPT_DIR}/${BASE_DOCKER_NAME}"
-#buildDockerImage "${SCRIPT_DIR}/${CONTROLLER_DOCKER_NAME}"
-#
-#if isDockerContainerNameRunning "${CONTROLLER_DOCKER_NAME}"; then
-#  docker stop "${CONTROLLER_DOCKER_NAME}"
-#fi
-#"${SCRIPT_DIR}"/run "${SCRIPT_DIR}"/"${CONTROLLER_DOCKER_NAME}" --dockerArg -d \
-#                                                                --dockerArg --name="${CONTROLLER_DOCKER_NAME}" \
-#                                                                --dockerArg --rm
+"${REPO_DIR}"/contexts/bootstrap lepertheory "${FORCE}"

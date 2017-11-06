@@ -5,8 +5,9 @@ set -o errtrace
 set -o nounset
 set -o pipefail
 
-readonly TAG="$1"
-readonly BRANCH="$2"
+readonly TAG_BASE="$1"
+readonly CONTEXT="$2"
+readonly GIT_BRANCH="$3"
 
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; readonly SCRIPT_PATH
 . "$SCRIPT_PATH"/buildscripts/common
@@ -31,4 +32,7 @@ if [[ "$TOTAL_SBUS" != "$OLD_SBUS" ]]; then
 	echo "$TOTAL_SBUS" > "$TOTAL_SBUS_FILE"
 fi
 
-docker build --build-arg=GIT_BRANCH="$2" --tag="$TAG" "$SCRIPT_PATH"
+docker build --build-arg=GIT_BRANCH="$GIT_BRANCH" \
+             --build-arg=TAG_BASE="$TAG_BASE"     \
+             --tag="$TAG_BASE/$CONTEXT"           \
+             "$SCRIPT_PATH"

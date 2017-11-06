@@ -1,5 +1,6 @@
 ARG GIT_BRANCH
-FROM lfs/bootstrap/ubuntu:$GIT_BRANCH AS staging
+ARG TAG_BASE
+FROM $TAG_BASE/ubuntu-core:$GIT_BRANCH AS staging
 
 ARG APT_OFFLINE=/root/apt-offline
 

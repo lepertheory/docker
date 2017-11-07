@@ -1,0 +1,31 @@
+--- Dockerfile	2017-10-27 17:09:13.916778822 +0000
++++ Dockerfile.new	2017-11-07 00:00:27.037432337 +0000
+@@ -30,18 +30,21 @@
+ 	&& echo 'Acquire::GzipIndexes "true"; Acquire::CompressionTypes::Order:: "gz";' > /etc/apt/apt.conf.d/docker-gzip-indexes \
+ 	\
+ # https://github.com/docker/docker/blob/9a9fc01af8fb5d98b8eec0740716226fadb3735c/contrib/mkimage/debootstrap#L134-L151
+-	&& echo 'Apt::AutoRemove::SuggestsImportant "false";' > /etc/apt/apt.conf.d/docker-autoremove-suggests
+-
++	&& echo 'Apt::AutoRemove::SuggestsImportant "false";' > /etc/apt/apt.conf.d/docker-autoremove-suggests \
++	\
+ # delete all the apt list files since they're big and get stale quickly
+-RUN rm -rf /var/lib/apt/lists/*
++	&& rm -rf /var/lib/apt/lists/* \
+ # this forces "apt-get update" in dependent images, which is also good
+-
++	\
+ # enable the universe
+-RUN sed -i 's/^#\s*\(deb.*universe\)$/\1/g' /etc/apt/sources.list
+-
++	&& sed -i 's/^#\s*\(deb.*universe\)$/\1/g' /etc/apt/sources.list \
++	\
+ # make systemd-detect-virt return "docker"
+ # See: https://github.com/systemd/systemd/blob/aa0c34279ee40bce2f9681b496922dedbadfca19/src/basic/virt.c#L434
+-RUN mkdir -p /run/systemd && echo 'docker' > /run/systemd/container
++	&& mkdir -p /run/systemd && echo 'docker' > /run/systemd/container
+ 
+ # overwrite this with 'CMD []' in a dependent Dockerfile
++SHELL ["/bin/bash", "-c"]
+ CMD ["/bin/bash"]
++ONBUILD SHELL ["/bin/bash", "-c"]
++ONBUILD CMD ["/bin/bash"]

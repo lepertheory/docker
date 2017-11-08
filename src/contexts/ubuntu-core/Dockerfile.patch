@@ -1,5 +1,5 @@
---- Dockerfile	2017-10-27 17:09:13.916778822 +0000
-+++ Dockerfile.new	2017-11-07 00:00:27.037432337 +0000
+--- ../../thirdparty/ubuntu-core/Dockerfile	2017-11-07 00:12:40.142425403 +0000
++++ Dockerfile	2017-11-08 07:20:18.723312655 +0000
 @@ -30,18 +30,21 @@
  	&& echo 'Acquire::GzipIndexes "true"; Acquire::CompressionTypes::Order:: "gz";' > /etc/apt/apt.conf.d/docker-gzip-indexes \
  	\

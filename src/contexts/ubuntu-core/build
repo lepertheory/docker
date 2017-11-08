@@ -5,13 +5,16 @@ set -o errtrace
 set -o pipefail
 set -o nounset
 
-readonly TAG_BASE="$1"
-readonly CONTEXT="$2"
-readonly GIT_BRANCH="$3"
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; readonly SCRIPT_DIR
+. "$SCRIPT_DIR"/../../paths 
 
-docker build --build-arg=GIT_BRANCH="$GIT_BRANCH" \
-             --build-arg=TAG_BASE="$TAG_BASE"     \
-             --tag="$TAG_BASE/$CONTEXT:$GIT_BRANCH"
+CONTEXT="$(basename "$SCRIPT_DIR")";                               readonly CONTEXT
+CONTEXT_SOURCE_DIR="$(get_context_source_dir "$CONTEXT")";         readonly CONTEXT_SOURCE_DIR
+CONTEXT_THIRDPARTY_DIR="$(get_context_thirdparty_dir "$CONTEXT")"; readonly CONTEXT_THIRDPARTY_DIR
 
+run patch --input="$CONTEXT_SOURCE_DIR"/Dockerfile.patch \
+          --output=Dockerfile                            \
+          "$CONTEXT_THIRDPARTY_DIR"/Dockerfile
+run cp "$CONTEXT_THIRDPARTY_DIR"/ubuntu-xenial-core-cloudimg-amd64-root.tar.gz .
+
+run docker build --tag="$TAG_BASE/$CONTEXT:$GIT_BRANCH" .

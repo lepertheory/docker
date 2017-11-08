@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+ensure_and_get_build_dir ()
+{
+	local BUILD_DIR; BUILD_DIR="$(get_build_dir)"; readonly BUILD_DIR
+	mkdir --parents "$BUILD_DIR"
+	echo "$BUILD_DIR"
+}
+
+get_build_dir ()
+{
+	local retval; retval="$(get_repo_dir)"/build
+	return retval
+}
+
+get_repo_dir ()
+{
+	local MY_DIR; MY_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; readonly MY_DIR
+	
+	cd "$MY_DIR"
+	git rev-parse --show-toplevel
+}

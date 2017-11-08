@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+if [[ -z "${PATHS_8djf8sj48jt8sjr8ja4al:-}" ]]; then
+	export PATHS_8djf8sj48jt8sjr8ja4al=true
+	
+	get_context_source_dir ()
+	{
+		echo "$SOURCE_DIR/contexts/$1"
+	}
+	
+	get_context_thirdparty_dir ()
+	{
+		echo "$THIRDPARTY_DIR/$1"
+	}
+	
+	run ()
+	{
+		echo "Running:$(printf ' %q' "$@")"
+		"$@"
+	}
+	
+	REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)"; readonly REPO_DIR
+	SOURCE_DIR="$REPO_DIR"/src;                                                         readonly SOURCE_DIR
+	THIRDPARTY_DIR="$SOURCE_DIR"/thirdparty;                                            readonly THIRDPARTY_DIR
+	GIT_BRANCH="$(cd "$REPO_DIR" && git symbolic-ref HEAD)"
+	GIT_BRANCH="${GIT_BRANCH##refs/heads/}";                                            readonly GIT_BRANCH
+	TAG_BASE=lepertheory;                                                               readonly TAG_BASE
+	
+	export GIT_BRANCH
+	export REPO_DIR
+	export SOURCE_DIR
+	export TAG_BASE
+	export THIRDPARTY_DIR
+	
+	export -f get_context_source_dir
+	export -f get_context_thirdparty_dir
+	export -f run
+fi

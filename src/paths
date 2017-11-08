@@ -3,20 +3,23 @@
 if [[ -z "${PATHS_8djf8sj48jt8sjr8ja4al:-}" ]]; then
 	export PATHS_8djf8sj48jt8sjr8ja4al=true
 	
-	get_context_source_dir ()
-	{
-		echo "$SOURCE_DIR/contexts/$1"
-	}
-	
-	get_context_thirdparty_dir ()
-	{
-		echo "$THIRDPARTY_DIR/$1"
-	}
-	
 	run ()
 	{
 		echo "Running:$(printf ' %q' "$@")"
 		"$@"
+	}
+	
+	set_context_env_vars ()
+	{
+		CONTEXT_SOURCE_DIR="$SCRIPT_DIR";                       readonly CONTEXT_SOURCE_DIR
+		CONTEXT_NAME="$(basename "$CONTEXT_SOURCE_DIR")";       readonly CONTEXT_NAME
+		CONTEXT_THIRDPARTY_DIR="$THIRDPARTY_DIR/$CONTEXT_NAME"; readonly CONTEXT_THIRDPARTY_DIR
+		CONTEXT_TAG="$TAG_BASE/$CONTEXT_NAME:$GIT_BRANCH";      readonly CONTEXT_TAG
+		
+		export CONTEXT_NAME
+		export CONTEXT_SOURCE_DIR
+		export CONTEXT_TAG
+		export CONTEXT_THIRDPARTY_DIR
 	}
 	
 	REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && git rev-parse --show-toplevel)"; readonly REPO_DIR
@@ -32,7 +35,6 @@ if [[ -z "${PATHS_8djf8sj48jt8sjr8ja4al:-}" ]]; then
 	export TAG_BASE
 	export THIRDPARTY_DIR
 	
-	export -f get_context_source_dir
-	export -f get_context_thirdparty_dir
 	export -f run
+	export -f set_context_env_vars
 fi

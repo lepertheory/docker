@@ -1,6 +1,6 @@
 ARG GIT_BRANCH
 ARG TAG_BASE
-FROM ${TAG_BASE}/apt-offline:$GIT_BRANCH AS staging
+FROM $TAG_BASE/apt-offline:$GIT_BRANCH AS staging
 
 #
 # FROM: :LFS

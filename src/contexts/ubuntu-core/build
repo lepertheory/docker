@@ -8,13 +8,11 @@ set -o nounset
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; readonly SCRIPT_DIR
 . "$SCRIPT_DIR"/../../paths 
 
-CONTEXT="$(basename "$SCRIPT_DIR")";                               readonly CONTEXT
-CONTEXT_SOURCE_DIR="$(get_context_source_dir "$CONTEXT")";         readonly CONTEXT_SOURCE_DIR
-CONTEXT_THIRDPARTY_DIR="$(get_context_thirdparty_dir "$CONTEXT")"; readonly CONTEXT_THIRDPARTY_DIR
+set_context_env_vars
 
 run patch --input="$CONTEXT_SOURCE_DIR"/Dockerfile.patch \
           --output=Dockerfile                            \
           "$CONTEXT_THIRDPARTY_DIR"/Dockerfile
 run cp "$CONTEXT_THIRDPARTY_DIR"/ubuntu-xenial-core-cloudimg-amd64-root.tar.gz .
 
-run docker build --tag="$TAG_BASE/$CONTEXT:$GIT_BRANCH" .
+run docker build --tag="$CONTEXT_TAG" .

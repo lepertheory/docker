@@ -11,25 +11,25 @@ print_error_getting_versions_and_exit ()
 {
 	local -r CALLER="${1}";
 	
-	echo "From: ${CALLER}"
+	echo "From: $CALLER"
 	echo "Got an error trying to get versions." 1>&2
 	exit 65
 }
 
 validate_version ()
 {
-	local -r NAME="${1}"
-	local -r REQUIRED="${2}"
-	local -r CURRENT="${3}"
+	local -r NAME="$1"
+	local -r REQUIRED="$2"
+	local -r CURRENT="$3"
 	
 	IFS=.
-	local -ra REQUIRED_VERSINFO=(${REQUIRED})
-	local -ra CURRENT_VERSINFO=(${CURRENT})
+	local -ra REQUIRED_VERSINFO=($REQUIRED)
+	local -ra CURRENT_VERSINFO=($CURRENT)
 	for component in "${!REQUIRED_VERSINFO[@]}"; do
 		local required_component=$((10#${REQUIRED_VERSINFO[$component]}))
 		local current_component=$((10#${CURRENT_VERSINFO[$component]}))
 		if (( required_component > current_component )); then
-			echo "${NAME} version ${REQUIRED_VERSINFO[*]} is required, ${CURRENT_VERSINFO[*]} found." 1>&2
+			echo "$NAME version ${REQUIRED_VERSINFO[*]} is required, ${CURRENT_VERSINFO[*]} found." 1>&2
 			return 1
 		elif (( required_component < current_component )); then
 			return 0
@@ -47,11 +47,11 @@ validate_versions ()
 	local GREP_VERSION;   GREP_VERSION="$(grep --version | sed -rn 's/^grep( \(.*\))?\s+//p')";  readonly GREP_VERSION
 	
 	validate_version bash    4.3   "${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]}" || return 1
-	validate_version sed     4.2   "${SED_VERSION}"                          || return 2
-	validate_version docker 17.09  "${DOCKER_VERSION}"                       || return 3
-	validate_version git     2.7   "${GIT_VERSION}"                          || return 4
-	validate_version find    4.6   "${FIND_VERSION}"                         || return 5
-	validate_version grep    2.25  "${GREP_VERSION}"                         || return 6
+	validate_version sed     4.2   "$SED_VERSION"                            || return 2
+	validate_version docker 17.09  "$DOCKER_VERSION"                         || return 3
+	validate_version git     2.7   "$GIT_VERSION"                            || return 4
+	validate_version find    4.6   "$FIND_VERSION"                           || return 5
+	validate_version grep    2.25  "$GREP_VERSION"                           || return 6
 	trap '' ERR
 }
 
@@ -61,6 +61,11 @@ if [[ ! $? ]]; then
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; readonly SCRIPT_DIR
-#REPO_DIR="$(cd "${SCRIPT_DIR}" && git rev-parse --show-toplevel)" 
+. "$SCRIPT_DIR"/paths
 
-"${SCRIPT_DIR}"/contexts/bootstrap lepertheory "${FORCE}"
+echo "Building in: $(pwd)"
+
+run mkdir --parents contexts
+run cd contexts
+
+"$SCRIPT_DIR"/contexts/build "$FORCE"

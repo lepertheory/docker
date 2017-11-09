@@ -11,7 +11,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; readonly SCRIPT_DIR
 for context in ubuntu-core        \
                apt-offline        \
                lfs-host-toolchain \
-               lfs-bootstrap
+               lfs-bootstrap      \
+               lfs
 do
 	run mkdir --parents "$context"
 	run cd              "$context"

@@ -11,12 +11,35 @@ RUN mkdir --parents "$HOME"/build
 # FIXME: Same, take out, fix by DRYing upstream.
 ENV SOURCES=/usr/src
 
+# FIXME: Comment somewhere better this idea: Tag images with an order-
+#        independent hash of the dependencies installed. That way you:
+#        1. Get all of your deps installed in a completely-uncustomized (as
+#           much as possible while still being part of the framework) baseline
+#           image that's automatically shared without needing to manually build
+#           a shared docker image.
+#        2. All configuration is done by your script. You can call out to other
+#           services to generate Dockerfiles.
+
 #
 # FROM: :LFS
 # REF: Chapter6.7
 #
 COPY buildscripts/linux-headers-4.12.7 /root/buildscripts/
 RUN  buildscripts/build linux-headers-4.12.7 /usr/src/linux-4.12.7.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter6.8
+#
+COPY buildscripts/man-pages-4.12 /root/buildscripts
+RUN  buildscripts/build man-pages-4.12 /usr/src/man-pages-4.12.tar.xz
+
+#
+# FROM: :LFS
+# REF: Chapter6.9
+#
+COPY buildscripts/glibc-2.26 /root/buildscripts
+RUN  buildscripts/build glibc-2.26 /usr/src/glibc-2.26.tar.xz
 
 ONBUILD ENV     HOME=/root
 ONBUILD WORKDIR "$HOME"

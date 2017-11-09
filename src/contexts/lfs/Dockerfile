@@ -5,6 +5,12 @@ FROM $TAG_BASE/lfs-bootstrap:$GIT_BRANCH
 # FIXME: Actually calculate the SBUs.
 RUN echo 1.0 > "$HOME"/total_sbus
 
+# FIXME: Take this out, see the problem, fix it the right way.
+RUN mkdir --parents "$HOME"/build
+
+# FIXME: Same, take out, fix by DRYing upstream.
+ENV SOURCES=/usr/src
+
 #
 # FROM: :LFS
 # REF: Chapter6.7

@@ -456,5 +456,5 @@ CMD ["/tools/bin/bash", "+h"]
 
 ONBUILD ENV     HOME=/root
 ONBUILD WORKDIR "$HOME"
-ONBUILD SHELL   ["/bin/bash", "-c"]
+ONBUILD SHELL   ["/bin/bash", "--login", "-c"]
 ONBUILD CMD     ["/bin/bash", "--login"]

@@ -86,7 +86,7 @@ else
   ESTIMATE_TEXT=''
 fi
 
-cd "$LFS"/build
+cd "${LFS:-$HOME}"/build
 
 echo "Unpacking $ARCHIVE"
 mkdir -v "$PACKAGE"

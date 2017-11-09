@@ -7,6 +7,23 @@ set -o errtrace
 set -o pipefail
 set -o nounset
 
+# FIXME: This is duplicated with the lfs-bootstrap glibc build.
+# NOTE: This should no longer be necessary in a newer version of glibc:
+#       https://sourceware.org/git/gitweb.cgi?p=glibc.git;h=ae65d4f3c3995279ca458c460ebf8bab1885fa03
+declare -r CFLAGS_ARR=($CFLAGS)
+CFLAGS=''
+for flag in "${CFLAGS_ARR[@]}"; do
+  if [[ "$flag" == '-Os' ]]; then
+    flag='-O2'
+  fi
+  if [[ -z "$CFLAGS" ]]; then
+    CFLAGS="$flag"
+  else
+    CFLAGS+=" $flag"
+  fi
+done
+CXXFLAGS="$CFLAGS"
+
 # TODO: Comment some.
 
 patch --forward --strip=1 --input="$SOURCES"/glibc-2.26-fhs-1.patch

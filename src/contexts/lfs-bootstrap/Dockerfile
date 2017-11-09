@@ -450,6 +450,7 @@ COPY root_home/* "$LFS"/root/
 #
 FROM scratch
 COPY --from=staging /mnt/lfs /
-SHELL ["/bin/bash", "-c"]
 ENV HOME=/root
+WORKDIR "$HOME"
+SHELL ["/bin/bash", "-c"]
 CMD ["/tools/bin/bash", "+h"]

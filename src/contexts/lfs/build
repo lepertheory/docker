@@ -5,21 +5,14 @@ set -o errtrace
 set -o nounset
 set -o pipefail
 
-readonly TAG_BASE="$1"
-readonly CONTEXT="$2"
-readonly GIT_BRANCH="$3"
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; readonly SCRIPT_DIR
-. "$SCRIPT_DIR"/buildscripts/common
+. "$SCRIPT_DIR"/../../paths
 
-TOTAL_SBUS_FILE="$SCRIPT_DIR"/root_home/total_sbus
-TOTAL_SBUS="$(get_total_sbus "$SCRIPT_DIR"/buildscripts)"; readonly TOTAL_SBUS
-OLD_SBUS="$(cat "$TOTAL_SBUS_FILE" 2>/dev/null || echo 0)"
-if [[ "$TOTAL_SBUS" != "$OLD_SBUS" ]]; then
-	echo "$TOTAL_SBUS" > "$TOTAL_SBUS_FILE"
-fi
+set_context_env_vars
 
-docker build --build-arg=GIT_BRANCH="$GIT_BRANCH" \
-             --build-arg=TAG_BASE="$TAG_BASE"     \
-             --tag="$TAG_BASE/$CONTEXT"           \
-             "$SCRIPT_DIR"
+run cp --recursive "$CONTEXT_SOURCE_DIR"/{Dockerfile,buildscripts} .
+
+run docker build --build-arg=GIT_BRANCH="$GIT_BRANCH" \
+                 --build-arg=TAG_BASE="$TAG_BASE"     \
+                 --tag="$CONTEXT_TAG"                 \
+                 .

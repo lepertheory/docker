@@ -9,7 +9,7 @@ FROM $TAG_BASE/apt-offline:$GIT_BRANCH AS staging
 RUN PACKAGES=($(<"$APT_OFFLINE"/packages)) \
   ; apt-get install --yes "${PACKAGES[@]}" \
  && apt-get clean   --yes                  \
- && rm -rf "$APT_OFFLINE"                  \
+ && rm -rf "$APT_OFFLINE"/apt-offline-*    \
            /var/cache/apt/archives/*       \
            /var/lib/apt/lists/*
 

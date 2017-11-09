@@ -2,7 +2,10 @@ ARG GIT_BRANCH
 ARG TAG_BASE
 FROM $TAG_BASE/ubuntu-core:$GIT_BRANCH AS staging
 
-WORKDIR /root
+ARG APT_OFFLINE=/root/apt-offline
+ENV APT_OFFLINE="$APT_OFFLINE"
+
+WORKDIR "$APT_OFFLINE"
 COPY *.deb ./
 
 RUN dpkg --install libpython2.7-minimal_2.7.12-1ubuntu0~16.04.1_amd64.deb
@@ -28,10 +31,10 @@ RUN rm *.deb
 
 COPY apt-offline/* "$APT_OFFLINE"/
 
-
-
 FROM scratch
 COPY --from=staging / /
+ONBUILD ARG APT_OFFLINE=/root/apt-offline
+ONBUILD ENV APT_OFFLINE="$APT_OFFLINE"
 ONBUILD SHELL ["/bin/bash", "-c"]
 ONBUILD CMD ["/bin/bash"]
 ONBUILD COPY apt-offline/* "$APT_OFFLINE"/

@@ -6,25 +6,19 @@ set -o pipefail
 set -o nounset
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; readonly SCRIPT_DIR
-. "$SCRIPT_DIR"/paths
+. "$SCRIPT_DIR"/src/paths
 
 BUILD_DIR="$(pwd)"; readonly BUILD_DIR
 
 main ()
 {
 	echo "Building in:   $(printf '%q\n' "$BUILD_DIR")"
-	echo "Building from: $(printf '%q\n' "$REPO_DIR")"
-	echo
-	for context in ubuntu-core; do
-		echo "Building $context:"
-		
-		local context_build_dir="$BUILD_DIR/$context"
-		local context_src_dir; context_src_dir="$(get_context_source_dir "$context")"
-		
-		run mkdir --parents "$context_build_dir"
-		run cd "$context_build_dir"
-		run "$context_src_dir"/build
-	done
+	echo "         from: $(printf '%q\n' "$REPO_DIR")"
+	echo "Contexts:"
+	run mkdir --parents contexts
+	run cd contexts
+	run "$SOURCE_DIR"/contexts/build
+	run cd ..
 }
 
 main

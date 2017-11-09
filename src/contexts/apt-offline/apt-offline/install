@@ -3,27 +3,27 @@
 set -e
 set -o pipefail
 
-UPDATE_SIG="${APT_OFFLINE}"/apt-get-update.sig
-UPDATE_ZIP="${APT_OFFLINE}"/apt-get-update.zip
-INSTALL_SIG="${APT_OFFLINE}"/apt-get-install.sig
-INSTALL_ZIP="${APT_OFFLINE}"/apt-get-install.zip
-PACKAGES=($(<"${APT_OFFLINE}"/packages))
+UPDATE_SIG="$APT_OFFLINE"/apt-get-update.sig
+UPDATE_ZIP="$APT_OFFLINE"/apt-get-update.zip
+INSTALL_SIG="$APT_OFFLINE"/apt-get-install.sig
+INSTALL_ZIP="$APT_OFFLINE"/apt-get-install.zip
+PACKAGES=($(<"$APT_OFFLINE"/packages))
 
-if [[ ! -f "${UPDATE_SIG}" ]]; then
-  rm -f "${UPDATE_ZIP}"
-  apt-offline set "${UPDATE_SIG}" --update
+if [[ ! -f "$UPDATE_SIG" ]]; then
+  rm -f "$UPDATE_ZIP"
+  apt-offline set "$UPDATE_SIG" --update
 fi
-if [[ ! -f "${UPDATE_ZIP}" ]]; then
-  rm -f "${INSTALL_SIG}"
-  apt-offline get "${UPDATE_SIG}" --bundle="${UPDATE_ZIP}" --download-dir="${APT_OFFLINE}"
+if [[ ! -f "$UPDATE_ZIP" ]]; then
+  rm -f "$INSTALL_SIG"
+  apt-offline get "$UPDATE_SIG" --bundle="$UPDATE_ZIP" --download-dir="$APT_OFFLINE"
 fi
 
-apt-offline install "${UPDATE_ZIP}"
-if [[ ! -f "${INSTALL_SIG}" ]]; then
-  rm -f "${INSTALL_ZIP}"
-  apt-offline set "${INSTALL_SIG}" --install-packages "${PACKAGES[@]}"
+apt-offline install "$UPDATE_ZIP"
+if [[ ! -f "$INSTALL_SIG" ]]; then
+  rm -f "$INSTALL_ZIP"
+  apt-offline set "$INSTALL_SIG" --install-packages "${PACKAGES[@]}"
 fi
-if [[ ! -f "${INSTALL_ZIP}" ]]; then
-  apt-offline get "${INSTALL_SIG}" --bundle="${INSTALL_ZIP}" --download-dir="${APT_OFFLINE}"
+if [[ ! -f "$INSTALL_ZIP" ]]; then
+  apt-offline get "$INSTALL_SIG" --bundle="$INSTALL_ZIP" --download-dir="$APT_OFFLINE"
 fi
-apt-offline install "${INSTALL_ZIP}"
+apt-offline install "$INSTALL_ZIP"

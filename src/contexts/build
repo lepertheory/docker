@@ -8,9 +8,11 @@ set -o nounset
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; readonly SCRIPT_DIR
 . "$SCRIPT_DIR"/../paths
 
-for context in ubuntu-core \
-               apt-offline \
-               lfs-host-toolchain; do
+for context in ubuntu-core        \
+               apt-offline        \
+               lfs-host-toolchain \
+               lfs-bootstrap
+do
 	run mkdir --parents "$context"
 	run cd              "$context"
 	

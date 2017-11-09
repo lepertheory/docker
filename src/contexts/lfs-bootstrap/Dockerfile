@@ -406,7 +406,7 @@ RUN rm -rf "$BUILD" \
 # FIXME: The chroot is from 6.4.
 # NOTE: Also symlinking env into /usr/bin
 #
-COPY sources/passwd sources/group "${LFS}"/etc/
+COPY etc/passwd etc/group "${LFS}"/etc/
 RUN chroot "${LFS}" /tools/bin/env --ignore-environment                          \
                                    HOME=/root                                    \
                                    TERM="${TERM}"                                \

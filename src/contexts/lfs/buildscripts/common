@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o errtrace
+set -o nounset
+set -o pipefail
+
+get_div10 ()
+{
+	local -r VALUE="$1"
+	
+	local retval
+	if ((${#VALUE} == 0)); then
+		echo 0
+	elif ((${#VALUE} == 1)); then
+		echo 0."$VALUE"
+	else
+		echo "${VALUE:0:-1}.${VALUE: -1}"
+	fi
+}
+
+get_package_sbus ()
+{
+	local -r PACKAGE_PATH="$1"
+	
+	sed -rn 's/^# SBUS: (.*)/\1/p' "$PACKAGE_PATH"
+}
+
+get_total_sbus ()
+{
+	# TODO: Find other occurrences of _PATH that should be _DIR.
+	local -r BUILDSCRIPTS_DIR="$1"
+	
+	local retval_x10=0
+	for package_path in "$BUILDSCRIPTS_DIR"/*-*; do
+		local package_sbus
+		local package_sbus_x10
+		package_sbus="$(get_package_sbus "$package_path")"
+		package_sbus_x10="$(get_x10 "$package_sbus")"
+		retval_x10=$((package_sbus_x10 + $retval_x10))
+	done
+	get_div10 "$retval_x10"
+}
+
+get_x10 ()
+{
+	local -r VALUE="$1"
+	
+	if [[ "$VALUE" == *.* ]]; then
+		echo $((10#${VALUE/./}))
+	else
+		echo "$VALUE"0
+	fi
+}

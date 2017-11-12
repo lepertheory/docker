@@ -11,6 +11,8 @@ RUN mkdir --parents "$HOME"/build
 # FIXME: Same, take out, fix by DRYing upstream.
 ENV SOURCES=/usr/src
 
+COPY buildscripts/build /root/buildscripts/
+
 # FIXME: Comment somewhere better this idea: Tag images with an order-
 #        independent hash of the dependencies installed. That way you:
 #        1. Get all of your deps installed in a completely-uncustomized (as
@@ -31,7 +33,7 @@ RUN  buildscripts/build linux-headers-4.12.7 /usr/src/linux-4.12.7.tar.xz
 # FROM: :LFS
 # REF: Chapter6.8
 #
-COPY buildscripts/man-pages-4.12 /root/buildscripts
+COPY buildscripts/man-pages-4.12 /root/buildscripts/
 RUN  buildscripts/build man-pages-4.12 /usr/src/man-pages-4.12.tar.xz
 
 #
@@ -39,7 +41,7 @@ RUN  buildscripts/build man-pages-4.12 /usr/src/man-pages-4.12.tar.xz
 # REF: Chapter6.9
 #
 COPY glibc-2.26-disable-broken-tests.patch "$SOURCES"/
-COPY buildscripts/glibc-2.26 /root/buildscripts
+COPY buildscripts/glibc-2.26* /root/buildscripts/
 RUN  buildscripts/build glibc-2.26 /usr/src/glibc-2.26.tar.xz
 
 ONBUILD ENV     HOME=/root

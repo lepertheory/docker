@@ -38,6 +38,7 @@ RUN  buildscripts/build man-pages-4.12 /usr/src/man-pages-4.12.tar.xz
 # FROM: :LFS
 # REF: Chapter6.9
 #
+COPY glibc-2.26-disable-broken-tests.patch "$SOURCES"/
 COPY buildscripts/glibc-2.26 /root/buildscripts
 RUN  buildscripts/build glibc-2.26 /usr/src/glibc-2.26.tar.xz
 

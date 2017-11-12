@@ -445,16 +445,18 @@ RUN chroot "${LFS}" /tools/bin/env --ignore-environment                         
  && chmod -v 600  /var/log/btmp'
 COPY root_home/* "$LFS"/root/
 
+ONBUILD ENV     HOME=/root
+ONBUILD WORKDIR "$HOME"
+ONBUILD SHELL   ["/bin/bash", "--login", "-c"]
+ONBUILD CMD     ["/bin/bash", "--login", "+h"]
+
 #
 # Outside of the book, squash image down to size.
 #
 FROM scratch
 COPY --from=staging /mnt/lfs /
-# TODO: This should probably go up top.
-SHELL ["/bin/bash", "-c"]
-CMD ["/tools/bin/bash", "+h"]
 
 ONBUILD ENV     HOME=/root
 ONBUILD WORKDIR "$HOME"
 ONBUILD SHELL   ["/bin/bash", "--login", "-c"]
-ONBUILD CMD     ["/bin/bash", "--login"]
+ONBUILD CMD     ["/bin/bash", "--login", "+h"]

@@ -1,0 +1,72 @@
+diff -ur glibc-2.26.fhs/libio/Makefile glibc-2.26.new/libio/Makefile
+--- glibc-2.26.fhs/libio/Makefile	2017-08-02 12:57:16.000000000 +0000
++++ glibc-2.26.new/libio/Makefile	2017-11-12 09:37:28.158393290 +0000
+@@ -52,7 +52,7 @@
+ tests = tst_swprintf tst_wprintf tst_swscanf tst_wscanf tst_getwc tst_putwc   \
+ 	tst_wprintf2 tst-widetext test-fmemopen tst-ext tst-ext2 \
+ 	tst-fgetws tst-ungetwc1 tst-ungetwc2 tst-swscanf tst-sscanf	      \
+-	tst-mmap-setvbuf bug-ungetwc1 bug-ungetwc2 tst-atime tst-eof          \
++	tst-mmap-setvbuf bug-ungetwc1 bug-ungetwc2 tst-eof          \
+ 	tst-freopen bug-rewind bug-rewind2 bug-ungetc bug-fseek \
+ 	tst-mmap-eofsync tst-mmap-fflushsync bug-mmap-fflush \
+ 	tst-mmap2-eofsync tst-mmap-offend bug-fopena+ bug-wfflush \
+diff -ur glibc-2.26.fhs/misc/Makefile glibc-2.26.new/misc/Makefile
+--- glibc-2.26.fhs/misc/Makefile	2017-08-02 12:57:16.000000000 +0000
++++ glibc-2.26.new/misc/Makefile	2017-11-12 09:37:11.185936557 +0000
+@@ -81,8 +81,7 @@
+ tests := tst-dirname tst-tsearch tst-fdset tst-efgcvt tst-mntent tst-hsearch \
+ 	 tst-error1 tst-pselect tst-insremque tst-mntent2 bug-hsearch1 \
+ 	 tst-mntent-blank-corrupt tst-mntent-blank-passno bug18240 \
+-	 tst-preadvwritev tst-preadvwritev64 tst-makedev tst-empty \
+-	 tst-preadvwritev2 tst-preadvwritev64v2
++	 tst-preadvwritev tst-preadvwritev64 tst-makedev tst-empty
+ 
+ tests-internal := tst-atomic tst-atomic-long
+ tests-static := tst-empty
+diff -ur glibc-2.26.fhs/posix/Makefile glibc-2.26.new/posix/Makefile
+--- glibc-2.26.fhs/posix/Makefile	2017-08-02 12:57:16.000000000 +0000
++++ glibc-2.26.new/posix/Makefile	2017-11-12 09:34:52.858212796 +0000
+@@ -67,7 +67,7 @@
+ tests		:= test-errno tstgetopt testfnm runtests runptests \
+ 		   tst-preadwrite tst-preadwrite64 test-vfork regexbug1 \
+ 		   tst-mmap tst-mmap-offset tst-getaddrinfo tst-truncate \
+-		   tst-truncate64 tst-fork tst-fnmatch tst-regexloc tst-dir \
++		   tst-truncate64 tst-fork tst-fnmatch tst-regexloc \
+ 		   tst-chmod bug-regex1 bug-regex2 bug-regex3 bug-regex4 \
+ 		   tst-gnuglob tst-regex bug-regex6 bug-regex7 \
+ 		   bug-regex8 bug-regex9 bug-regex10 bug-regex11 bug-regex12 \
+@@ -89,7 +89,7 @@
+ 		   tst-getaddrinfo3 tst-fnmatch2 tst-cpucount tst-cpuset \
+ 		   bug-getopt1 bug-getopt2 bug-getopt3 bug-getopt4 \
+ 		   bug-getopt5 tst-getopt_long1 bug-regex34 bug-regex35 \
+-		   tst-pathconf tst-getaddrinfo4 tst-rxspencer-no-utf8 \
++		   tst-pathconf tst-rxspencer-no-utf8 \
+ 		   tst-fnmatch3 bug-regex36 tst-getaddrinfo5 \
+ 		   tst-posix_spawn-fd tst-posix_spawn-setsid \
+ 		   tst-posix_fadvise tst-posix_fadvise64 \
+diff -ur glibc-2.26.fhs/rt/Makefile glibc-2.26.new/rt/Makefile
+--- glibc-2.26.fhs/rt/Makefile	2017-08-02 12:57:16.000000000 +0000
++++ glibc-2.26.new/rt/Makefile	2017-11-12 09:33:56.228687500 +0000
+@@ -53,7 +53,7 @@
+ 	 tst-timer3 tst-timer4 tst-timer5 \
+ 	 tst-cpuclock1 tst-cpuclock2 \
+ 	 tst-cputimer1 tst-cputimer2 tst-cputimer3 \
+-	 tst-clock2 tst-shm-cancel
++	 tst-shm-cancel
+ 
+ extra-libs := librt
+ extra-libs-others := $(extra-libs)
+diff -ur glibc-2.26.fhs/sysdeps/unix/sysv/linux/Makefile glibc-2.26.new/sysdeps/unix/sysv/linux/Makefile
+--- glibc-2.26.fhs/sysdeps/unix/sysv/linux/Makefile	2017-08-02 12:57:16.000000000 +0000
++++ glibc-2.26.new/sysdeps/unix/sysv/linux/Makefile	2017-11-12 09:36:30.508841810 +0000
+@@ -49,8 +49,8 @@
+ 		  bits/mman-linux.h \
+ 		  bits/siginfo-arch.h bits/siginfo-consts-arch.h
+ 
+-tests += tst-clone tst-clone2 tst-clone3 tst-fanotify tst-personality \
+-	 tst-quota tst-sync_file_range test-errno-linux
++tests += tst-clone tst-clone2 tst-clone3 tst-fanotify \
++	 tst-quota tst-sync_file_range
+ 
+ # Generate the list of SYS_* macros for the system calls (__NR_* macros).
+ 

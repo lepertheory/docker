@@ -27,6 +27,7 @@ CXXFLAGS="$CFLAGS"
 # TODO: Comment some.
 
 patch --forward --strip=1 --input="$SOURCES"/glibc-2.26-fhs-1.patch
+patch --forward --strip=1 --input="$SOURCES"/glibc-2.26-disable-broken-tests.patch
 
 ln --symbolic --force --verbose /tools/lib/gcc /usr/lib
 

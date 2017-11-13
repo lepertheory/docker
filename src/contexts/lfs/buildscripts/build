@@ -22,7 +22,7 @@ readonly TOTAL_SBUS_FILE="$HOME"/total_sbus
 readonly SBU_SECONDS_FILE="$HOME"/sbu_seconds
 readonly BUILDSCRIPT="$SCRIPT_PATH/$PACKAGE"
 readonly SUPPRESSIONS="$BUILDSCRIPT"-suppressions
-readonly BUILD_LOG="$HOME/$PACKAGE"-build.log
+readonly BUILD_LOG_PREFIX="$HOME/$PACKAGE"-build
 
 get_dhms ()
 {
@@ -115,13 +115,13 @@ for stage_script in "$BUILDSCRIPT"-[0-9][0-9]-*; do
 	name="${stage_script#$BUILDSCRIPT-$sequence-}"
 	echo "$sequence: $name"
 	if [[ -x $BUILDSCRIPT ]]; then
-		"$BUILDSCRIPT" "$stage_script" > "$BUILD_LOG" 2>&1
+		"$BUILDSCRIPT" "$stage_script" > "$BUILD_LOG_PREFIX-$sequence.log" 2>&1
 	else
-		"$stage_script" > "$BUILD_LOG" 2>&1
+		"$stage_script" > "$BUILD_LOG_PREFIX-$sequence.log" 2>&1
 	fi
 done
 if [[ $staged_build == false ]]; then
-	"$BUILDSCRIPT" > "$BUILD_LOG" 2>&1
+	"$BUILDSCRIPT" > "$BUILD_LOG_PREFIX.log" 2>&1
 fi
 
 BUILD_END_EPOCH_SECONDS="$(date +%s)"

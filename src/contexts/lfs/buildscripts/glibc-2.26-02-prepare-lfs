@@ -12,8 +12,6 @@ set -o nounset
 ln --symbolic --force --verbose /tools/lib/gcc /usr/lib
 
 # LSB compliance and 64-bit dynamic loader fix.
-MACHINE="$(uname --machine)"; readonly MACHINE
-GCC_INCDIR=/usr/lib/gcc/$MACHINE-pc-linux-gnu/7.2.0/include
 case "$MACHINE" in
   i?86)   ln --symbolic --force --verbose ld-linux.so.2 /lib/ld-lsb.so.3 ;;
   x86_64) ln --symbolic --force --verbose ../lib/ld-linux-x86-64.so.2 /lib64

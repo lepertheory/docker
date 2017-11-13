@@ -7,6 +7,8 @@ set -o errtrace
 set -o pipefail
 set -o nounset
 
+MACHINE="$(uname --machine)"; readonly MACHINE
+
 # FIXME: This is duplicated with the lfs-bootstrap glibc build.
 # NOTE: This should no longer be necessary in a newer version of glibc:
 #       https://sourceware.org/git/gitweb.cgi?p=glibc.git;h=ae65d4f3c3995279ca458c460ebf8bab1885fa03
@@ -26,5 +28,6 @@ CXXFLAGS="$CFLAGS"
 
 export CFLAGS
 export CXXFLAGS
+export MACHINE
 
 "$@"

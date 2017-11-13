@@ -42,7 +42,11 @@ RUN  buildscripts/build man-pages-4.12 /usr/src/man-pages-4.12.tar.xz
 #
 COPY glibc-2.26-disable-broken-tests.patch "$SOURCES"/
 COPY buildscripts/glibc-2.26* /root/buildscripts/
-RUN  buildscripts/build glibc-2.26 /usr/src/glibc-2.26.tar.xz
+RUN  buildscripts/build glibc-2.26 /usr/src/glibc-2.26.tar.xz start
+RUN  buildscripts/build glibc-2.26 01-patch
+RUN  buildscripts/build glibc-2.26 02-prepare-lfs
+RUN  buildscripts/build glibc-2.26 03-configure
+RUN  buildscripts/build glibc-2.26 04-make end
 
 ONBUILD ENV     HOME=/root
 ONBUILD WORKDIR "$HOME"

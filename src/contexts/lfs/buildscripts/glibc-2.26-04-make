@@ -7,4 +7,5 @@ set -o errtrace
 set -o pipefail
 set -o nounset
 
+cd build
 make

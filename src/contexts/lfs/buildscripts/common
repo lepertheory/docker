@@ -5,6 +5,22 @@ set -o errtrace
 set -o nounset
 set -o pipefail
 
+get_dhms ()
+{
+	local -ri EPOCH_SECONDS="$1"
+	
+	local -ri DAYS=$((   EPOCH_SECONDS / 60 / 60 / 24))
+	local -ri HOURS=$((  EPOCH_SECONDS / 60 / 60 % 24))
+	local -ri MINUTES=$((EPOCH_SECONDS / 60      % 60))
+	local -ri SECONDS=$((EPOCH_SECONDS           % 60))
+	
+	if ((DAYS > 0)); then
+		echo -n "${DAYS}d "
+	fi
+	
+	printf '%02d:%02d:%02d' "$HOURS" "$MINUTES" "$SECONDS"
+}
+
 get_div10 ()
 {
 	local -r VALUE="$1"

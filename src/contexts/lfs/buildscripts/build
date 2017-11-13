@@ -12,7 +12,8 @@ readonly SCRIPT_NAME
 readonly SCRIPT_PATH
 
 readonly PACKAGE="$1"
-readonly ARCHIVE="$2"
+readonly OPERATION="$2"
+readonly ANCHOR="${3:-}"
 
 . "$HOME"/buildscripts/common
 
@@ -23,28 +24,16 @@ readonly SBU_SECONDS_FILE="$HOME"/sbu_seconds
 readonly BUILDSCRIPT="$SCRIPT_PATH/$PACKAGE"
 readonly SUPPRESSIONS="$BUILDSCRIPT"-suppressions
 readonly BUILD_LOG_PREFIX="$HOME/$PACKAGE"-build
+readonly OP_ARCHIVE="$SOURCES/$OPERATION"
+readonly OP_STAGE="$SCRIPT_PATH/$PACKAGE-$OPERATION"
 
-get_dhms ()
+enter_build_env ()
 {
-  local -ri EPOCH_SECONDS="$1"
-
-  local -ri DAYS=$((EPOCH_SECONDS / 60 / 60 / 24))
-  local -ri HOURS=$((EPOCH_SECONDS / 60 / 60 % 24))
-  local -ri MINUTES=$((EPOCH_SECONDS / 60 % 60))
-  local -ri SECONDS=$((EPOCH_SECONDS % 60))
-
-  if ((DAYS > 0)); then
-    echo -n "${DAYS}d "
-  fi
-
-  printf '%02d:%02d:%02d' "$HOURS" "$MINUTES" "$SECONDS"
-}
-
-get_package_sbus ()
-{
-  local -r PACKAGE_PATH="$1"
-
-  sed -rn 's/^# SBUS: (.*)/\1/p' "$PACKAGE_PATH"
+	cd "$PACKAGE"
+	
+	export CFLAGS='-Os -pipe'
+	export CXXFLAGS="$CFLAGS"
+	export SOURCES
 }
 
 get_sbus_string ()
@@ -58,8 +47,16 @@ get_sbus_string ()
   fi
 }
 
+show_start_progress ()
+{
+	echo "Building $PACKAGE ($(get_sbus_string "$PACKAGE_SBUS")$PACKAGE_ESTIMATE_TEXT)" \
+	     " $COMPLETE_SBUS/$TOTAL_SBUS"                                                  \
+	     " $SBUS_COMPLETE_PERCENT% Complete${ESTIMATE_TEXT}"
+}
+
 TOTAL_SBUS="$(<"$TOTAL_SBUS_FILE")";                                readonly TOTAL_SBUS
 PACKAGE_SBUS="$(get_package_sbus "$BUILDSCRIPT")";                  readonly PACKAGE_SBUS
+STAGE_SBUS="$(get_stage_sbus "$OP_STAGE")";                         readonly STAGE_SBUS
 SBU_SECONDS="$(cat "$SBU_SECONDS_FILE" 2>/dev/null || echo 0)";     readonly SBU_SECONDS
 COMPLETE_SBUS="$(cat "$COMPLETE_SBUS_PATH" 2>/dev/null || echo 0)"; readonly COMPLETE_SBUS
 START_EPOCH_SECONDS="$(cat "$START_EPOCH_SECONDS_PATH" 2>/dev/null || echo 0)"; readonly START_EPOCH_SECONDS
@@ -74,59 +71,48 @@ NOW_EPOCH_SECONDS="$(date +%s)";                                          readon
 if ((SBU_SECONDS > 0)); then
   ESTIMATE_TOTAL_SECONDS=$((SBU_SECONDS * TOTAL_SBUS_X10 / 10)); readonly ESTIMATE_TOTAL_SECONDS
   ESTIMATE_REMAINING_SECONDS=$((SBU_SECONDS * (TOTAL_SBUS_X10 - COMPLETE_SBUS_X10) / 10))
-  readonly ESTIMATE_REMAINING_SECONDS
-  ELAPSED_SECONDS=$((NOW_EPOCH_SECONDS - START_EPOCH_SECONDS))
-  ELAPSED_TEXT="$(get_dhms "$ELAPSED_SECONDS")"
-  ESTIMATE_TIME_TEXT="$(get_dhms "$ESTIMATE_TOTAL_SECONDS")"
+                                                                 readonly ESTIMATE_REMAINING_SECONDS
+  ELAPSED_SECONDS=$((NOW_EPOCH_SECONDS - START_EPOCH_SECONDS));  readonly ELAPSED_SECONDS
+  ELAPSED_TEXT="$(get_dhms "$ELAPSED_SECONDS")" ;                readonly ELAPSED_TEXT
+  ESTIMATE_TIME_TEXT="$(get_dhms "$ESTIMATE_TOTAL_SECONDS")";    readonly ESTIMATE_TIME_TEX
   PACKAGE_ESTIMATED_SECONDS=$((PACKAGE_SBUS_X10 * SBU_SECONDS / 10))
+	                                                               readonly PACKAGE_ESTIMATED_SECONDS
 
-  PACKAGE_ESTIMATE_TEXT=" $(get_dhms "$PACKAGE_ESTIMATED_SECONDS")"
-  ESTIMATE_TEXT="  $ELAPSED_TEXT/$ESTIMATE_TIME_TEXT"
+  PACKAGE_ESTIMATE_TEXT=" $(get_dhms "$PACKAGE_ESTIMATED_SECONDS")"; readonly PACKAGE_ESTIMATE_TEXT
+  ESTIMATE_TEXT="  $ELAPSED_TEXT/$ESTIMATE_TIME_TEXT";               readonly ESTIMATE_TEXT
 else
-  PACKAGE_ESTIMATE_TEXT=''
-  ESTIMATE_TEXT=''
+  readonly PACKAGE_ESTIMATE_TEXT=''
+  readonly ESTIMATE_TEXT=''
 fi
 
 cd "${LFS:-$HOME}"/build
 
-echo "Unpacking $ARCHIVE"
-mkdir -v "$PACKAGE"
-tar --extract  --strip-components=1 --directory="$PACKAGE" --file="$ARCHIVE"
-
-cd "$PACKAGE"
-
-echo "Building $PACKAGE ($(get_sbus_string "$PACKAGE_SBUS")$PACKAGE_ESTIMATE_TEXT)" \
-     " $COMPLETE_SBUS/$TOTAL_SBUS"                                                  \
-     " $SBUS_COMPLETE_PERCENT% Complete${ESTIMATE_TEXT}"
-
-BUILD_START_EPOCH_SECONDS="$(date +%s)"
-if ((START_EPOCH_SECONDS == 0)); then
-  echo "$BUILD_START_EPOCH_SECONDS" > "$START_EPOCH_SECONDS_PATH"
-fi
-
-export CFLAGS='-Os -pipe'
-export CXXFLAGS='-Os -pipe'
-export SOURCES="$SOURCES"
-staged_build=false
-
-for stage_script in "$BUILDSCRIPT"-[0-9][0-9]-*; do
-	sequence="${stage_script#$BUILDSCRIPT-}"
-	sequence="${sequence%%-*}"
-	name="${stage_script#$BUILDSCRIPT-$sequence-}"
-	echo "$sequence: $name"
-	if [[ -x $BUILDSCRIPT ]]; then
-		"$BUILDSCRIPT" "$stage_script" > "$BUILD_LOG_PREFIX-$sequence.log" 2>&1
-	else
-		"$stage_script" > "$BUILD_LOG_PREFIX-$sequence.log" 2>&1
+if [[ $ANCHOR == start ]]; then
+	BUILD_START_EPOCH_SECONDS="$(date +%s)"; readonly BUILD_START_EPOCH_SECONDS
+	if ((START_EPOCH_SECONDS == 0)); then
+		echo "$BUILD_START_EPOCH_SECONDS" > "$START_EPOCH_SECONDS_PATH"
 	fi
-done
-if [[ $staged_build == false ]]; then
-	"$BUILDSCRIPT" > "$BUILD_LOG_PREFIX.log" 2>&1
+	show_start_progress
 fi
 
-BUILD_END_EPOCH_SECONDS="$(date +%s)"
+if [[ -f $OP_ARCHIVE ]]; then
+	readonly ARCHIVE="$OP_ARCHIVE"
+	echo "Unpacking $ARCHIVE"
+	tar --extract --strip-components=1 --directory="$PACKAGE" --file="$ARCHIVE"
+else
+	enter_build_env
+	if [[ -z $OPERATION ]]; then
+		"$BUILDSCRIPT" > "$BUILD_LOG_PREFIX.log" 2>&1
+	else
+		"$BUILDSCRIPT" "$OP_STAGE" > "$BUILD_LOG_PREFIX-$OPERATION.log" 2>&1
+	fi
+fi
 
-echo "Done building $PACKAGE in $(get_dhms $((BUILD_END_EPOCH_SECONDS - BUILD_START_EPOCH_SECONDS)))"
+if [[ $ANCHOR == end ]]; then
+	BUILD_END_EPOCH_SECONDS="$(date +%s)"
+
+	echo "Done building $PACKAGE in $(get_dhms $((BUILD_END_EPOCH_SECONDS - BUILD_START_EPOCH_SECONDS)))"
+fi
 
 BUILD_ELAPSED_SECONDS=$((BUILD_END_EPOCH_SECONDS - BUILD_START_EPOCH_SECONDS))
 NEW_COMPLETE_SBUS_X10=$((COMPLETE_SBUS_X10 + PACKAGE_SBUS_X10)); readonly NEW_COMPLETE_SBUS_X10

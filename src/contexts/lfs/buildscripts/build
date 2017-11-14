@@ -11,9 +11,8 @@ SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SCRIPT_NAME
 readonly SCRIPT_PATH
 
-readonly PACKAGE="$1"
-readonly OPERATION="$2"
-readonly ANCHOR="${3:-}"
+readonly PACKAGE="$1";   shift
+readonly OPERATION="$2"; shift
 
 . "$HOME"/buildscripts/common
 
@@ -56,7 +55,7 @@ show_start_progress ()
 
 TOTAL_SBUS="$(<"$TOTAL_SBUS_FILE")";                                readonly TOTAL_SBUS
 PACKAGE_SBUS="$(get_package_sbus "$BUILDSCRIPT")";                  readonly PACKAGE_SBUS
-STAGE_SBUS="$(get_stage_sbus "$OP_STAGE")";                         readonly STAGE_SBUS
+STAGE_SBUS="$(get_script_sbus "$OP_STAGE")";                        readonly STAGE_SBUS
 SBU_SECONDS="$(cat "$SBU_SECONDS_FILE" 2>/dev/null || echo 0)";     readonly SBU_SECONDS
 COMPLETE_SBUS="$(cat "$COMPLETE_SBUS_PATH" 2>/dev/null || echo 0)"; readonly COMPLETE_SBUS
 START_EPOCH_SECONDS="$(cat "$START_EPOCH_SECONDS_PATH" 2>/dev/null || echo 0)"; readonly START_EPOCH_SECONDS

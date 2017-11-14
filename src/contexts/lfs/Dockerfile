@@ -11,7 +11,7 @@ RUN mkdir --parents "$HOME"/build
 # FIXME: Same, take out, fix by DRYing upstream.
 ENV SOURCES=/usr/src
 
-COPY buildscripts/build /root/buildscripts/
+COPY buildscripts/build buildscripts/common /root/buildscripts/
 
 # FIXME: Comment somewhere better this idea: Tag images with an order-
 #        independent hash of the dependencies installed. That way you:
@@ -27,14 +27,16 @@ COPY buildscripts/build /root/buildscripts/
 # REF: Chapter6.7
 #
 COPY buildscripts/linux-headers-4.12.7 /root/buildscripts/
-RUN  buildscripts/build linux-headers-4.12.7 /usr/src/linux-4.12.7.tar.xz
+RUN  buildscripts/build prepare linux-4.12.7.tar.xz
+RUN  buildscripts/build linux-headers-4.12.7
 
 #
 # FROM: :LFS
 # REF: Chapter6.8
 #
 COPY buildscripts/man-pages-4.12 /root/buildscripts/
-RUN  buildscripts/build man-pages-4.12 /usr/src/man-pages-4.12.tar.xz
+RUN  buildscripts/build prepare man-pages-4.12.tar.xz
+RUN  buildscripts/build man-pages-4.12
 
 #
 # FROM: :LFS
@@ -42,7 +44,7 @@ RUN  buildscripts/build man-pages-4.12 /usr/src/man-pages-4.12.tar.xz
 #
 COPY glibc-2.26-disable-broken-tests.patch "$SOURCES"/
 COPY buildscripts/glibc-2.26* /root/buildscripts/
-RUN  buildscripts/build glibc-2.26 /usr/src/glibc-2.26.tar.xz start
+RUN  buildscripts/build prepare glibc-2.26.tar.xz
 RUN  buildscripts/build glibc-2.26 01-patch
 RUN  buildscripts/build glibc-2.26 02-prepare-lfs
 RUN  buildscripts/build glibc-2.26 03-configure

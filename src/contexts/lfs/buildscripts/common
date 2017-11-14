@@ -5,6 +5,19 @@ set -o errtrace
 set -o nounset
 set -o pipefail
 
+add_x10 ()
+{
+  local -r A="$1"
+  local -r B="$2"
+  
+  local -i A_X10; A_X10="$(get_x10 "$A")"; readonly A_X10
+  local -i B_X10; B_X10="$(get_x10 "$B")"; readonly B_X10
+  
+  local -i RETVAL_X10; RETVAL_X10="$((A_X10 + B_X10))"; readonly RETVAL_X10
+
+  get_div10 "$RETVAL_X10"
+}
+
 get_dhms ()
 {
 	local -ri EPOCH_SECONDS="$1"
@@ -39,21 +52,46 @@ get_package_sbus ()
 {
 	local -r PACKAGE_PATH="$1"
 	
-	sed -rn 's/^# SBUS: (.*)/\1/p' "$PACKAGE_PATH"
+  local -i retval_x10
+  retval_x10="$(get_script_sbus_x10 "$PACKAGE_PATH")"
+
+  local -i script_sbus_x10
+  for stage_script in "$PACKAGE_PATH"-[0-9]-*; do
+    local script_sbus_x10
+    script_sbus_x10="$(get_script_sbus_x10 "$stage_script")"
+    retval_x10=$((retval_x10 + script_sbus_x10))
+  done
+  
+  get_div10 "$retval_x10"
+}
+
+get_script_sbus ()
+{
+  local -r _SCRIPT_PATH="$1"
+  
+  sed -rn 's/^# SBUS: //p' "$_SCRIPT_PATH"
+}
+
+get_script_sbus_x10 ()
+{
+  local -r _SCRIPT_PATH="$1"
+
+  local _SBUS="$(get_script_sbus "$_SCRIPT_PATH")"
+  
+  get_x10 "$_SBUS"
 }
 
 get_total_sbus ()
 {
-	# TODO: Find other occurrences of _PATH that should be _DIR.
 	local -r BUILDSCRIPTS_DIR="$1"
 	
 	local retval_x10=0
-	for package_path in "$BUILDSCRIPTS_DIR"/*-*; do
-		local package_sbus
-		local package_sbus_x10
-		package_sbus="$(get_package_sbus "$package_path")"
-		package_sbus_x10="$(get_x10 "$package_sbus")"
-		retval_x10=$((package_sbus_x10 + $retval_x10))
+	for script_path in "$BUILDSCRIPTS_DIR"/*-*-[0-9]-*; do
+		local script_sbus
+		local script_sbus_x10
+	  script_sbus="$(get_script_sbus "$script_path")"
+		script_sbus_x10="$(get_x10 "$script_sbus")"
+		retval_x10=$((script_sbus_x10 + retval_x10))
 	done
 	get_div10 "$retval_x10"
 }

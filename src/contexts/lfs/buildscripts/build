@@ -4,6 +4,7 @@ set -o errexit
 set -o errtrace
 set -o nounset
 set -o pipefail
+shopt -s inherit_errexit
 shopt -s nullglob
 
 SCRIPT_NAME="$(basename      "${BASH_SOURCE[0]}")"
@@ -11,20 +12,10 @@ SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SCRIPT_NAME
 readonly SCRIPT_PATH
 
-readonly PACKAGE="$1";   shift
-readonly OPERATION="$2"; shift
+readonly PACKAGE="$1";       shift
+readonly OPERATION="${2:-}"; shift
 
 . "$HOME"/buildscripts/common
-
-readonly COMPLETE_SBUS_PATH="$HOME"/complete_sbus
-readonly START_EPOCH_SECONDS_PATH="$HOME"/start_epoch_seconds
-readonly TOTAL_SBUS_FILE="$HOME"/total_sbus
-readonly SBU_SECONDS_FILE="$HOME"/sbu_seconds
-readonly BUILDSCRIPT="$SCRIPT_PATH/$PACKAGE"
-readonly SUPPRESSIONS="$BUILDSCRIPT"-suppressions
-readonly BUILD_LOG_PREFIX="$HOME/$PACKAGE"-build
-readonly OP_ARCHIVE="$SOURCES/$OPERATION"
-readonly OP_STAGE="$SCRIPT_PATH/$PACKAGE-$OPERATION"
 
 enter_build_env ()
 {
@@ -46,6 +37,25 @@ get_sbus_string ()
   fi
 }
 
+set_progress_env ()
+{
+  readonly COMPLETE_SBUS_PATH="$HOME"/complete_sbus
+  readonly START_EPOCH_SECONDS_PATH="$HOME"/start_epoch_seconds
+  readonly TOTAL_SBUS_PATH="$HOME"/total_sbus
+
+  TOTAL_SBUS="$(<"$TOTAL_SBUS_PATH")";                   readonly TOTAL_SBUS
+  PACKAGE_SBUS="$(get_package_sbus "$BUILDSCRIPT")";     readonly PACKAGE_SBUS
+  STAGE_SBUS="$(get_script_sbus "$OP_STAGE")";           readonly STAGE_SBUS
+  COMPLETE_SBUS="$(<"$COMPLETE_SBUS_PATH")";             readonly COMPLETE_SBUS
+  START_EPOCH_SECONDS="$(<"$START_EPOCH_SECONDS_PATH")"; readonly START_EPOCH_SECONDS
+
+  export COMPLETE_SBUS
+  export PACKAGE_SBUS
+  export STAGE_SBUS
+  export START_EPOCH_SECONDS
+  export TOTAL_SBUS
+}
+
 show_start_progress ()
 {
 	echo "Building $PACKAGE ($(get_sbus_string "$PACKAGE_SBUS")$PACKAGE_ESTIMATE_TEXT)" \
@@ -53,16 +63,9 @@ show_start_progress ()
 	     " $SBUS_COMPLETE_PERCENT% Complete${ESTIMATE_TEXT}"
 }
 
-TOTAL_SBUS="$(<"$TOTAL_SBUS_FILE")";                                readonly TOTAL_SBUS
-PACKAGE_SBUS="$(get_package_sbus "$BUILDSCRIPT")";                  readonly PACKAGE_SBUS
-STAGE_SBUS="$(get_script_sbus "$OP_STAGE")";                        readonly STAGE_SBUS
-SBU_SECONDS="$(cat "$SBU_SECONDS_FILE" 2>/dev/null || echo 0)";     readonly SBU_SECONDS
-COMPLETE_SBUS="$(cat "$COMPLETE_SBUS_PATH" 2>/dev/null || echo 0)"; readonly COMPLETE_SBUS
-START_EPOCH_SECONDS="$(cat "$START_EPOCH_SECONDS_PATH" 2>/dev/null || echo 0)"; readonly START_EPOCH_SECONDS
+readonly BUILDSCRIPT="$SCRIPT_PATH/$PACKAGE"
+readonly BUILD_LOG_PREFIX="$HOME/$PACKAGE"-build
 
-PACKAGE_SBUS_X10="$(get_x10 "$PACKAGE_SBUS")";                            readonly PACKAGE_SBUS_X10
-TOTAL_SBUS_X10="$(get_x10 "$TOTAL_SBUS")";                                readonly TOTAL_SBUS_X10
-COMPLETE_SBUS_X10="$(get_x10 "$COMPLETE_SBUS")";                          readonly COMPLETE_SBUS_X10
 SBUS_COMPLETE_PERCENT_X10=$((COMPLETE_SBUS_X10 * 1000 / TOTAL_SBUS_X10)); readonly SBUS_COMPLETE_PERCENT_X10
 SBUS_COMPLETE_PERCENT="$(get_div10 "$SBUS_COMPLETE_PERCENT_X10")";        readonly SBUS_COMPLETE_PERCENT
 NOW_EPOCH_SECONDS="$(date +%s)";                                          readonly NOW_EPOCH_SECONDS

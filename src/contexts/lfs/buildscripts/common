@@ -18,6 +18,20 @@ add_x10 ()
   get_div10 "$RETVAL_X10"
 }
 
+get_percent ()
+{
+  local -r P="$1"
+  local -r Q="$2"
+  
+  local -i P_X10; P_X10="$(get_x10 "$P")"; readonly P_X10
+  local -i Q_X10; Q_X10="$(get_x10 "$Q")"; readonly Q_X10
+  
+  # Note: Multiplying by 1,000 instead of 100 because everything is X10.
+  local -i RETVAL_X10; RETVAL_X10="$((P_X10 * 1000 / Q_X10))"; readonly RETVAL_X10
+
+  get_div10 "$RETVAL_X10"
+}
+
 get_dhms ()
 {
 	local -ri EPOCH_SECONDS="$1"

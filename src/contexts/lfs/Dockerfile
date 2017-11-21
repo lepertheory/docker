@@ -42,6 +42,8 @@ COPY buildscripts/glibc-2.26-06-install buildscripts/
 RUN  buildscripts/build glibc-2.26 06-install
 COPY buildscripts/glibc-2.26-07-config-nsswitch buildscripts/
 RUN  buildscripts/build glibc-2.26 07-config-nsswitch
+COPY buildscripts/glibc-2.26-08-config-tzdata buildscripts/
+RUN  buildscripts/build glibc-2.26 08-config-tzdata
 
 # FROM scratch
 # COPY --from=staging / /

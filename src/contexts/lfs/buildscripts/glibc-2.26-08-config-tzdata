@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+shopt -s inherit_errexit
+
+cd build
+
+tar -xf "$SOURCES"/tzdata2017b.tar.gz
+
+ZONEINFO=/usr/share/zoneinfo
+mkdir --parents --verbose "$ZONEINFO"/{posix,right}
+
+for tz in etcetera     \
+          southamerica \
+          northamerica \
+          europe       \
+          africa       \
+          antarctica   \
+          asia         \
+          australasia  \
+          backward     \
+          pacificnew   \
+          systemv; do
+  zic -L/dev/null   -d"$ZONEINFO"       -y"sh yearistype.sh" "$tz"
+  zic -L/dev/null   -d"$ZONEINFO"/posix -y"sh yearistype.sh" "$tz"
+  zic -Lleapseconds -d"$ZONEINFO"/right -y"sh yearistype.sh" "$tz"
+done
+
+cp --verbose zone.tab zone1970.tab iso3166.tab "$ZONEINFO"
+zic -d"$ZONEINFO" -pAmerica/New_York
+
+unset ZONEINFO
+
+ln --symbolic --verbose /usr/share/zoneinfo/America/New_York /etc/localtime

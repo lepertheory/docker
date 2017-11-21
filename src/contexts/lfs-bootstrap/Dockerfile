@@ -351,7 +351,7 @@ RUN  buildscripts/build util-linux-2.30.1
 #
 COPY buildscripts/xz-5.2.3 ./buildscripts/
 RUN  buildscripts/build xz-5.2.3 prepare xz-5.2.3.tar.xz
-RUN  buildscripts/build x6-5.2.3
+RUN  buildscripts/build xz-5.2.3
 
 #
 # FROM: :LFS

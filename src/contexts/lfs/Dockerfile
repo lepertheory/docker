@@ -11,7 +11,7 @@ RUN mkdir --parents "$HOME"/build
 # FIXME: Same, take out, fix by DRYing upstream.
 ENV SOURCES=/usr/src
 
-COPY buildscripts/build buildscripts/common /root/buildscripts/
+COPY buildscripts/build /root/buildscripts/
 
 # FIXME: Comment somewhere better this idea: Tag images with an order-
 #        independent hash of the dependencies installed. That way you:
@@ -27,7 +27,7 @@ COPY buildscripts/build buildscripts/common /root/buildscripts/
 # REF: Chapter6.7
 #
 COPY buildscripts/linux-headers-4.12.7 /root/buildscripts/
-RUN  buildscripts/build prepare linux-4.12.7.tar.xz
+RUN  buildscripts/build linux-headers-4.12.7 prepare linux-4.12.7.tar.xz
 RUN  buildscripts/build linux-headers-4.12.7
 
 #
@@ -35,7 +35,7 @@ RUN  buildscripts/build linux-headers-4.12.7
 # REF: Chapter6.8
 #
 COPY buildscripts/man-pages-4.12 /root/buildscripts/
-RUN  buildscripts/build prepare man-pages-4.12.tar.xz
+RUN  buildscripts/build man-pages-4.12 prepare man-pages-4.12.tar.xz
 RUN  buildscripts/build man-pages-4.12
 
 #
@@ -43,12 +43,20 @@ RUN  buildscripts/build man-pages-4.12
 # REF: Chapter6.9
 #
 COPY glibc-2.26-disable-broken-tests.patch "$SOURCES"/
-COPY buildscripts/glibc-2.26* /root/buildscripts/
-RUN  buildscripts/build prepare glibc-2.26.tar.xz
+COPY buildscripts/glibc-2.26 buildscripts/
+RUN  buildscripts/build glibc-2.26 prepare glibc-2.26.tar.xz
+COPY buildscripts/glibc-2.26-01-patch buildscripts/
 RUN  buildscripts/build glibc-2.26 01-patch
+COPY buildscripts/glibc-2.26-02-prepare-lfs buildscripts/
 RUN  buildscripts/build glibc-2.26 02-prepare-lfs
+COPY buildscripts/glibc-2.26-03-configure buildscripts/
 RUN  buildscripts/build glibc-2.26 03-configure
-RUN  buildscripts/build glibc-2.26 04-make end
+COPY buildscripts/glibc-2.26-04-make buildscripts/
+RUN  buildscripts/build glibc-2.26 04-make
+COPY buildscripts/glibc-2.26-05-test buildscripts/
+RUN  buildscripts/build glibc-2.26 05-test
+COPY buildscripts/glibc-2.26-06-install buildscripts/
+RUN  buildscripts/build glibc-2.26 06-install
 
 ONBUILD ENV     HOME=/root
 ONBUILD WORKDIR "$HOME"

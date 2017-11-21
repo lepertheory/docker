@@ -366,7 +366,7 @@ RUN strip --strip-debug /tools/lib/*                 \
 # REF: Chapter5.37
 #
 USER root
-RUN chown -R root:root "${LFS}"/tools
+RUN chown -R 0:0 "${LFS}"/tools
 
 #
 # No longer needed stuff.
@@ -375,7 +375,7 @@ RUN chown -R root:root "${LFS}"/tools
 #           "${LFS}"/sources
 RUN rm -rf "$BUILD"                      \
  && mkdir -pv /mnt/lfs/root/buildscripts \
- && cp /home/lfs/buildscripts/{build,common} /mnt/lfs/root/buildscripts
+ && cp /home/lfs/buildscripts/build "$LFS"/root/buildscripts
 
 #
 # FROM: :LFS

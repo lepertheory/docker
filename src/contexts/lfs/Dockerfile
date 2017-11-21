@@ -2,8 +2,6 @@ ARG GIT_BRANCH
 ARG TAG_BASE
 FROM $TAG_BASE/lfs-bootstrap:$GIT_BRANCH
 
-COPY buildscripts/build buildscripts/
-
 #
 # FROM: :LFS
 # REF: Chapter6.7

@@ -44,6 +44,28 @@ COPY buildscripts/glibc-2.26-07-config-nsswitch buildscripts/
 RUN  buildscripts/build glibc-2.26 07-config-nsswitch
 COPY buildscripts/glibc-2.26-08-config-tzdata buildscripts/
 RUN  buildscripts/build glibc-2.26 08-config-tzdata
+COPY buildscripts/glibc-2.26-09-config-dl buildscripts/
+RUN  buildscripts/build glibc-2.26 09-config-dl
+
+#
+# FROM: :LFS
+# REF: Chapter6.10
+#
+RUN MACHINE="$(uname --machine)"        \
+  ; TARGET="$MACHINE"-pc-linux-gnu      \
+  ; mv /tools/bin/{ld,ld-old}           \
+ && mv /tools/"$TARGET"/bin/{ld,ld-old} \
+ && mv /tools/bin/{ld-new,ld}           \
+ && ln --symbolic /tools/bin/ld /tools/"$TARGET"/bin/ld
+RUN gcc -dumpspecs | sed --expression='s@/tools@@g'                                    \
+                         --expression='/\*startfile_prefix_spec:/{n;s@.*@/usr/lib/ @}' \
+                         --expression='/\*cpp:/{n;s@$@ -isystem /usr/include@}'        \
+    > "$(dirname "$(gcc --print-libgcc-file-name)")"/specs
+RUN echo 'int main(){}' > dummy.c                                                               \
+ && cc --verbose -Wl,--verbose --output=dummy dummy.c &> dummy.log                              \
+ && readelf --program-headers dummy | grep --quiet ': /lib'                                     \
+ && [[ "$(grep '^attempt to open /usr/lib/crt[1in]\.o succeeded$' dummy.log | wc --lines)" == 3 ]] \
+ && rm dummy{,.{c,log}}
 
 # FROM scratch
 # COPY --from=staging / /

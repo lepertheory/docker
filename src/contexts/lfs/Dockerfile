@@ -2,6 +2,9 @@ ARG GIT_BRANCH
 ARG TAG_BASE
 FROM $TAG_BASE/lfs-bootstrap:$GIT_BRANCH
 
+ENV SOURCES=/usr/src
+RUN mkdir build
+
 #
 # FROM: :LFS
 # REF: Chapter6.7

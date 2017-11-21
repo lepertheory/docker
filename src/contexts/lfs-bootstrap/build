@@ -13,15 +13,6 @@ set_context_env_vars
 run cp --recursive "$CONTEXT_SOURCE_DIR"/{Dockerfile,buildscripts,etc,lfs_home,root_home} .
 run cp --recursive "$THIRDPARTY_DIR"/lfs/sources . 
 
-. buildscripts/common
-
-TOTAL_SBUS_FILE=lfs_home/total_sbus
-TOTAL_SBUS="$(get_total_sbus buildscripts)"; readonly TOTAL_SBUS
-OLD_SBUS="$(cat "$TOTAL_SBUS_FILE" 2>/dev/null || echo 0)"
-if [[ "$TOTAL_SBUS" != "$OLD_SBUS" ]]; then
-	echo "$TOTAL_SBUS" > "$TOTAL_SBUS_FILE"
-fi
-
 run docker build --build-arg=GIT_BRANCH="$GIT_BRANCH"   \
                  --build-arg=TAG_BASE="$TAG_BASE"       \
                  --tag="$CONTEXT_TAG"                   \

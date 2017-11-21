@@ -24,18 +24,25 @@ RUN dpkg --install less_481-2.1ubuntu0.2_amd64.deb
 RUN dpkg --install libmagic1_1%3a5.25-2ubuntu1_amd64.deb
 RUN dpkg --install python-magic_1%3a5.25-2ubuntu1_all.deb
 RUN dpkg --install apt-offline_1.7_all.deb
-
-RUN mkdir -p /var/lib/apt/lists/partial
-
 RUN rm *.deb
+RUN mkdir -p /var/lib/apt/lists/partial
 
 COPY apt-offline/* "$APT_OFFLINE"/
 
 FROM scratch
 COPY --from=staging / /
-ONBUILD ARG APT_OFFLINE=/root/apt-offline
-ONBUILD ENV APT_OFFLINE="$APT_OFFLINE"
-ONBUILD SHELL ["/bin/bash", "-c"]
-ONBUILD CMD ["/bin/bash"]
-ONBUILD COPY apt-offline/* "$APT_OFFLINE"/
-ONBUILD RUN "$APT_OFFLINE"/install
+
+ENV     HOME=/root
+WORKDIR "$HOME"
+SHELL   ["/bin/bash", "--login", "-c"]
+CMD     ["/bin/bash", "--login"]]
+
+ONBUILD ENV     HOME=/root
+ONBUILD WORKDIR "$HOME"
+ONBUILD SHELL   ["/bin/bash", "--login", "-c"]
+ONBUILD CMD     ["/bin/bash", "--login"]
+
+ONBUILD ARG     APT_OFFLINE="$HOME"/apt-offline
+ONBUILD ENV     APT_OFFLINE="$APT_OFFLINE"
+ONBUILD COPY    apt-offline/* "$APT_OFFLINE"/
+ONBUILD RUN     "$APT_OFFLINE"/install

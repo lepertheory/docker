@@ -93,8 +93,8 @@ COPY sources/* "$SOURCES"/
 # REF: Chapter5.4
 #
 COPY buildscripts/binutils-2.29 buildscripts/
-RUN buildscripts/build binutils-2.29 prepare binutils-2.29.tar.bz2
-RUN buildscripts/build binutils-2.29
+RUN  buildscripts/build binutils-2.29 prepare binutils-2.29.tar.bz2
+RUN  buildscripts/build binutils-2.29
 
 #
 # FROM: :LFS

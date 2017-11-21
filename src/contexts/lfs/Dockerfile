@@ -2,13 +2,13 @@ ARG GIT_BRANCH
 ARG TAG_BASE
 FROM $TAG_BASE/lfs-bootstrap:$GIT_BRANCH
 
-COPY buildscripts/build /root/buildscripts/
+COPY buildscripts/build buildscripts/
 
 #
 # FROM: :LFS
 # REF: Chapter6.7
 #
-COPY buildscripts/linux-headers-4.12.7 /root/buildscripts/
+COPY buildscripts/linux-headers-4.12.7 buildscripts/
 RUN  buildscripts/build linux-headers-4.12.7 prepare linux-4.12.7.tar.xz
 RUN  buildscripts/build linux-headers-4.12.7
 
@@ -16,7 +16,7 @@ RUN  buildscripts/build linux-headers-4.12.7
 # FROM: :LFS
 # REF: Chapter6.8
 #
-COPY buildscripts/man-pages-4.12 /root/buildscripts/
+COPY buildscripts/man-pages-4.12 buildscripts/
 RUN  buildscripts/build man-pages-4.12 prepare man-pages-4.12.tar.xz
 RUN  buildscripts/build man-pages-4.12
 
@@ -39,6 +39,14 @@ COPY buildscripts/glibc-2.26-05-test buildscripts/
 RUN  buildscripts/build glibc-2.26 05-test
 COPY buildscripts/glibc-2.26-06-install buildscripts/
 RUN  buildscripts/build glibc-2.26 06-install
+
+# FROM scratch
+# COPY --from=staging / /
+#
+# ENV     HOME=/root
+# WORKDIR "$HOME"
+# SHELL   ["/bin/bash", "--login", "-c"]
+# CMD     ["/bin/bash", "--login"]
 
 ONBUILD ENV     HOME=/root
 ONBUILD WORKDIR "$HOME"

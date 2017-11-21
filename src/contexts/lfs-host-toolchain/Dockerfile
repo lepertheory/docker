@@ -28,4 +28,4 @@ CMD     ["/bin/bash", "--login"]
 ONBUILD ENV     HOME=/root
 ONBUILD WORKDIR "$HOME"
 ONBUILD SHELL   ["/bin/bash", "--login", "-c"]
-ONBUILD CMD     ["/bin/bash", "-c"]
+ONBUILD CMD     ["/bin/bash", "--login"]

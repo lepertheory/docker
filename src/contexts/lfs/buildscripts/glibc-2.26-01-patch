@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+patch --forward --strip=1 --input="$SOURCES"/glibc-2.26-fhs-1.patch
+patch --forward --strip=1 --input="$SOURCES"/glibc-2.26-disable-broken-tests.patch

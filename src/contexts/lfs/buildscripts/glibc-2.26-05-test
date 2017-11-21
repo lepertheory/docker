@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+shopt -s inherit_errexit
+
+cd build
+make check

@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+# Create a symlink to reference during build so that we don't get references to /tools in the built
+# library.
+ln --symbolic --force --verbose /tools/lib/gcc /usr/lib
+
+# LSB compliance and 64-bit dynamic loader fix.
+case "$MACHINE" in
+  i?86)   ln --symbolic --force --verbose ld-linux.so.2 /lib/ld-lsb.so.3 ;;
+  x86_64) ln --symbolic --force --verbose ../lib/ld-linux-x86-64.so.2 /lib64
+          ln --symbolic --force --verbose ../lib/ld-linux-x86-64.so.2 /lib64/ld-lsb-x86-64.so.3
+  ;;
+esac

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+sed --in-place '/MV.*old/d'    Makefile.in
+sed --in-place '/{OLDSUFF}/c:' support/shlib-install
+
+./configure --prefix=/usr    \
+            --disable-static \
+            --docdir=/usr/share/doc/readline-7.0
+make SHLIB_LIBS='-L/tools/lib -lncursesw'
+make SHLIB_LIBS='-L/tools/lib -lncursesw' install
+
+for lib in readline history; do
+  mv --verbose /usr/lib/lib"${lib}".so.* /lib
+  ln --symbolic --force --verbose ../../lib/$(readlink /usr/lib/lib"${lib}".so) /usr/lib/lib"${lib}".so
+done
+
+install --verbose --mode=644 doc/*.{ps,pdf,html,dvi} /usr/share/doc/readline-7.0

@@ -106,6 +106,14 @@ COPY buildscripts/file-5.31 buildscripts/
 RUN  buildscripts/build file-5.31 prepare file-5.31.tar.gz
 RUN  buildscripts/build file-5.31
 
+#
+# FROM: :LFS
+# REF: Chapter6.13
+#
+COPY buildscripts/readline-7.0 buildscripts/
+RUN  buildscripts/build readline-7.0 prepare readline-7.0.tar.gz
+RUN  buildscripts/build readline-7.0
+
 # FROM scratch
 # COPY --from=staging / /
 #

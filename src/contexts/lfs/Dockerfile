@@ -150,6 +150,14 @@ RUN  buildscripts/build gmp-6.1.2 prepare gmp-6.1.2.tar.xz
 COPY buildscripts/gmp-6.1.2 buildscripts/
 RUN  buildscripts/build gmp-6.1.2
 
+#
+# FROM: :LFS
+# REF: Chapter6.18
+#
+RUN  buildscripts/build mpfr-3.1.5 prepare mpfr-3.1.5.tar.xz
+COPY buildscripts/mpfr-3.1.5 buildscripts/
+RUN  buildscripts/build mpfr-3.1.5
+
 # FROM scratch
 # COPY --from=staging / /
 #

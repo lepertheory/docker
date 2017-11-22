@@ -1,7 +1,10 @@
 # Milestones
 
+This follows [Semantic Versioning 2.0.0]
+
 ## 0.1
-*You are here.*
+* Follow semantic versioning 2.0.0.
+  *You are here.*
 
 ## 0.2
 * End-to-end LFS book.
@@ -15,17 +18,19 @@
         + Bootstrap `.deb`s should come from the `.zip`.
 * Make `apt-offline` easy to pass down to sub-containers.
 * Supports manual ZP install & run.
+* `# REF: :LFS` tracking.
+    - Catch relative links to files.
 
 ## 0.7
 * Supports isolated ZP environment build.
 
-## 0.9
+## 0.8
 * Absolute minimum dependencies needed to bootstrap.
     - Docker
     - git
-    Transitive dependencies don't count, so if you can be absolutely sure .
+    Transitive dependencies _do_ count. Update this list if necessary.
 
-## 1.0
+## 0.9
 * Single-command build and launch of:
     - ZP
     - GCorp
@@ -39,6 +44,13 @@
     - Windows
     - Ubuntu LTS
     - Amazon Linux
+
+## 1.0
+* Formal spec of dependencies.
+    - Licensing for all third-party code present in repo.
+* Defined public API.
+    - This is a must-have to comply with semver.
+* Automated validation of semver? Sure would be nice!
 
 ## 1.1
 * Support Buildkite build/test of:

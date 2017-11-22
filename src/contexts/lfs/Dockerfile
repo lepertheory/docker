@@ -113,6 +113,7 @@ RUN  buildscripts/build file-5.31
 COPY buildscripts/readline-7.0 buildscripts/
 RUN  buildscripts/build readline-7.0 prepare readline-7.0.tar.gz
 RUN  buildscripts/build readline-7.0
+
 #
 # FROM: :LFS
 # REF: Chapter6.14
@@ -121,6 +122,13 @@ COPY buildscripts/m4-1.4.18 buildscripts/
 RUN  buildscripts/build m4-1.4.18 prepare m4-1.4.18.tar.xz
 RUN  buildscripts/build m4-1.4.18
 
+#
+# FROM: :LFS
+# REF: Chapter6.15
+#
+COPY buildscripts/bc-1.07.1 buildscripts/
+RUN  buildscripts/build bc-1.07.1 prepare bc-1.07.1.tar.gz
+RUN  buildscripts/build bc-1.07.1
 
 # FROM scratch
 # COPY --from=staging / /

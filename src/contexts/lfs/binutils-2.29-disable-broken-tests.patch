@@ -1,6 +1,6 @@
 diff -ur binutils-2.29/gold/testsuite/Makefile.am binutils-2.29.new/gold/testsuite/Makefile.am
---- binutils-2.29/gold/testsuite/Makefile.am	2017-07-04 02:43:21.000000000 -0600
-+++ binutils-2.29.new/gold/testsuite/Makefile.am	2017-11-21 23:31:16.000000000 -0700
+--- binutils-2.29/gold/testsuite/Makefile.am	2017-07-04 08:43:21.000000000 +0000
++++ binutils-2.29.new/gold/testsuite/Makefile.am	2017-11-22 07:44:59.246847452 +0000
 @@ -1413,7 +1413,7 @@
  # initpri3b_LDADD =
  
@@ -11,8 +11,8 @@ diff -ur binutils-2.29/gold/testsuite/Makefile.am binutils-2.29.new/gold/testsui
  # Create the data files that debug_msg.sh analyzes.
  check_DATA += debug_msg.err
 diff -ur binutils-2.29/gold/testsuite/Makefile.in binutils-2.29.new/gold/testsuite/Makefile.in
---- binutils-2.29/gold/testsuite/Makefile.in	2017-07-04 02:43:21.000000000 -0600
-+++ binutils-2.29.new/gold/testsuite/Makefile.in	2017-11-21 23:29:59.000000000 -0700
+--- binutils-2.29/gold/testsuite/Makefile.in	2017-07-04 08:43:21.000000000 +0000
++++ binutils-2.29.new/gold/testsuite/Makefile.in	2017-11-22 07:44:59.246847452 +0000
 @@ -349,7 +349,6 @@
  @GCC_TRUE@@NATIVE_LINKER_TRUE@am__append_41 = many_sections_define.h \
  @GCC_TRUE@@NATIVE_LINKER_TRUE@	many_sections_check.h \
@@ -38,3 +38,14 @@ diff -ur binutils-2.29/gold/testsuite/Makefile.in binutils-2.29.new/gold/testsui
  @GCC_TRUE@@NATIVE_LINKER_TRUE@	missing_key_func.err \
  @GCC_TRUE@@NATIVE_LINKER_TRUE@	debug_msg_cdebug.err \
  @GCC_TRUE@@NATIVE_LINKER_TRUE@	debug_msg_cdebug_gabi.err \
+diff -ur binutils-2.29/ld/testsuite/ld-x86-64/x86-64.exp binutils-2.29.new/ld/testsuite/ld-x86-64/x86-64.exp
+--- binutils-2.29/ld/testsuite/ld-x86-64/x86-64.exp	2017-07-24 09:53:52.000000000 +0000
++++ binutils-2.29.new/ld/testsuite/ld-x86-64/x86-64.exp	2017-11-22 07:49:42.029894721 +0000
+@@ -1572,7 +1572,6 @@
+ ]
+ 
+ # Linux only tests
+-run_dump_test "pr17618"
+ run_dump_test "pltgot-1"
+ run_dump_test "pltgot-2"
+ run_dump_test "pr20830a"

@@ -9,7 +9,7 @@ set -o nounset
 
 expect -c 'spawn ls'
 
-patch --strip=1 < "$HOME"/binutils-2.29-disable-broken-test.patch
+patch --strip=1 < "$HOME"/binutils-2.29-disable-broken-tests.patch
 
 mkdir --verbose build
 cd build

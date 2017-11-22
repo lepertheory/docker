@@ -137,7 +137,7 @@ RUN  buildscripts/build bc-1.07.1
 RUN  buildscripts/build binutils-2.29 prepare binutils-2.29.tar.bz2
 COPY buildscripts/binutils-2.29 \
      buildscripts/binutils-2.29-01-build buildscripts/
-COPY binutils-2.29-disable-broken-test.patch ./
+COPY binutils-2.29-disable-broken-tests.patch ./
 RUN  buildscripts/build binutils-2.29 01-build
 COPY buildscripts/binutils-2.29-02-install buildscripts/
 RUN  buildscripts/build binutils-2.29 02-install

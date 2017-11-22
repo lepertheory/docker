@@ -11,7 +11,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; readonly SCRIPT_DIR
 set_context_env_vars
 
 run cp --recursive "$CONTEXT_SOURCE_DIR"/{Dockerfile,buildscripts,glibc-2.26-disable-broken-tests.patch} .
-run cp "$CONTEXT_SOURCE_DIR"/binutils-2.29-disable-broken-test.patch .
+run cp "$CONTEXT_SOURCE_DIR"/binutils-2.29-disable-broken-tests.patch .
 
 run docker build --build-arg=GIT_BRANCH="$GIT_BRANCH" \
                  --build-arg=TAG_BASE="$TAG_BASE"     \

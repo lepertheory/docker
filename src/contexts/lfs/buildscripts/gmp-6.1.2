@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+# We don't want processor-specific stuff.
+cp --verbose configfsf.guess config.guess
+cp --verbose configfsf.sub   config.sub
+
+./configure --prefix=/usr    \
+            --enable-cxx     \
+            --disable-static \
+            --docdir=/usr/share/doc/gmp-6.1.2
+make
+make html
+
+make check 2>&1 | tee gmp-check-log
+PASSES="$(awk '/# PASS:/{total+=$3} ; END{print total}' gmp-check-log)"
+EXPECTED_PASSES=190
+if [[ "$PASSES" != "$EXPECTED_PASSES" ]]; then
+  echo "Expected $EXPECTED_PASSES tests to pass, $PASSES did." 2>&1
+  exit 1
+fi
+
+make install
+make install-html

@@ -142,6 +142,14 @@ RUN  buildscripts/build binutils-2.29 01-build
 COPY buildscripts/binutils-2.29-02-install buildscripts/
 RUN  buildscripts/build binutils-2.29 02-install
 
+#
+# FROM: :LFS
+# REF: Chapter6.17
+#
+RUN  buildscripts/build gmp-6.1.2 prepare gmp-6.1.2.tar.xz
+COPY buildscripts/gmp-6.1.2 buildscripts/
+RUN  buildscripts/build gmp-6.1.2
+
 # FROM scratch
 # COPY --from=staging / /
 #

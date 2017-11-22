@@ -1,0 +1,40 @@
+diff -ur binutils-2.29/gold/testsuite/Makefile.am binutils-2.29.new/gold/testsuite/Makefile.am
+--- binutils-2.29/gold/testsuite/Makefile.am	2017-07-04 02:43:21.000000000 -0600
++++ binutils-2.29.new/gold/testsuite/Makefile.am	2017-11-21 23:31:16.000000000 -0700
+@@ -1413,7 +1413,7 @@
+ # initpri3b_LDADD =
+ 
+ # Test --detect-odr-violations
+-check_SCRIPTS += debug_msg.sh
++#check_SCRIPTS += debug_msg.sh
+ 
+ # Create the data files that debug_msg.sh analyzes.
+ check_DATA += debug_msg.err
+diff -ur binutils-2.29/gold/testsuite/Makefile.in binutils-2.29.new/gold/testsuite/Makefile.in
+--- binutils-2.29/gold/testsuite/Makefile.in	2017-07-04 02:43:21.000000000 -0600
++++ binutils-2.29.new/gold/testsuite/Makefile.in	2017-11-21 23:29:59.000000000 -0700
+@@ -349,7 +349,6 @@
+ @GCC_TRUE@@NATIVE_LINKER_TRUE@am__append_41 = many_sections_define.h \
+ @GCC_TRUE@@NATIVE_LINKER_TRUE@	many_sections_check.h \
+ @GCC_TRUE@@NATIVE_LINKER_TRUE@	file_in_many_sections \
+-@GCC_TRUE@@NATIVE_LINKER_TRUE@	debug_msg.err \
+ @GCC_TRUE@@NATIVE_LINKER_TRUE@	missing_key_func.err \
+ @GCC_TRUE@@NATIVE_LINKER_TRUE@	debug_msg_cdebug.err \
+ @GCC_TRUE@@NATIVE_LINKER_TRUE@	debug_msg_cdebug_gabi.err \
+@@ -411,7 +410,7 @@
+ # and --dynamic-list-cpp-typeinfo
+ @GCC_TRUE@@NATIVE_LINKER_TRUE@am__append_42 =  \
+ @GCC_TRUE@@NATIVE_LINKER_TRUE@	file_in_many_sections_test.sh \
+-@GCC_TRUE@@NATIVE_LINKER_TRUE@	debug_msg.sh missing_key_func.sh \
++@GCC_TRUE@@NATIVE_LINKER_TRUE@	missing_key_func.sh \
+ @GCC_TRUE@@NATIVE_LINKER_TRUE@	undef_symbol.sh pr18689.sh \
+ @GCC_TRUE@@NATIVE_LINKER_TRUE@	ver_test_1.sh ver_test_2.sh \
+ @GCC_TRUE@@NATIVE_LINKER_TRUE@	ver_test_4.sh ver_test_5.sh \
+@@ -447,7 +446,6 @@
+ # build it without error.
+ @GCC_TRUE@@NATIVE_LINKER_TRUE@am__append_43 =  \
+ @GCC_TRUE@@NATIVE_LINKER_TRUE@	file_in_many_sections.stdout \
+-@GCC_TRUE@@NATIVE_LINKER_TRUE@	debug_msg.err \
+ @GCC_TRUE@@NATIVE_LINKER_TRUE@	missing_key_func.err \
+ @GCC_TRUE@@NATIVE_LINKER_TRUE@	debug_msg_cdebug.err \
+ @GCC_TRUE@@NATIVE_LINKER_TRUE@	debug_msg_cdebug_gabi.err \

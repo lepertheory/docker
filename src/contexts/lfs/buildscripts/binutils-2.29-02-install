@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+cd build
+
+# Intentionally not continuing on failed tests, since nobody is watching.
+make check
+
+make tooldir=/usr install

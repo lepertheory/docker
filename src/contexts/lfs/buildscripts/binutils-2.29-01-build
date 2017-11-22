@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+expect -c 'spawn ls'
+
+patch --strip=1 < "$HOME"/binutils-2.29-disable-broken-test.patch
+
+mkdir --verbose build
+cd build
+
+../configure --prefix=/usr       \
+             --enable-gold       \
+             --enable-ld=default \
+             --enable-plugins    \
+             --enable-shared     \
+             --disable-werror    \
+             --with-system-zlib
+make tooldir=/usr

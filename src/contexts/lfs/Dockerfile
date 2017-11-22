@@ -158,6 +158,14 @@ RUN  buildscripts/build mpfr-3.1.5 prepare mpfr-3.1.5.tar.xz
 COPY buildscripts/mpfr-3.1.5 buildscripts/
 RUN  buildscripts/build mpfr-3.1.5
 
+#
+# FROM: :LFS
+# REF: Chapter6.18
+#
+RUN  buildscripts/build mpc-1.0.3 prepare mpc-1.0.3.tar.gz
+COPY buildscripts/mpc-1.0.3 buildscripts/
+RUN  buildscripts/build mpc-1.0.3
+
 # FROM scratch
 # COPY --from=staging / /
 #

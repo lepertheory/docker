@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+./configure --prefix=/usr
+make
+make check
+make install
+
+mv --verbose /usr/lib/libz.so.* /lib
+ln --symbolic --verbose --force ../../lib/"$(readlink /usr/lib/libz.so)" /usr/lib/libz.so

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+patch --strip=1 < "$SOURCES"/gcc-7.2.0-disable-broken-tests.patch
+
+if [[ $(uname --machine) == x86_64 ]]; then
+	sed --expression '/m64=/s/lib64/lib/' \
+	    --in-place=.orig                  \
+	    gcc/config/i386/t-linux64
+fi
+
+rm --force /usr/lib/gcc
+
+mkdir --verbose build
+cd build
+
+SED=sed ../configure --prefix=/usr            \
+                     --enable-languages=c,c++ \
+                     --disable-multilib       \
+                     --disable-bootstrap      \
+                     --with-system-zlib

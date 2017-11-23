@@ -166,6 +166,20 @@ RUN  buildscripts/build mpc-1.0.3 prepare mpc-1.0.3.tar.gz
 COPY buildscripts/mpc-1.0.3 buildscripts/
 RUN  buildscripts/build mpc-1.0.3
 
+#
+# FROM: :LFS
+# REF: Chapter6.19
+#
+RUN  buildscripts/build gcc-7.2.0 prepare gcc-7.2.0.tar.xz
+COPY gcc-7.2.0-disable-broken-tests.patch "$SOURCES"/
+COPY buildscripts/gcc-7.2.0 \
+     buildscripts/gcc-7.2.0-01-configure buildscripts/
+RUN  buildscripts/build gcc-7.2.0 01-configure
+COPY buildscripts/gcc-7.2.0-02-build buildscripts/
+RUN  buildscripts/build gcc-7.2.0 02-build
+COPY buildscripts/gcc-7.2.0-03-test buildscripts/
+RUN  buildscripts/build gcc-7.2.0 03-test
+
 # FROM scratch
 # COPY --from=staging / /
 #

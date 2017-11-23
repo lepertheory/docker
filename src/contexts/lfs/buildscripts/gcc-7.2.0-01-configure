@@ -7,7 +7,17 @@ set -o errtrace
 set -o pipefail
 set -o nounset
 
-patch --strip=1 < "$SOURCES"/gcc-7.2.0-disable-broken-tests.patch
+rm --verbose \
+   gcc/testsuite/c-c++-common/asan/{asan-interface,clone-test,halt_on_error,swapcontext-test}-1.c \
+   gcc/testsuite/c-c++-common/asan/pr{59063-{1,2},63316,63888,70712,71480,79944,80308}.c          \
+   gcc/testsuite/g++.dg/asan/{default-options,interception-failure-test}-1.C                      \
+   gcc/testsuite/g++.dg/asan/pr{55617,62017,77396{,-2},81021}.C                                   \
+   gcc/testsuite/g++.dg/asan/use-after-scope-5.C                                                  \
+   gcc/testsuite/gcc.dg/asan/nosanitize-and-inline.c                                              \
+   gcc/testsuite/gcc.dg/asan/pr{79196,80166,81186}.c                                              \
+   gcc/testsuite/gcc.dg/asan/use-after-scope-{{2..4},{6,7,11}}.c                                  \
+   gcc/testsuite/gcc.dg/asan/use-after-scope-goto-{1,2}.c                                         \
+   gcc/testsuite/gcc.dg/asan/use-after-scope-switch-{1..4}.c
 
 if [[ $(uname --machine) == x86_64 ]]; then
 	sed --expression '/m64=/s/lib64/lib/' \

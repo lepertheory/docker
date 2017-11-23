@@ -1,15 +1,17 @@
-# Milestones
+# TODO
+
+## Milestones
 
 This follows [Semantic Versioning 2.0.0]
 
-## 0.1
+### 0.1
 * Follow semantic versioning 2.0.0.
   *You are here.*
 
-## 0.2
+### 0.2
 * End-to-end LFS book.
 
-## 0.5
+### 0.5
 * Disable networking during build.
 * Single-command update of happy path.
     - LFS book
@@ -21,16 +23,16 @@ This follows [Semantic Versioning 2.0.0]
 * `# REF: :LFS` tracking.
     - Catch relative links to files.
 
-## 0.7
+### 0.7
 * Supports isolated ZP environment build.
 
-## 0.8
+### 0.8
 * Absolute minimum dependencies needed to bootstrap.
     - Docker
     - git
     Transitive dependencies _do_ count. Update this list if necessary.
 
-## 0.9
+### 0.9
 * Single-command build and launch of:
     - ZP
     - GCorp
@@ -45,14 +47,14 @@ This follows [Semantic Versioning 2.0.0]
     - Ubuntu LTS
     - Amazon Linux
 
-## 1.0
+### 1.0
 * Formal spec of dependencies.
     - Licensing for all third-party code present in repo.
 * Defined public API.
     - This is a must-have to comply with semver.
 * Automated validation of semver? Sure would be nice!
 
-## 1.1
+### 1.1
 * Support Buildkite build/test of:
     - ZP
     - GCorp
@@ -60,5 +62,9 @@ This follows [Semantic Versioning 2.0.0]
     - Airflow
 * Tests for development environment.
 
-## 2.0
+### 2.0
 * Self-hosting build of Docker.
+
+## I Dunno Put This Somewhere
+* http://phusion.github.io/baseimage-docker/#intro
+* http://skarnet.org/software/s6/why.html

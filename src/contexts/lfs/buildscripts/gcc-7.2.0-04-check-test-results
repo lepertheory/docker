@@ -9,6 +9,4 @@ set -o nounset
 
 cd build
 
-ulimit -s 32768
-# FIXME: Get rid of the || true if possible.
-make -k check || true
+../contrib/test_summary

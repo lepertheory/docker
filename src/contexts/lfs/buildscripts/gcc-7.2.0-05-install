@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+shopt -s inherit_errexit
+
+cd build
+
+make install
+
+ln --symbolic --verbose ../usr/bin/cpp /lib
+
+ln --symbolic --verbose gcc /usr/bin/cc
+
+install --verbose --directory --mode=755 /usr/lib/bfd-plugins
+ln --symbolic --verbose                                           \
+   ../../libexec/gcc/"$(gcc -dumpmachine)"/7.2.0/liblto_plugin.so \
+   /usr/lib/bfd-plugins/
+
+echo 'int main(){}' > dummy.c
+cc dummy.c --verbose -Wl,--verbose --output=dummy &> dummy.log
+if [[ "$(readelf --program-headers dummy | grep ': /lib')" \
+   != '      [Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]' ]]; then
+	echo 'Something is broken 1' 1>&2
+	exit 1
+fi
+
+if [[ "$(grep '^attempt to open /usr/lib/gcc/x86_64-pc-linux-gnu/7\.2\.0/\.\./\.\./\.\./\.\./lib/crt[1in]\.o succeeded$' dummy.log | wc --lines)" \
+   != '3' ]]; then
+	echo 'Something is broken 2' 1>&2
+	exit 2
+fi
+
+if [[ "$(grep --before=4 '^ /usr/include' dummy.log)" \
+   != $'#include <...> search starts here:
+ /usr/lib/gcc/x86_64-pc-linux-gnu/7.2.0/include
+ /usr/local/include
+ /usr/lib/gcc/x86_64-pc-linux-gnu/7.2.0/include-fixed
+ /usr/include' ]]; then
+	echo 'Something is broken 3' 1>&2
+	exit 3
+fi
+
+TEST_4="$(grep 'SEARCH.*/usr/lib' dummy.log                               \
+         | sed --regexp-extended 's/; ?/\n/g'                             \
+         | grep --invert-match -- -linux-gnu                              \
+         | sed --regexp-extended --quiet 's/^SEARCH_DIR\("(.*)"\)/\1/p')"
+readonly TEST_4
+if [[ "$TEST_4" != '/usr/local/lib64
+/lib64
+/usr/lib64
+/usr/local/lib
+/lib
+/usr/lib' ]]; then
+	printf '%s: %q' 'Something is broken 4' "$TEST_4" 1>&2
+	exit 4
+fi
+
+if ! grep --quiet '^attempt to open /lib/libc.so.6 succeeded$' dummy.log; then
+	echo 'Something is broken 5' 1>&2
+	echo 5
+fi
+
+if ! grep --quiet '^found ld-linux-x86-64\.so\.2 at /lib/ld-linux-x86-64\.so\.2$' dummy.log; then
+	echo 'Something is broken 6' 1>&2
+	echo 6
+fi
+
+rm --verbose dummy.c dummy dummy.log
+
+# TODO: This should go elsewhere, although make sure it doesn't break anything. This is the book
+#       order.
+mkdir --parents --verbose /usr/share/gdb/auto-load/usr/lib
+mv --verbose /usr/lib/*gdb.py /usr/share/gdb/auto-load/usr/lib

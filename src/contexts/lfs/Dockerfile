@@ -180,6 +180,8 @@ COPY buildscripts/gcc-7.2.0-03-test buildscripts/
 RUN  buildscripts/build gcc-7.2.0 03-test
 COPY buildscripts/gcc-7.2.0-04-check-test-results buildscripts/
 RUN  buildscripts/build gcc-7.2.0 04-check-test-results
+COPY buildscripts/gcc-7.2.0-05-install buildscripts/
+RUN  buildscripts/build gcc-7.2.0 05-install
 
 # FROM scratch
 # COPY --from=staging / /

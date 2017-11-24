@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+sed --in-place --expression='s|/@pkg_name@|&-@pkg-version@|' include/builddefs.in
+sed --in-place 's:| sed.*::g' test/{sbits-restore,cp,misc}.test
+sed --in-place 's/{(/\\{(/' test/run
+sed --in-place --expression='/TABS-1;/a if (x > (TABS-1)) x= (TABS-1);' libacl/__acl_to_any_text.c
+
+./configure --prefix=/usr    \
+            --disable-static \
+            --libexecdir=/usr/lib
+make
+make install install-dev install-lib
+chmod --verbose 755 /usr/lib/libacl.so
+mv --verbose /usr/lib/libacl.so.* /lib
+ln --symbolic --force --verbose ../../lib/"$(readlink /usr/lib/libacl.so)" /usr/lib/libacl.so

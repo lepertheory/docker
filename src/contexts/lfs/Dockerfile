@@ -216,6 +216,14 @@ COPY attr-2.4.47-disable-broken-tests.patch "$SOURCES"/
 COPY buildscripts/attr-2.4.47 buildscripts/
 RUN  buildscripts/build attr-2.4.47
 
+#
+# FROM: :LFS
+# REF: Chapter6.23
+#
+RUN  buildscripts/build acl-2.2.52 prepare acl-2.2.52.src.tar.gz
+COPY buildscripts/acl-2.2.52 buildscripts/
+RUN  buildscripts/build acl-2.2.52
+
 # FROM scratch
 # COPY --from=staging / /
 #

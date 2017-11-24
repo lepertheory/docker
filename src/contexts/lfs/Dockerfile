@@ -160,7 +160,7 @@ RUN  buildscripts/build mpfr-3.1.5
 
 #
 # FROM: :LFS
-# REF: Chapter6.18
+# REF: Chapter6.19
 #
 RUN  buildscripts/build mpc-1.0.3 prepare mpc-1.0.3.tar.gz
 COPY buildscripts/mpc-1.0.3 buildscripts/
@@ -168,7 +168,7 @@ RUN  buildscripts/build mpc-1.0.3
 
 #
 # FROM: :LFS
-# REF: Chapter6.19
+# REF: Chapter6.20
 #
 RUN  buildscripts/build gcc-7.2.0 prepare gcc-7.2.0.tar.xz
 COPY buildscripts/gcc-7.2.0 \
@@ -185,7 +185,7 @@ RUN  buildscripts/build gcc-7.2.0 05-install
 
 #
 # FROM: :LFS
-# REF: Chapter6.20
+# REF: Chapter6.21
 #
 RUN  buildscripts/build bzip2-1.0.6 prepare bzip2-1.0.6.tar.gz
 COPY buildscripts/bzip2-1.0.6 buildscripts/
@@ -193,7 +193,7 @@ RUN  buildscripts/build bzip2-1.0.6
 
 #
 # FROM: :LFS
-# REF: Chapter6.21
+# REF: Chapter6.22
 #
 RUN  buildscripts/build pkg-config-0.29.2 prepare pkg-config-0.29.2.tar.gz
 COPY buildscripts/pkg-config-0.29.2 buildscripts/
@@ -201,7 +201,7 @@ RUN  buildscripts/build pkg-config-0.29.2
 
 #
 # FROM: :LFS
-# REF: Chapter6.22
+# REF: Chapter6.23
 #
 RUN  buildscripts/build ncurses-6.0 prepare ncurses-6.0.tar.gz
 COPY buildscripts/ncurses-6.0 buildscripts/
@@ -209,7 +209,7 @@ RUN  buildscripts/build ncurses-6.0
 
 #
 # FROM: :LFS
-# REF: Chapter6.23
+# REF: Chapter6.24
 #
 RUN  buildscripts/build attr-2.4.47 prepare attr-2.4.47.src.tar.gz
 COPY attr-2.4.47-disable-broken-tests.patch "$SOURCES"/
@@ -218,7 +218,7 @@ RUN  buildscripts/build attr-2.4.47
 
 #
 # FROM: :LFS
-# REF: Chapter6.23
+# REF: Chapter6.25
 #
 RUN  buildscripts/build acl-2.2.52 prepare acl-2.2.52.src.tar.gz
 COPY buildscripts/acl-2.2.52 buildscripts/
@@ -226,11 +226,19 @@ RUN  buildscripts/build acl-2.2.52
 
 #
 # FROM: :LFS
-# REF: Chapter6.24
+# REF: Chapter6.26
 #
 RUN  buildscripts/build libcap-2.25 prepare libcap-2.25.tar.xz
 COPY buildscripts/libcap-2.25 buildscripts/
 RUN  buildscripts/build libcap-2.25
+
+#
+# FROM: :LFS
+# REF: Chapter6.27
+#
+RUN  buildscripts/build sed-4.4 prepare sed-4.4.tar.xz
+COPY buildscripts/sed-4.4 buildscripts/
+RUN  buildscripts/build sed-4.4
 
 # FROM scratch
 # COPY --from=staging / /

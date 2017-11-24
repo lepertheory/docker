@@ -207,6 +207,15 @@ RUN  buildscripts/build ncurses-6.0 prepare ncurses-6.0.tar.gz
 COPY buildscripts/ncurses-6.0 buildscripts/
 RUN  buildscripts/build ncurses-6.0
 
+#
+# FROM: :LFS
+# REF: Chapter6.23
+#
+RUN  buildscripts/build attr-2.4.47 prepare attr-2.4.47.src.tar.gz
+COPY attr-2.4.47-disable-broken-tests.patch "$SOURCES"/
+COPY buildscripts/attr-2.4.47 buildscripts/
+RUN  buildscripts/build attr-2.4.47
+
 # FROM scratch
 # COPY --from=staging / /
 #

@@ -12,6 +12,8 @@ set_context_env_vars
 
 run cp --recursive "$CONTEXT_SOURCE_DIR"/{Dockerfile,buildscripts,glibc-2.26-disable-broken-tests.patch} .
 run cp "$CONTEXT_SOURCE_DIR"/binutils-2.29-disable-broken-tests.patch .
+# NOTE: Assuming these failures are due to running in docker for now.
+run cp "$CONTEXT_SOURCE_DIR"/attr-2.4.47-disable-broken-tests.patch .
 
 run docker build --build-arg=GIT_BRANCH="$GIT_BRANCH" \
                  --build-arg=TAG_BASE="$TAG_BASE"     \

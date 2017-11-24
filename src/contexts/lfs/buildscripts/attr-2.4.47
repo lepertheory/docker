@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+patch --strip=1 < "$SOURCES"/attr-2.4.47-disable-broken-tests.patch
+
+sed --in-place --expression='s|/@pkg_name@|&-@pkg_version@|' include/builddefs.in
+sed --in-place --expression='/SUBDiRS/s|man[25]||g' man/Makefile
+
+sed --in-place 's:{(:\\{(:' test/run
+
+./configure --prefix=/usr --disable-static
+make
+make --jobs=1 tests root-tests
+make install install-dev install-lib
+chmod --verbose 755 /usr/lib/libattr.so
+mv --verbose /usr/lib/libattr.so.* /lib
+ln --symbolic --force --verbose ../../lib/"$(readlink /usr/lib/libattr.so)" /usr/lib/libattr.so

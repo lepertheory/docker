@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+sed --in-place '/install.*STALIBNAME/d' libcap/Makefile
+make
+make RAISE_SETFCAP=no lib=lib prefix=/usr install
+chmod --verbose 755 /usr/lib/libcap.so
+
+mv --verbose /usr/lib/libcap.so.* /lib
+ln --symbolic --force --verbose ../../lib/"$(readlink /usr/lib/libcap.so)" /usr/lib/libcap.so

@@ -224,6 +224,14 @@ RUN  buildscripts/build acl-2.2.52 prepare acl-2.2.52.src.tar.gz
 COPY buildscripts/acl-2.2.52 buildscripts/
 RUN  buildscripts/build acl-2.2.52
 
+#
+# FROM: :LFS
+# REF: Chapter6.24
+#
+RUN  buildscripts/build libcap-2.25 prepare libcap-2.25.tar.xz
+COPY buildscripts/libcap-2.25 buildscripts/
+RUN  buildscripts/build libcap-2.25
+
 # FROM scratch
 # COPY --from=staging / /
 #

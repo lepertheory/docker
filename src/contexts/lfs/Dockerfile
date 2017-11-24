@@ -183,6 +183,22 @@ RUN  buildscripts/build gcc-7.2.0 04-check-test-results
 COPY buildscripts/gcc-7.2.0-05-install buildscripts/
 RUN  buildscripts/build gcc-7.2.0 05-install
 
+#
+# FROM: :LFS
+# REF: Chapter6.20
+#
+RUN  buildscripts/build bzip2-1.0.6 prepare bzip2-1.0.6.tar.gz
+COPY buildscripts/bzip2-1.0.6 buildscripts/
+RUN  buildscripts/build bzip2-1.0.6
+
+#
+# FROM: :LFS
+# REF: Chapter6.21
+#
+RUN  buildscripts/build pkg-config-0.29.2 prepare pkg-config-0.29.2.tar.gz
+COPY buildscripts/pkg-config-0.29.2 buildscripts/
+RUN  buildscripts/build pkg-config-0.29.2
+
 # FROM scratch
 # COPY --from=staging / /
 #

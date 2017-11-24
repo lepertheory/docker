@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+patch --forward --strip=1 --input="$SOURCES"/bzip2-1.0.6-install_docs-1.patch
+
+sed --in-place 's@\(ln -s -f \)$(PREFIX)/bin/@\1@' Makefile
+sed --in-place 's@(PREFIX)/man@(PREFIX)/share/man@g' Makefile
+
+make --file=Makefile-libbz2_so
+make clean
+make
+make PREFIX=/usr install
+cp --verbose bzip2-shared /bin/bzip2
+cp --archive --verbose libbz2.so* /lib
+ln --symbolic --verbose ../../lib/libbz2.so.1.0 /usr/lib/libbz2.so
+rm --verbose /usr/bin/{bunzip2,bzcat,bzip2}
+ln --symbolic --verbose bzip2 /bin/bunzip2
+ln --symbolic --verbose bzip2 /bin/bzcat

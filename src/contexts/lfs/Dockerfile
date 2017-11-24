@@ -199,6 +199,14 @@ RUN  buildscripts/build pkg-config-0.29.2 prepare pkg-config-0.29.2.tar.gz
 COPY buildscripts/pkg-config-0.29.2 buildscripts/
 RUN  buildscripts/build pkg-config-0.29.2
 
+#
+# FROM: :LFS
+# REF: Chapter6.22
+#
+RUN  buildscripts/build ncurses-6.0 prepare ncurses-6.0.tar.gz
+COPY buildscripts/ncurses-6.0 buildscripts/
+RUN  buildscripts/build ncurses-6.0
+
 # FROM scratch
 # COPY --from=staging / /
 #

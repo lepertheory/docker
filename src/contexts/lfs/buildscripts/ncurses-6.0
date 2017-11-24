@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+sed --in-place '/LIBTOOL_INSTALL/d' c++/Makefile.in
+
+./configure --prefix=/usr           \
+            --mandir=/usr/share/man \
+            --with-shared           \
+            --without-debug         \
+            --without-normal        \
+            --enable-pc-files       \
+            --enable-widec
+make
+make install
+
+mv --verbose /usr/lib/libncursesw.so.6* /lib
+ln --symbolic --force --verbose ../../lib/"$(readlink /usr/lib/libncursesw.so)" \
+                                /usr/lib/libncursesw.so
+
+for lib in ncurses form panel menu; do
+  rm --verbose --force       /usr/lib/lib"${lib}".so
+  echo "INPUT(-l${lib}}w)" > /usr/lib/lib"${lib}".so
+  ln --symbolic --force --verbose "${lib}"w.pc /usr/lib/pkgconfig/${lib}.pc
+done
+
+echo 'INPUT(-lncursesw)' > /usr/lib/libcursesw.so
+ln --symbolic --force --verbose libncurses.so /usr/lib/libcurses.so
+
+mkdir --verbose                /usr/share/doc/ncurses-6.0
+cp --verbose --recursive doc/* /usr/share/doc/ncurses-6.0/
+
+# Optional instructions for LFS compliance.
+make distclean
+./configure --prefix=/usr         \
+            --with-shared         \
+            --without-normal      \
+            --without-debug       \
+            --without-cxx-binding \
+            --with-abi-version=5
+make sources libs
+cp --archive --verbose lib/lib*.so.5* /usr/lib

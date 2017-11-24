@@ -240,6 +240,22 @@ RUN  buildscripts/build sed-4.4 prepare sed-4.4.tar.xz
 COPY buildscripts/sed-4.4 buildscripts/
 RUN  buildscripts/build sed-4.4
 
+#
+# FROM: :LFS
+# REF: Chapter6.28
+#
+RUN  buildscripts/build shadow-4.5 prepare shadow-4.5.tar.xz
+COPY buildscripts/shadow-4.5 buildscripts/
+RUN  buildscripts/build shadow-4.5
+
+#
+# FROM: :LFS
+# REF: Chapter6.29
+#
+RUN  buildscripts/build psmisc-23.1 prepare psmisc-23.1.tar.xz
+COPY buildscripts/psmisc-23.1 buildscripts/
+RUN  buildscripts/build psmisc-23.1
+
 # FROM scratch
 # COPY --from=staging / /
 #

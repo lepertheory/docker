@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+./configure --prefix=/usr
+make
+make install
+
+mv --verbose /usr/bin/fuser   /bin
+mv --verbose /usr/bin/killall /bin

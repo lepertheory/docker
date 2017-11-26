@@ -296,6 +296,15 @@ RUN  buildscripts/build bash-4.4 prepare bash-4.4.tar.gz
 COPY buildscripts/bash-4.4 buildscripts/
 RUN  buildscripts/build bash-4.4
 
+#
+# FROM: :LFS
+# REF: Chapter6.35
+#
+RUN  buildscripts/build libtool-2.4.6 prepare libtool-2.4.6.tar.xz
+COPY buildscripts/libtool-2.4.6 buildscripts/
+COPY libtool-2.4.6-disable-broken-tests.patch "$SOURCES"/
+RUN  buildscripts/build libtool-2.4.6
+
 # FROM scratch
 # COPY --from=staging / /
 #

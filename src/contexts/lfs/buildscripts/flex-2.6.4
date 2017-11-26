@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+sed --in-place '/math.h/a #include <malloc.h>' src/flexdef.h
+
+HELP2MAN=/tools/bin/true ./configure --prefix=/usr --docdir=/usr/share/doc/flex-2.6.4
+make
+make check
+make install
+lnn --symbolic --verbose flex /usr/bin/lex

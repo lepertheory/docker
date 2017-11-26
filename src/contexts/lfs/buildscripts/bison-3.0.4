@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+./configure --prefix=/usr --docdir=/usr/share/doc/bison-3.0.4
+make
+make install

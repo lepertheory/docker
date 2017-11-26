@@ -264,6 +264,22 @@ RUN  buildscripts/build iana-etc-2.30 prepare iana-etc-2.30.tar.bz2
 COPY buildscripts/iana-etc-2.30 buildscripts/
 RUN  buildscripts/build iana-etc-2.30
 
+#
+# FROM: :LFS
+# REF: Chapter6.31
+#
+RUN  buildscripts/build bison-3.0.4 prepare bison-3.0.4.tar.xz
+COPY buildscripts/bison-3.0.4 buildscripts/
+RUN  buildscripts/build bison-3.0.4
+
+#
+# FROM: :LFS
+# REF: Chapter6.32
+#
+RUN  buildscripts/build flex-2.6.4 prepare flex-2.6.4.tar.gz
+COPY buildscripts/flex-2.6.4 buildscripts/
+RUN  buildscripts/build flex-2.6.4
+
 # FROM scratch
 # COPY --from=staging / /
 #

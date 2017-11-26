@@ -280,6 +280,22 @@ RUN  buildscripts/build flex-2.6.4 prepare flex-2.6.4.tar.gz
 COPY buildscripts/flex-2.6.4 buildscripts/
 RUN  buildscripts/build flex-2.6.4
 
+#
+# FROM: :LFS
+# REF: Chapter6.33
+#
+RUN  buildscripts/build grep-3.1 prepare grep-3.1.tar.xz
+COPY buildscripts/grep-3.1 buildscripts/
+RUN  buildscripts/build grep-3.1
+
+#
+# FROM: :LFS
+# REF: Chapter6.34
+#
+RUN  buildscripts/build bash-4.4 prepare bash-4.4.tar.gz
+COPY buildscripts/bash-4.4 buildscripts/
+RUN  buildscripts/build bash-4.4
+
 # FROM scratch
 # COPY --from=staging / /
 #

@@ -24,8 +24,8 @@ ln --symbolic --force --verbose ../../lib/"$(readlink /usr/lib/libncursesw.so)" 
                                 /usr/lib/libncursesw.so
 
 for lib in ncurses form panel menu; do
-  rm --verbose --force       /usr/lib/lib"${lib}".so
-  echo "INPUT(-l${lib}}w)" > /usr/lib/lib"${lib}".so
+  rm --verbose --force      /usr/lib/lib"${lib}".so
+  echo "INPUT(-l${lib}w)" > /usr/lib/lib"${lib}".so
   ln --symbolic --force --verbose "${lib}"w.pc /usr/lib/pkgconfig/${lib}.pc
 done
 

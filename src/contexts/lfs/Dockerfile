@@ -256,6 +256,14 @@ RUN  buildscripts/build psmisc-23.1 prepare psmisc-23.1.tar.xz
 COPY buildscripts/psmisc-23.1 buildscripts/
 RUN  buildscripts/build psmisc-23.1
 
+#
+# FROM: :LFS
+# REF: Chapter6.30
+#
+RUN  buildscripts/build iana-etc-2.30 prepare iana-etc-2.30.tar.bz2
+COPY buildscripts/iana-etc-2.30 buildscripts/
+RUN  buildscripts/build iana-etc-2.30
+
 # FROM scratch
 # COPY --from=staging / /
 #

@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+cat > config.cache << "EOF"
+KILL=/bin/kill
+MOUNT_PATH=/bin/mount
+UMOUNT_PATH=/bin/umount
+HAVE_BLKID=1
+BLKID_LIBS="-lblkid"
+BLKID_CFLAGS="-I/tools/include/blkid"
+HAVE_LIBMOUNT=1
+MOUNT_LIBS="-lmount"
+MOUNT_CFLAGS="-I/tools/include/libmount"
+cc_cv_CFLAGS__flto=no
+SULOGIN="/sbin/sulogin"
+GPERF_LEN_TYPE=size_t
+XSLTPROC="/usr/bin/xsltproc"
+EOF
+
+./configure --prefix=/usr            \
+            --sysconfdir=/etc        \
+            --localstatedir=/var     \
+            --config-cache           \
+            --with-rootprefix=       \
+            --with-rootlibdir=/lib   \
+            --enable-split-usr       \
+            --disable-firstboot      \
+            --disable-ldconfig       \
+            --disable-sysusers       \
+            --without-python         \
+            --with-default-dnssec=no \
+            --docdir=/usr/share/doc/systemd-234
+make
+make install
+
+rm --recursive --force --verbose /usr/lib/rpm
+
+for tool in runlevel reboot shutdown poweroff halt telinit; do
+  ln --symbolic --force --verbose ../bin/systemctl /sbin/"${tool}"
+done
+ln --symbolic --force --verbose ../lib/systemd /sbin/init
+
+systemd-machine-id-setup

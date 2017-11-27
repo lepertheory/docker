@@ -421,6 +421,14 @@ RUN  buildscripts/build gettext-0.19.8.1 prepare gettext-0.19.8.1.tar.xz
 COPY buildscripts/gettext-0.19.8.1 buildscripts/
 RUN  buildscripts/build gettext-0.19.8.1
 
+#
+# FROM: :LFS
+# REF: Chapter6.48
+#
+RUN  buildscripts/build systemd-234 prepare systemd-234-lfs.tar.xz
+COPY buildscripts/systemd-234 buildscripts/
+RUN  buildscripts/build systemd-234
+
 # FROM scratch
 # COPY --from=staging / /
 #

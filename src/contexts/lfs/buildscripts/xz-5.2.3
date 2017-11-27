@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+./configure --prefix=/usr --disable-static --docdir=/usr/share/doc/xz-5.2.3
+make
+make check
+
+make install
+mv --verbose /usr/bin/{lzma,unlzma,lzcat,xz,unxz,xzcat} /bin
+mv --verbose /usr/lib/liblzma.so.*                      /lib
+ln --symbolic --verbose --force ../../lib/"$(readlink /usr/lib/liblzma.so)" /usr/lib/liblzma.so

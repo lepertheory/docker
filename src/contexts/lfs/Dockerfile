@@ -397,6 +397,14 @@ COPY automake-1.15.1-disable-broken-tests.patch "$SOURCES"/
 COPY buildscripts/automake-1.15.1 buildscripts/
 RUN  buildscripts/build automake-1.15.1
 
+#
+# FROM: :LFS
+# REF: Chapter6.45
+#
+RUN  buildscripts/build xz-5.2.3 prepare xz-5.2.3.tar.xz
+COPY buildscripts/xz-5.2.3 buildscripts/
+RUN  buildscripts/build xz-5.2.3
+
 # FROM scratch
 # COPY --from=staging / /
 #

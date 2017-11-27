@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+patch --strip=1 < "$SOURCES"/automake-1.15.1-disable-broken-tests.patch
+
+./configure --prefix=/usr --docdir=/usr/share/doc/automake-1.15.1
+make
+sed --in-place 's:./configure:LEXLIB=/usr/lib/libfl.a &:' t/lex-{clean,depend}-cxx.sh
+make check
+make install

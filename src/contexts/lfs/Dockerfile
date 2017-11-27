@@ -388,6 +388,15 @@ RUN  buildscripts/build autoconf-2.69 prepare autoconf-2.69.tar.xz
 COPY buildscripts/autoconf-2.69 buildscripts/
 RUN  buildscripts/build autoconf-2.69
 
+#
+# FROM: :LFS
+# REF: Chapter6.44
+#
+RUN  buildscripts/build automake-1.15.1 prepare automake-1.15.1.tar.xz
+COPY automake-1.15.1-disable-broken-tests.patch "$SOURCES"/
+COPY buildscripts/automake-1.15.1 buildscripts/
+RUN  buildscripts/build automake-1.15.1
+
 # FROM scratch
 # COPY --from=staging / /
 #

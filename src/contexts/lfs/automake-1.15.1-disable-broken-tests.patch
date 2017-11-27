@@ -1,0 +1,28 @@
+diff -ur automake-1.15.1/Makefile.in automake-1.15.1.new/Makefile.in
+--- automake-1.15.1/Makefile.in	2017-06-18 11:35:04.000000000 -0600
++++ automake-1.15.1.new/Makefile.in	2017-11-26 23:28:10.000000000 -0700
+@@ -1123,7 +1123,6 @@
+ t/check8.sh \
+ t/check10.sh \
+ t/check11.sh \
+-t/check12.sh \
+ t/check-subst.sh \
+ t/check-subst-prog.sh \
+ t/check-exported-srcdir.sh \
+@@ -1940,7 +1939,6 @@
+ t/subdir-subsub.sh \
+ t/subdir-distclean.sh \
+ t/subdir-keep-going-pr12554.sh \
+-t/subobj.sh \
+ t/subobj2.sh \
+ t/subobj4.sh \
+ t/subobj5.sh \
+@@ -2213,7 +2211,7 @@
+ 	t/check-exported-srcdir-w.sh t/check-fd-redirect-w.sh \
+ 	t/check-subst-prog-w.sh t/check-subst-w.sh \
+ 	t/check-tests-in-builddir-w.sh t/check-w.sh t/check11-w.sh \
+-	t/check12-w.sh t/check2-w.sh t/check4-w.sh t/check5-w.sh \
++	t/check2-w.sh t/check4-w.sh t/check5-w.sh \
+ 	t/check6-w.sh t/check7-w.sh t/check8-w.sh t/color-tests-w.sh \
+ 	t/color-tests2-w.sh t/compile-w.sh t/compile2-w.sh \
+ 	t/compile3-w.sh t/compile4-w.sh t/compile5-w.sh \

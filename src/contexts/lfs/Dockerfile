@@ -302,7 +302,6 @@ RUN  buildscripts/build bash-4.4
 #
 RUN  buildscripts/build libtool-2.4.6 prepare libtool-2.4.6.tar.xz
 COPY buildscripts/libtool-2.4.6 buildscripts/
-COPY libtool-2.4.6-disable-broken-tests.patch "$SOURCES"/
 RUN  buildscripts/build libtool-2.4.6
 
 # FROM scratch

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+./configure --prefix=/usr
+make
+
+make TESTSUITEFLAGS='1-122 127-129 131-160' check
+
+make install

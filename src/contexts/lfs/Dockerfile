@@ -445,6 +445,15 @@ RUN  buildscripts/build e2fsprogs-1.43.5 prepare e2fsprogs-1.43.5.tar.gz
 COPY buildscripts/e2fsprogs-1.43.5 buildscripts/
 RUN  buildscripts/build e2fsprogs-1.43.5
 
+#
+# FROM: :LFS
+# REF: Chapter6.51
+#
+RUN  buildscripts/build coreutils-8.27 prepare coreutils-8.27.tar.xz
+COPY coreutils-8.27-dunno.patch "$SOURCES"/
+COPY buildscripts/coreutils-8.27 buildscripts/
+RUN  buildscripts/build coreutils-8.27
+
 # FROM scratch
 # COPY --from=staging / /
 #

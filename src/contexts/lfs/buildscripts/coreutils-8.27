@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+patch --forward --strip=1 --input="$SOURCES"/coreutils-8.27-i18n-1.patch
+patch --strip=1 < "$SOURCES"/coreutils-8.27-dunno.patch
+sed --in-place '/test.lock/s/^/#/' gnulib-tests/gnulib.mk
+
+FORCE_UNSAFE_CONFIGURE=1 ./configure --prefix=/usr --enable-no-install-program=killm,uptime
+FORCE_UNSAFE_CONFIGURE=1 make
+
+make NON_ROOT_USERNAME=nobody check-root
+echo 'dummy:x:1000:nobody' >> /etc/group
+chown --recursive --verbose nobody .
+su nobody --shell=/bin/bash -c "PATH=$(printf '%q' "$PATH") make RUN_EXPENSIVE_TESTS=yes check"
+sed --in-place '/dummy/d' /etc/group
+
+make install
+mv --verbose /usr/bin/{cat,chgrp,chmod,chown,cp,date,dd,df,echo}                     /bin
+mv --verbose /usr/bin/{false,ln,ls,mkdir,mknod,mv,pwd,rm,rmdir,stty,sync,true,uname} /bin
+mv --verbose /usr/bin/{head,sleep,nice,test,[}                                       /bin
+mv --verbose /usr/bin/chroot                                                         /usr/sbin
+mv --verbose /usr/share/man/man1/chroot.1 /usr/share/man/man8/chroot.8
+sed --in-place s/\"1\"/\"8\"/1            /usr/share/man/man8/chroot.8

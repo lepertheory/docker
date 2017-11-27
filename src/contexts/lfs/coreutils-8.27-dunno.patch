@@ -1,0 +1,37 @@
+diff -ur coreutils-8.27/src/expand.c coreutils-8.27.new/src/expand.c
+--- coreutils-8.27/src/expand.c	2017-11-27 08:36:58.013629048 +0000
++++ coreutils-8.27.new/src/expand.c	2017-11-27 08:41:21.736039928 +0000
+@@ -38,6 +38,7 @@
+ #include <getopt.h>
+ #include <sys/types.h>
+ 
++#define MBFILE_INLINE _GL_EXTERN_INLINE
+ #include <mbfile.h>
+ 
+ #include "system.h"
+diff -ur coreutils-8.27/src/unexpand.c coreutils-8.27.new/src/unexpand.c
+--- coreutils-8.27/src/unexpand.c	2017-11-27 08:36:58.017629024 +0000
++++ coreutils-8.27.new/src/unexpand.c	2017-11-27 08:40:50.064231808 +0000
+@@ -39,6 +39,7 @@
+ #include <getopt.h>
+ #include <sys/types.h>
+ 
++#define MBFILE_INLINE _GL_EXTERN_INLINE
+ #include <mbfile.h>
+ 
+ #include "system.h"
+diff -ur coreutils-8.27/tests/misc/chroot-credentials.sh coreutils-8.27.new/tests/misc/chroot-credentials.sh
+--- coreutils-8.27/tests/misc/chroot-credentials.sh	2017-01-01 22:34:24.000000000 +0000
++++ coreutils-8.27.new/tests/misc/chroot-credentials.sh	2017-11-27 09:58:29.873305102 +0000
+@@ -52,11 +52,6 @@
+ )
+ test "$whoami_after_chroot" != "$root" || fail=1
+ 
+-# Verify that when specifying only a group we don't change the
+-# list of supplemental groups
+-test "$(chroot --userspec=:$NON_ROOT_GROUP / id -G)" = \
+-     "$NON_ROOT_GID $(id -G)" || fail=1
+-
+ if ! test "$HAVE_SETGROUPS"; then
+   Exit $fail
+ fi

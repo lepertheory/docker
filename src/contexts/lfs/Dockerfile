@@ -405,6 +405,22 @@ RUN  buildscripts/build xz-5.2.3 prepare xz-5.2.3.tar.xz
 COPY buildscripts/xz-5.2.3 buildscripts/
 RUN  buildscripts/build xz-5.2.3
 
+#
+# FROM: :LFS
+# REF: Chapter6.46
+#
+RUN  buildscripts/build kmod-24 prepare kmod-24.tar.xz
+COPY buildscripts/kmod-24 buildscripts/
+RUN  buildscripts/build kmod-24
+
+#
+# FROM: :LFS
+# REF: Chapter6.47
+#
+RUN  buildscripts/build gettext-0.19.8.1 prepare gettext-0.19.8.1.tar.xz
+COPY buildscripts/gettext-0.19.8.1 buildscripts/
+RUN  buildscripts/build gettext-0.19.8.1
+
 # FROM scratch
 # COPY --from=staging / /
 #

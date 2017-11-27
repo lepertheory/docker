@@ -23,7 +23,7 @@ sed --in-place '/dummy/d' /etc/group
 make install
 mv --verbose /usr/bin/{cat,chgrp,chmod,chown,cp,date,dd,df,echo}                     /bin
 mv --verbose /usr/bin/{false,ln,ls,mkdir,mknod,mv,pwd,rm,rmdir,stty,sync,true,uname} /bin
-mv --verbose /usr/bin/{head,sleep,nice,test,[}                                       /bin
+mv --verbose /usr/bin/{head,sleep,nice,test,\[}                                      /bin
 mv --verbose /usr/bin/chroot                                                         /usr/sbin
 mv --verbose /usr/share/man/man1/chroot.1 /usr/share/man/man8/chroot.8
 sed --in-place s/\"1\"/\"8\"/1            /usr/share/man/man8/chroot.8

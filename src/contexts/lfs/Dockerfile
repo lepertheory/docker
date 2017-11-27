@@ -349,6 +349,18 @@ COPY inetutils-1.9.4-disable-broken-tests.patch "$SOURCES"/
 COPY buildscripts/inetutils-1.9.4 buildscripts/
 RUN  buildscripts/build inetutils-1.9.4
 
+#
+# FROM: :LFS
+# REF: Chapter6.40
+#
+RUN  buildscripts/build perl-5.26.0 prepare perl-5.26.0.tar.xz
+COPY perl-5.26.0-upstream-docker-fix.patch "$SOURCES"/
+COPY buildscripts/perl-5.26.0 \
+     buildscripts/perl-5.26.0-01-build buildscripts/
+RUN  buildscripts/build perl-5.26.0 01-build
+COPY buildscripts/perl-5.26.0-02-install buildscripts/
+RUN  buildscripts/build perl-5.26.0 02-install
+
 # FROM scratch
 # COPY --from=staging / /
 #

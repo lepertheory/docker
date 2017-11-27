@@ -1,0 +1,33 @@
+diff -ur perl-5.26.0/t/op/getppid.t perl-5.26.0.new/t/op/getppid.t
+--- perl-5.26.0/t/op/getppid.t	2017-04-19 07:37:06.000000000 -0600
++++ perl-5.26.0.new/t/op/getppid.t	2017-11-26 20:22:00.000000000 -0700
+@@ -35,7 +35,8 @@
+ 	    unless my ($how, $first, $second) = /^([a-z]+),(\d+),(\d+)\z/;
+ 	cmp_ok ($first, '>=', 1, "Parent of $which grandchild");
+ 	my $message = "grandchild waited until '$how'";
+-	cmp_ok ($second, '>=', 1, "New parent of orphaned $which grandchild")
++	my $min_getppid_result = is_linux_container() ? 0 : 1;
++	cmp_ok ($second, '>=', $min_getppid_result, "New parent of orphaned $which grandchild")
+ 	    ? note ($message) : diag ($message);
+ 
+ 	SKIP: {
+@@ -104,6 +105,19 @@
+     }
+ }
+ 
++sub is_linux_container {
++    my $is_linux_container = 0;
++    if ($^O eq 'linux' && open my $fh, '<', '/proc/1/cgroup') {
++        while(<$fh>) {
++            if (m{^\d+:pids:(.*)} && $1 ne '/init.scope') {
++                $is_linux_container = 1;
++                last;
++            }
++        }
++    }
++    $is_linux_container;
++}
++
+ my $first = fork_and_retrieve("first");
+ my $second = fork_and_retrieve("second");
+ SKIP: {

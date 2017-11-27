@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+patch --strip=1 < "$SOURCES"/perl-5.26.0-upstream-docker-fix.patch
+
+# Docker creates /etc/hosts, skipping that step.
+
+sh Configure -des -Dprefix=/usr                 \
+                  -Dvendorprefix=/usr           \
+                  -Dman1dir=/usr/share/man/man1 \
+                  -Dman3dir=/usr/share/man/man3 \
+                  -Dpager='/usr/bin/less -isR'  \
+                  -Duseshrplib                  \
+                  -Dusethreads
+make

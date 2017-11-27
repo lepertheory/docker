@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+# Assuming this flag is present specifically for building against the system zlib.
+TEST_SKIP_VERSION_CHECK=True make test
+
+make install

@@ -437,6 +437,14 @@ RUN  buildscripts/build procps-ng-3.3.12 prepare procps-ng-3.3.12.tar.xz
 COPY buildscripts/procps-ng-3.3.12 buildscripts/
 RUN  buildscripts/build procps-ng-3.3.12
 
+#
+# FROM: :LFS
+# REF: Chapter6.50
+#
+RUN  buildscripts/build e2fsprogs-1.43.5 prepare e2fsprogs-1.43.5.tar.gz
+COPY buildscripts/e2fsprogs-1.43.5 buildscripts/
+RUN  buildscripts/build e2fsprogs-1.43.5
+
 # FROM scratch
 # COPY --from=staging / /
 #

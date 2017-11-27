@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+patch --strip=1 < "$SOURCES"/inetutils-1.9.4-disable-broken-tests.patch
+
+./configure --prefix=/usr        \
+            --localstatedir=/var \
+            --disable-logger     \
+            --disable-whois      \
+            --disable-rcp        \
+            --disable-rexec      \
+            --disable-rlogin     \
+            --disable-rsh        \
+            --disable-servers
+make
+# TODO: Run IPv6 tests if the docker daemon has it enabled.
+make TEST_IPV6=no check
+make install
+mv --verbose /usr/bin/{hostname,ping,ping6,traceroute} /bin
+mv --verbose /usr/bin/ifconfig                         /sbin

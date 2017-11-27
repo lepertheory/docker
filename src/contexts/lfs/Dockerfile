@@ -340,6 +340,15 @@ RUN  buildscripts/build expat-2.2.3 prepare expat-2.2.3.tar.bz2
 COPY buildscripts/expat-2.2.3 buildscripts/
 RUN  buildscripts/build expat-2.2.3
 
+#
+# FROM: :LFS
+# REF: Chapter6.39
+#
+RUN  buildscripts/build inetutils-1.9.4 prepare inetutils-1.9.4.tar.xz
+COPY inetutils-1.9.4-disable-broken-tests.patch "$SOURCES"/
+COPY buildscripts/inetutils-1.9.4 buildscripts/
+RUN  buildscripts/build inetutils-1.9.4
+
 # FROM scratch
 # COPY --from=staging / /
 #

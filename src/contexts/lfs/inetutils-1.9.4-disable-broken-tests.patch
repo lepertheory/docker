@@ -1,0 +1,36 @@
+diff -ur inetutils-1.9.4/tests/hostname.sh inetutils-1.9.4.new/tests/hostname.sh
+--- inetutils-1.9.4/tests/hostname.sh	2015-03-31 01:06:38.000000000 -0600
++++ inetutils-1.9.4.new/tests/hostname.sh	2017-11-26 18:45:01.000000000 -0700
+@@ -48,32 +48,4 @@
+ test $errno -eq 0 || echo "Failed to get same hostname as uname does." >&2
+ test $errno -eq 0 || exit $errno
+ 
+-if test `func_id_uid` != 0; then
+-    echo "hostname: skipping tests to set host name"
+-else
+-    # Only run this if hostname succeeded...
+-    if test $errno -eq 0; then
+-	$hostname `$hostname` || errno=$?
+-	test $errno -eq 0 || echo "Failed to set hostname." >&2
+-	test $errno -eq 0 || exit $errno
+-
+-	NAMEFILE=`$MKTEMP tmp.XXXXXXXXXX` || errno=$?
+-	test $errno -eq 0 || echo >&2 'Cannot create test file.'
+-	test $errno -eq 0 || exit $errno
+-
+-	trap posttest 0 1 2 3 15
+-
+-	SAVEDNAME=`hostname` || errno=$?
+-	echo $SAVEDNAME > $NAMEFILE
+-
+-	if test $errno -eq 0 && test -s $NAMEFILE; then
+-	    $hostname -F $NAMEFILE || errno=$?
+-	    test $errno -eq 0 || echo >&2 'Failed to set hostname.'
+-
+-	    # Attempt to rescue name using the first method.
+-	    test $errno -eq 0 || $hostname "$SAVEDNAME" || errno=$?
+-	fi
+-    fi
+-fi
+-
+ exit $errno

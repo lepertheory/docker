@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+./configure --prefix=/usr          \
+            --bindir=/bin          \
+            --sysconfdir=/etc      \
+            --with-rootlibdir=/lib \
+            --with-xz              \
+            --with-zlib
+make
+make install
+for target in depmod insmod lsmod modinfo modprobe rmmod; do
+  ln --symbolic --force --verbose ../bin/kmod /sbin/"$target"
+done
+
+ln --symbolic --force --verbose kmod /bin/lsmod

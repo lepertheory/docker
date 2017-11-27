@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+sed --in-place '/^TESTS =/d' gettext-runtime/tests/Makefile.in
+sed --in-place 's/test-lock..EXEEXT.//' gettext-tools/gnulib-tests/Makefile.in
+
+./configure --prefix=/usr --disable-static --docdir=/usr/share/doc/gettext-0.19.8.1
+make
+make check
+make install
+chmod --verbose 0755 /usr/lib/preloadable_libintl.so

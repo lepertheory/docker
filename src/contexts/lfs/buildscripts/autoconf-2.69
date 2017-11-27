@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+./configure --prefix=/usr
+make
+make TESTSUITEFLAGS="-j$CPUS 1-500 502" check
+make install

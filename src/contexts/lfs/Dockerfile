@@ -361,6 +361,33 @@ RUN  buildscripts/build perl-5.26.0 01-build
 COPY buildscripts/perl-5.26.0-02-install buildscripts/
 RUN  buildscripts/build perl-5.26.0 02-install
 
+#
+# FROM: :LFS
+# REF: Chapter6.41
+#
+RUN  buildscripts/build xml-parser-2.44 prepare XML-Parser-2.44.tar.gz
+COPY buildscripts/xml-parser-2.44 buildscripts/
+RUN  buildscripts/build xml-parser-2.44
+
+#
+# FROM: :LFS
+# REF: Chapter6.42
+#
+RUN  buildscripts/build intltool-0.51.0 prepare intltool-0.51.0.tar.gz
+COPY buildscripts/intltool-0.51.0 buildscripts/
+RUN  buildscripts/build intltool-0.51.0
+
+# TODO: Put this in the right place.
+RUN echo 'export CPUS="$(nproc --all)"' >> "$HOME"/.bash_profile
+
+#
+# FROM: :LFS
+# REF: Chapter6.43
+#
+RUN  buildscripts/build autoconf-2.69 prepare autoconf-2.69.tar.xz
+COPY buildscripts/autoconf-2.69 buildscripts/
+RUN  buildscripts/build autoconf-2.69
+
 # FROM scratch
 # COPY --from=staging / /
 #

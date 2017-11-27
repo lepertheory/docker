@@ -429,6 +429,14 @@ RUN  buildscripts/build systemd-234 prepare systemd-234-lfs.tar.xz
 COPY buildscripts/systemd-234 buildscripts/
 RUN  buildscripts/build systemd-234
 
+#
+# FROM: :LFS
+# REF: Chapter6.49
+#
+RUN  buildscripts/build procps-ng-3.3.12 prepare procps-ng-3.3.12.tar.xz
+COPY buildscripts/procps-ng-3.3.12 buildscripts/
+RUN  buildscripts/build procps-ng-3.3.12
+
 # FROM scratch
 # COPY --from=staging / /
 #

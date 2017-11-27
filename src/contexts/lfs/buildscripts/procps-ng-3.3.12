@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+./configure --prefix=/usr                            \
+            --exec-prefix=                           \
+            --libdir=/usr/lib                        \
+            --docdir=/usr/share/doc/procps-ng-3.3.12 \
+            --disable-static                         \
+            --disable-kill                           \
+            --with-systemd
+make
+
+sed --in-place --regexp-extended 's|(pmap_initname)\\\$|\1|' testsuite/pmap.test/pmap.exp
+sed --in-place                   '/set tty/d'                testsuite/pkill.test/pkill.exp
+rm testsuite/pgrep.test/pgrep.exp
+make check
+
+make install
+mv --verbose /usr/lib/libprocps.so.* /lib
+ln --symbolic --force --verbose ../../lib/"$(readlink /usr/lib/procps.so)" /usr/lib/libprocps.so

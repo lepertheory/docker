@@ -1,6 +1,6 @@
 ARG GIT_BRANCH
 ARG TAG_BASE
-FROM $TAG_BASE/lfs-bootstrap:$GIT_BRANCH
+FROM $TAG_BASE/lfs-bootstrap:$GIT_BRANCH AS stage1
 
 ENV SOURCES=/usr/src
 RUN mkdir build
@@ -303,6 +303,42 @@ RUN  buildscripts/build bash-4.4
 RUN  buildscripts/build libtool-2.4.6 prepare libtool-2.4.6.tar.xz
 COPY buildscripts/libtool-2.4.6 buildscripts/
 RUN  buildscripts/build libtool-2.4.6
+
+#
+# FROM: :LFS
+# REF: Chapter6.36
+#
+RUN  buildscripts/build gdbm-1.13 prepare gdbm-1.13.tar.gz
+COPY buildscripts/gdbm-1.13 buildscripts/
+RUN  buildscripts/build gdbm-1.13
+
+# HACK: Get around too many layers.
+FROM scratch
+COPY --from=stage1 / /
+
+ENV     HOME=/root
+WORKDIR "$HOME"
+SHELL   ["/bin/bash", "--login", "+h", "-c"]
+CMD     ["/bin/bash", "--login", "+h"]
+
+# TODO: Get this from the parent layer.
+ENV SOURCES=/usr/src
+
+#
+# FROM: :LFS
+# REF: Chapter6.37
+#
+RUN  buildscripts/build gperf-3.1 prepare gperf-3.1.tar.gz
+COPY buildscripts/gperf-3.1 buildscripts/
+RUN  buildscripts/build gperf-3.1
+
+#
+# FROM: :LFS
+# REF: Chapter6.38
+#
+RUN  buildscripts/build expat-2.2.3 prepare expat-2.2.3.tar.bz2
+COPY buildscripts/expat-2.2.3 buildscripts/
+RUN  buildscripts/build expat-2.2.3
 
 # FROM scratch
 # COPY --from=staging / /

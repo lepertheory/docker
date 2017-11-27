@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+sed --in-place 's|usr/bin/env |bin/|' run.sh.in
+
+./configure --prefix=/usr --disable-static
+make
+make check
+make install
+install --verbose --directory --mode=755          /usr/share/doc/expat-2.2.3
+install --verbose --mode=644 doc/*.{html,png,css} /usr/share/doc/expat-2.2.3/

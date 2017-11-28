@@ -7,6 +7,8 @@ set -o errtrace
 set -o pipefail
 set -o nounset
 
+set +h
+
 patch --forward --strip=1 --input="$SOURCES"/coreutils-8.27-i18n-1.patch
 patch --strip=1 < "$SOURCES"/coreutils-8.27-dunno.patch
 sed --in-place '/test.lock/s/^/#/' gnulib-tests/gnulib.mk
@@ -19,6 +21,8 @@ echo 'dummy:x:1000:nobody' >> /etc/group
 chown --recursive --verbose nobody .
 su nobody --shell=/bin/bash -c "PATH=$(printf '%q' "$PATH") make RUN_EXPENSIVE_TESTS=yes check"
 sed --in-place '/dummy/d' /etc/group
+
+echo "PATH: $PATH"
 
 make install
 mv --verbose /usr/bin/{cat,chgrp,chmod,chown,cp,date,dd,df,echo}                     /bin

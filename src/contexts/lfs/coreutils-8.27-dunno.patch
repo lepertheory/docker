@@ -1,6 +1,6 @@
 diff -ur coreutils-8.27/gnulib-tests/gnulib.mk coreutils-8.27.new/gnulib-tests/gnulib.mk
---- coreutils-8.27/gnulib-tests/gnulib.mk	2017-03-09 03:52:57.000000000 +0000
-+++ coreutils-8.27.new/gnulib-tests/gnulib.mk	2017-11-27 18:51:07.956012267 +0000
+--- coreutils-8.27/gnulib-tests/gnulib.mk	2017-03-08 20:52:57.000000000 -0700
++++ coreutils-8.27.new/gnulib-tests/gnulib.mk	2017-11-28 13:52:07.000000000 -0700
 @@ -833,8 +833,6 @@
  
  ## begin gnulib module getcwd-tests
@@ -10,10 +10,9 @@ diff -ur coreutils-8.27/gnulib-tests/gnulib.mk coreutils-8.27.new/gnulib-tests/g
  test_getcwd_LDADD = $(LDADD) @LIBINTL@
  EXTRA_DIST += test-getcwd.c test-getcwd.sh
  
-Only in coreutils-8.27.new/gnulib-tests: .test-getcwd.c.swp
 diff -ur coreutils-8.27/src/expand.c coreutils-8.27.new/src/expand.c
---- coreutils-8.27/src/expand.c	2017-11-27 08:36:58.013629048 +0000
-+++ coreutils-8.27.new/src/expand.c	2017-11-27 08:41:21.736039928 +0000
+--- coreutils-8.27/src/expand.c	2017-11-28 13:49:03.000000000 -0700
++++ coreutils-8.27.new/src/expand.c	2017-11-28 13:52:07.000000000 -0700
 @@ -38,6 +38,7 @@
  #include <getopt.h>
  #include <sys/types.h>
@@ -23,8 +22,8 @@ diff -ur coreutils-8.27/src/expand.c coreutils-8.27.new/src/expand.c
  
  #include "system.h"
 diff -ur coreutils-8.27/src/unexpand.c coreutils-8.27.new/src/unexpand.c
---- coreutils-8.27/src/unexpand.c	2017-11-27 08:36:58.017629024 +0000
-+++ coreutils-8.27.new/src/unexpand.c	2017-11-27 08:40:50.064231808 +0000
+--- coreutils-8.27/src/unexpand.c	2017-11-28 13:49:03.000000000 -0700
++++ coreutils-8.27.new/src/unexpand.c	2017-11-28 13:52:07.000000000 -0700
 @@ -39,6 +39,7 @@
  #include <getopt.h>
  #include <sys/types.h>
@@ -34,8 +33,8 @@ diff -ur coreutils-8.27/src/unexpand.c coreutils-8.27.new/src/unexpand.c
  
  #include "system.h"
 diff -ur coreutils-8.27/tests/local.mk coreutils-8.27.new/tests/local.mk
---- coreutils-8.27/tests/local.mk	2017-11-27 08:36:58.017629024 +0000
-+++ coreutils-8.27.new/tests/local.mk	2017-11-27 18:16:46.039814595 +0000
+--- coreutils-8.27/tests/local.mk	2017-11-28 13:49:03.000000000 -0700
++++ coreutils-8.27.new/tests/local.mk	2017-11-28 13:58:53.000000000 -0700
 @@ -184,7 +184,6 @@
    tests/rm/d-2.sh				\
    tests/rm/d-3.sh				\
@@ -44,7 +43,15 @@ diff -ur coreutils-8.27/tests/local.mk coreutils-8.27.new/tests/local.mk
    tests/rm/dir-no-w.sh				\
    tests/rm/dir-nonrecur.sh			\
    tests/rm/dot-rel.sh				\
-@@ -534,7 +533,6 @@
+@@ -323,7 +322,6 @@
+   tests/misc/printf-hex.sh			\
+   tests/misc/printf-surprise.sh			\
+   tests/misc/printf-quote.sh			\
+-  tests/misc/pwd-long.sh			\
+   tests/misc/readlink-fp-loop.sh		\
+   tests/misc/readlink-root.sh			\
+   tests/misc/realpath.sh			\
+@@ -534,7 +532,6 @@
    tests/du/inacc-dir.sh				\
    tests/du/inaccessible-cwd.sh			\
    tests/du/inodes.sh				\
@@ -52,7 +59,7 @@ diff -ur coreutils-8.27/tests/local.mk coreutils-8.27.new/tests/local.mk
    tests/du/long-sloop.sh			\
    tests/du/max-depth.sh				\
    tests/du/move-dir-while-traversing.sh		\
-@@ -606,7 +604,6 @@
+@@ -606,7 +603,6 @@
    tests/mkdir/p-1.sh				\
    tests/mkdir/p-2.sh				\
    tests/mkdir/p-3.sh				\
@@ -61,8 +68,8 @@ diff -ur coreutils-8.27/tests/local.mk coreutils-8.27.new/tests/local.mk
    tests/mkdir/p-thru-slink.sh			\
    tests/mkdir/p-v.sh				\
 diff -ur coreutils-8.27/tests/misc/chroot-credentials.sh coreutils-8.27.new/tests/misc/chroot-credentials.sh
---- coreutils-8.27/tests/misc/chroot-credentials.sh	2017-01-01 22:34:24.000000000 +0000
-+++ coreutils-8.27.new/tests/misc/chroot-credentials.sh	2017-11-27 09:58:29.873305102 +0000
+--- coreutils-8.27/tests/misc/chroot-credentials.sh	2017-01-01 15:34:24.000000000 -0700
++++ coreutils-8.27.new/tests/misc/chroot-credentials.sh	2017-11-28 13:52:07.000000000 -0700
 @@ -52,11 +52,6 @@
  )
  test "$whoami_after_chroot" != "$root" || fail=1
@@ -76,8 +83,8 @@ diff -ur coreutils-8.27/tests/misc/chroot-credentials.sh coreutils-8.27.new/test
    Exit $fail
  fi
 diff -ur coreutils-8.27/tests/misc/date-debug.sh coreutils-8.27.new/tests/misc/date-debug.sh
---- coreutils-8.27/tests/misc/date-debug.sh	2017-01-21 14:53:43.000000000 +0000
-+++ coreutils-8.27.new/tests/misc/date-debug.sh	2017-11-27 17:02:11.970535436 +0000
+--- coreutils-8.27/tests/misc/date-debug.sh	2017-01-21 07:53:43.000000000 -0700
++++ coreutils-8.27.new/tests/misc/date-debug.sh	2017-11-28 13:52:07.000000000 -0700
 @@ -52,10 +52,10 @@
  date: final: 661095000.000000000 (epoch-seconds)
  date: final: (Y-M-D) 1990-12-13 13:30:00 (UTC0)

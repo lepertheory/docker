@@ -454,6 +454,14 @@ COPY coreutils-8.27-dunno.patch "$SOURCES"/
 COPY buildscripts/coreutils-8.27 buildscripts/
 RUN  buildscripts/build coreutils-8.27
 
+#
+# FROM: :LFS
+# REF: Chapter6.52
+#
+RUN  buildscripts/build diffutils-3.6 prepare diffutils-3.6.tar.xz
+COPY buildscripts/diffutils-3.6 buildscripts/
+RUN  buildscripts/build diffutils-3.6
+
 # FROM scratch
 # COPY --from=staging / /
 #

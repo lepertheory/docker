@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+# FIXME: This needs to go in every script. May be the reason for some failed tests, or additional
+#        tests may fail, which is even worse. Best place is probably when upgrading all packages,
+#        since the work will have to be done anyway.
+set +h
+
+sed --in-place 's/test-lock..EXEEXT.//' tests/Makefile.in
+
+./configure --prefix=/usr --localstatedir=/var/lib/locate
+make
+make check
+make install
+mv --verbose /usr/bin/find /bin
+sed --in-place 's|find:=${BINDIR}|find:=/bin|' /usr/bin/updatedb

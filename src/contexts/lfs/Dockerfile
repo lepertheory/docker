@@ -471,6 +471,14 @@ COPY gawk-4.1.4-disable-broken-tests.patch "$SOURCES"/
 COPY buildscripts/gawk-4.1.4 buildscripts/
 RUN  buildscripts/build gawk-4.1.4
 
+#
+# FROM: :LFS
+# REF: Chapter6.54
+#
+RUN  buildscripts/build findutils-4.6.0 prepare findutils-4.6.0.tar.gz
+COPY buildscripts/findutils-4.6.0 buildscripts/
+RUN  buildscripts/build findutils-4.6.0
+
 # FROM scratch
 # COPY --from=staging / /
 #

@@ -544,6 +544,14 @@ RUN  buildscripts/build make-4.2.1 prepare make-4.2.1.tar.bz2
 COPY buildscripts/make-4.2.1 buildscripts/
 RUN  buildscripts/build make-4.2.1
 
+#
+# FROM: :LFS
+# REF: Chapter6.62
+#
+RUN  buildscripts/build patch-2.7.5 prepare patch-2.7.5.tar.xz
+COPY buildscripts/patch-2.7.5 buildscripts/
+RUN  buildscripts/build patch-2.7.5
+
 # FROM scratch
 # COPY --from=staging / /
 #

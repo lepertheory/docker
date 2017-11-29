@@ -487,6 +487,14 @@ RUN  buildscripts/build groff-1.22.3 prepare groff-1.22.3.tar.gz
 COPY buildscripts/groff-1.22.3 buildscripts/
 RUN  buildscripts/build groff-1.22.3
 
+#
+# FROM: :LFS
+# REF: Chapter6.56
+#
+RUN  buildscripts/build grub-2.02 prepare grub-2.02.tar.xz
+COPY buildscripts/grub-2.02 buildscripts/
+RUN  buildscripts/build grub-2.02
+
 # FROM scratch
 # COPY --from=staging / /
 #

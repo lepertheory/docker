@@ -536,6 +536,14 @@ RUN  buildscripts/build libpipeline-1.4.2 prepare libpipeline-1.4.2.tar.gz
 COPY buildscripts/libpipeline-1.4.2 buildscripts/
 RUN  buildscripts/build libpipeline-1.4.2
 
+#
+# FROM: :LFS
+# REF: Chapter6.62
+#
+RUN  buildscripts/build make-4.2.1 prepare make-4.2.1.tar.bz2
+COPY buildscripts/make-4.2.1 buildscripts/
+RUN  buildscripts/build make-4.2.1
+
 # FROM scratch
 # COPY --from=staging / /
 #

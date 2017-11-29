@@ -495,6 +495,14 @@ RUN  buildscripts/build grub-2.02 prepare grub-2.02.tar.xz
 COPY buildscripts/grub-2.02 buildscripts/
 RUN  buildscripts/build grub-2.02
 
+#
+# FROM: :LFS
+# REF: Chapter6.57
+#
+RUN  buildscripts/build less-487 prepare less-487.tar.gz
+COPY buildscripts/less-487 buildscripts/
+RUN  buildscripts/build less-487
+
 # FROM scratch
 # COPY --from=staging / /
 #

@@ -520,6 +520,22 @@ RUN  buildscripts/build iproute2-4.12.0 prepare iproute2-4.12.0.tar.xz
 COPY buildscripts/iproute2-4.12.0 buildscripts/
 RUN  buildscripts/build iproute2-4.12.0
 
+#
+# FROM: :LFS
+# REF: Chapter6.60
+#
+RUN  buildscripts/build kbd-2.0.4 prepare kbd-2.0.4.tar.xz
+COPY buildscripts/kbd-2.0.4 buildscripts/
+RUN  buildscripts/build kbd-2.0.4
+
+#
+# FROM: :LFS
+# REF: Chapter6.61
+#
+RUN  buildscripts/build libpipeline-1.4.2 prepare libpipeline-1.4.2.tar.gz
+COPY buildscripts/libpipeline-1.4.2 buildscripts/
+RUN  buildscripts/build libpipeline-1.4.2
+
 # FROM scratch
 # COPY --from=staging / /
 #

@@ -479,6 +479,14 @@ RUN  buildscripts/build findutils-4.6.0 prepare findutils-4.6.0.tar.gz
 COPY buildscripts/findutils-4.6.0 buildscripts/
 RUN  buildscripts/build findutils-4.6.0
 
+#
+# FROM: :LFS
+# REF: Chapter6.55
+#
+RUN  buildscripts/build groff-1.22.3 prepare groff-1.22.3.tar.gz
+COPY buildscripts/groff-1.22.3 buildscripts/
+RUN  buildscripts/build groff-1.22.3
+
 # FROM scratch
 # COPY --from=staging / /
 #

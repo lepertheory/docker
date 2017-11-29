@@ -462,6 +462,15 @@ RUN  buildscripts/build diffutils-3.6 prepare diffutils-3.6.tar.xz
 COPY buildscripts/diffutils-3.6 buildscripts/
 RUN  buildscripts/build diffutils-3.6
 
+#
+# FROM: :LFS
+# REF: Chapter6.53
+#
+RUN  buildscripts/build gawk-4.1.4 prepare gawk-4.1.4.tar.xz
+COPY gawk-4.1.4-disable-broken-tests.patch "$SOURCES"/
+COPY buildscripts/gawk-4.1.4 buildscripts/
+RUN  buildscripts/build gawk-4.1.4
+
 # FROM scratch
 # COPY --from=staging / /
 #

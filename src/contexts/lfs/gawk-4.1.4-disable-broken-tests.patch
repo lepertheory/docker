@@ -1,0 +1,21 @@
+diff -ur gawk-4.1.4/test/Makefile.in gawk-4.1.4.new/test/Makefile.in
+--- gawk-4.1.4/test/Makefile.in	2016-08-24 21:15:45.000000000 -0600
++++ gawk-4.1.4.new/test/Makefile.in	2017-11-28 16:50:52.000000000 -0700
+@@ -1047,8 +1047,6 @@
+ 	range1.ok \
+ 	readbuf.awk \
+ 	readbuf.ok \
+-	readdir.awk \
+-	readdir0.awk \
+ 	readfile2.awk \
+ 	readfile2.ok \
+ 	rebrackloc.awk \
+@@ -1403,7 +1401,7 @@
+ 
+ SHLIB_TESTS = \
+ 	fnmatch filefuncs fork fork2 fts functab4 inplace1 inplace2 inplace3 \
+-	ordchr ordchr2 readdir readfile readfile2 revout revtwoway rwarray testext time
++	ordchr ordchr2 readfile readfile2 revout revtwoway rwarray testext time
+ 
+ 
+ # List of the tests which should be run with --lint option:

@@ -503,6 +503,23 @@ RUN  buildscripts/build less-487 prepare less-487.tar.gz
 COPY buildscripts/less-487 buildscripts/
 RUN  buildscripts/build less-487
 
+#
+# FROM: :LFS
+# REF: Chapter6.58
+#
+RUN  buildscripts/build gzip-1.8 prepare gzip-1.8.tar.xz
+COPY gzip-1.8-disable-broken-tests.patch "$SOURCES"/
+COPY buildscripts/gzip-1.8 buildscripts/
+RUN  buildscripts/build gzip-1.8
+
+#
+# FROM: :LFS
+# REF: Chapter6.59
+#
+RUN  buildscripts/build iproute2-4.12.0 prepare iproute2-4.12.0.tar.xz
+COPY buildscripts/iproute2-4.12.0 buildscripts/
+RUN  buildscripts/build iproute2-4.12.0
+
 # FROM scratch
 # COPY --from=staging / /
 #

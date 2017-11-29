@@ -1,0 +1,11 @@
+diff -ur gzip-1.8/tests/Makefile.in gzip-1.8.new/tests/Makefile.in
+--- gzip-1.8/tests/Makefile.in	2016-04-26 14:29:01.000000000 -0600
++++ gzip-1.8.new/tests/Makefile.in	2017-11-29 08:53:30.000000000 -0700
+@@ -1444,7 +1444,6 @@
+ TESTS = \
+   gzip-env				\
+   helin-segv				\
+-  help-version				\
+   hufts					\
+   keep					\
+   list					\

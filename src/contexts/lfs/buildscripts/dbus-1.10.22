@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+# FIXME: This needs to go in every script. May be the reason for some failed tests, or additional
+#        tests may fail, which is even worse. Best place is probably when upgrading all packages,
+#        since the work will have to be done anyway.
+set +h
+
+./configure --prefix=/usr                        \
+            --sysconfdir=/etc                    \
+            --localstatedir=/var                 \
+            --disable-static                     \
+            --disable-doxygen-docs               \
+            --disable-xml-docs                   \
+            --docdir=/usr/share/doc/dbus-1.10.22 \
+            --with-console-auth-dir=/run/console
+make
+make install
+mv --verbose /usr/lib/libdbus-1.so.* /lib
+ln --symbolic --force --verbose ../../lib/"$(readlink /usr/lib/libdbus-1.so)" /usr/lib/libdbus-1.so
+ln --symbolic --force --verbose /etc/machine-id /var/lib/dbus

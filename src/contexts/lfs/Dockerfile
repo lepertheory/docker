@@ -546,11 +546,19 @@ RUN  buildscripts/build make-4.2.1
 
 #
 # FROM: :LFS
-# REF: Chapter6.62
+# REF: Chapter6.63
 #
 RUN  buildscripts/build patch-2.7.5 prepare patch-2.7.5.tar.xz
 COPY buildscripts/patch-2.7.5 buildscripts/
 RUN  buildscripts/build patch-2.7.5
+
+#
+# FROM: :LFS
+# REF: Chapter6.64
+#
+RUN  buildscripts/build dbus-1.10.22 prepare dbus-1.10.22.tar.gz
+COPY buildscripts/dbus-1.10.22 buildscripts/
+RUN  buildscripts/build dbus-1.10.22
 
 # FROM scratch
 # COPY --from=staging / /

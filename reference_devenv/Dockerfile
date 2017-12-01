@@ -1,3 +1,5 @@
+# FIXME: Replace this. No longer supported, just for reference.
+
 FROM alpine:latest
 
 # Command-line config.

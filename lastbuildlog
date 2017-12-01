@@ -1,1 +1,5 @@
+#!/usr/bin/env bash
+
+
+
 docker exec -it "$(docker ps -q)" bash --login -c 'tail -f "$(ls -1rt | tail -n1)"'

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; readonly SCRIPT_DIR
+. "$SCRIPT_DIR"/src/paths
+
+BUILD_DIR="$(pwd)"; readonly BUILD_DIR
+
+main ()
+{
+	echo "Building in:   $(printf '%q\n' "$BUILD_DIR")"
+	echo "         from: $(printf '%q\n' "$REPO_DIR")"
+	echo "Contexts:"
+	run mkdir --parents contexts
+	run cd contexts
+	run "$SOURCE_DIR"/contexts/build
+	run cd ..
+}
+
+main

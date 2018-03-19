@@ -12,6 +12,9 @@ set -o nounset
 #        since the work will have to be done anyway.
 set +h
 
+# FIXME: This seems to be dirt left over from the bootstrap image.
+rm /var/run
+
 ./configure --prefix=/usr                        \
             --sysconfdir=/etc                    \
             --localstatedir=/var                 \

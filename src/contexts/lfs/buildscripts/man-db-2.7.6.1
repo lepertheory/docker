@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+# FIXME: This needs to go in every script. May be the reason for some failed tests, or additional
+#        tests may fail, which is even worse. Best place is probably when upgrading all packages,
+#        since the work will have to be done anyway.
+set +h
+
+# TODO: links2 is a better text-mode browser.
+./configure --prefix=/usr                          \
+            --docdir=/usr/share/doc/man-db-2.7.6.1 \
+            --sysconfdir=/etc                      \
+            --disable-setuid                       \
+            --enable-cache-owner=bin               \
+            --with-browser=/usr/bin/lynx           \
+            --with-vgrind=/usr/bin/vgrind          \
+            --with-grap=/usr/bin/grap
+make
+make check
+make install
+
+# This user doesn't exist.
+sed --in-place 's/man man/root root/g' /usr/lib/tmpfiles.d/man-db.conf

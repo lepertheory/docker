@@ -560,6 +560,30 @@ RUN  buildscripts/build dbus-1.10.22 prepare dbus-1.10.22.tar.gz
 COPY buildscripts/dbus-1.10.22 buildscripts/
 RUN  buildscripts/build dbus-1.10.22
 
+#
+# FROM: :LFS
+# REF: Chapter6.65
+#
+RUN  buildscripts/build util-linux-2.30.1 prepare util-linux-2.30.1.tar.xz
+COPY buildscripts/util-linux-2.30.1 buildscripts/
+RUN  buildscripts/build util-linux-2.30.1
+
+#
+# FROM :LFS
+# REF: Chapter6.66
+#
+RUN  buildscripts/build man-db-2.7.6.1 prepare man-db-2.7.6.1.tar.xz
+COPY buildscripts/man-db-2.7.6.1 buildscripts/
+RUN  buildscripts/build man-db-2.7.6.1
+
+#
+# FROM :LFS
+# REF: Chapte6.67
+#
+RUN  buildscripts/build tar-1.29 prepare tar-1.29.tar.xz
+COPY buildscripts/tar-1.29 buildscripts/
+RUN  buildscripts/build tar-1.29
+
 # FROM scratch
 # COPY --from=staging / /
 #

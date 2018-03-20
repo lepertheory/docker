@@ -15,5 +15,11 @@ run cp --recursive "$THIRDPARTY_DIR"/lfs/sources .
 
 run docker build --build-arg=GIT_BRANCH="$GIT_BRANCH"   \
                  --build-arg=TAG_BASE="$TAG_BASE"       \
+                 --tag="$CONTEXT_TAG-cache"             \
+                 --target=staging                       \
+                 .
+
+run docker build --build-arg=GIT_BRANCH="$GIT_BRANCH"   \
+                 --build-arg=TAG_BASE="$TAG_BASE"       \
                  --tag="$CONTEXT_TAG"                   \
                  .

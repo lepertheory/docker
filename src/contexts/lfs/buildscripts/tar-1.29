@@ -12,9 +12,10 @@ set -o nounset
 #        since the work will have to be done anyway.
 set +h
 
+# Unsafe configure (running as root) doesn't matter. If something breaks, rebuild the container.
 FORCE_UNSAFE_CONFIGURE=1 ./configure --prefix=/usr --bindir=/bin
 make
 # FIXME: These tests don't work in Docker. Dunno why.
-make check TESTSUITEFLAGS='--keywords=!listed04 --keywords=!xattr03'
+make check TESTSUITEFLAGS='--keywords=!listed04,!xattr03'
 make install
 make --directory=doc install-html docdir=/usr/share/doc/tar-1.29

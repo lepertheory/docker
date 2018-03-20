@@ -313,7 +313,7 @@ COPY buildscripts/gdbm-1.13 buildscripts/
 RUN  buildscripts/build gdbm-1.13
 
 # HACK: Get around too many layers.
-FROM scratch
+FROM scratch AS staging
 COPY --from=stage1 / /
 
 ENV     HOME=/root
@@ -601,13 +601,13 @@ RUN  buildscripts/build vim-8.0.586 prepare vim-8.0.586.tar.bz2
 COPY buildscripts/vim-8.0.586 buildscripts/
 RUN  buildscripts/build vim-8.0.586
 
-# FROM scratch
-# COPY --from=staging / /
-#
-# ENV     HOME=/root
-# WORKDIR "$HOME"
-# SHELL   ["/bin/bash", "--login", "-c"]
-# CMD     ["/bin/bash", "--login"]
+FROM scratch
+COPY --from=staging / /
+
+ENV     HOME=/root
+WORKDIR "$HOME"
+SHELL   ["/bin/bash", "--login", "-c"]
+CMD     ["/bin/bash", "--login"]
 
 ONBUILD ENV     HOME=/root
 ONBUILD WORKDIR "$HOME"

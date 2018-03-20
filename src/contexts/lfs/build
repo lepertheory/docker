@@ -23,5 +23,11 @@ run docker build --build-arg=GIT_BRANCH="$GIT_BRANCH" \
 
 run docker build --build-arg=GIT_BRANCH="$GIT_BRANCH" \
                  --build-arg=TAG_BASE="$TAG_BASE"     \
+                 --tag="$CONTEXT_TAG-cache2"          \
+                 --target=staging                     \
+                 .
+
+run docker build --build-arg=GIT_BRANCH="$GIT_BRANCH" \
+                 --build-arg=TAG_BASE="$TAG_BASE"     \
                  --tag="$CONTEXT_TAG"                 \
                  .

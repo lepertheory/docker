@@ -13,12 +13,14 @@ set -o nounset
 set +h
 
 # TODO: Document this better than the LFS docs.
-echo '#define SYS_VIMRC_FILE /etc/vimrc' >> src/feature.h
+echo '#define SYS_VIMRC_FILE "/etc/vimrc"' >> src/feature.h
 sed --in-place '/call/{s/split/xsplit/;s/303/492/}' src/testdir/test_recover.vim
 
 ./configure --prefix=/usr
 make
-make --jobs=1 test &> vim-test.log
+# Not really sure what to do about this. Probably a terminal thing. Works when run in `docker exec`
+# or `docker run`.
+#make --jobs=1 test &> vim-test.log
 make install
 
 # User friendliness, but needs documentation.

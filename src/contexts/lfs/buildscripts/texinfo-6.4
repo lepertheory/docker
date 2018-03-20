@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+# FIXME: This needs to go in every script. May be the reason for some failed tests, or additional
+#        tests may fail, which is even worse. Best place is probably when upgrading all packages,
+#        since the work will have to be done anyway.
+set +h
+
+./configure --prefix=/usr --disable-static
+make
+make check
+make install
+make TEXMF=/usr/share/texmf install-tex
+
+# FIXME: Not sure what to do with this. Should probably be a script somewhere.
+#pushd /usr/share/info
+#rm --verbose dir
+#for file in *; do
+#  # FIXME: Why are we swallowing stderr?
+#  install-info "$file" dir 2>/dev/null
+#done
+#popd

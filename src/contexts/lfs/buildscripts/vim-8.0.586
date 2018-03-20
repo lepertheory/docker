@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# SBUS: 0
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+# FIXME: This needs to go in every script. May be the reason for some failed tests, or additional
+#        tests may fail, which is even worse. Best place is probably when upgrading all packages,
+#        since the work will have to be done anyway.
+set +h
+
+# TODO: Document this better than the LFS docs.
+echo '#define SYS_VIMRC_FILE /etc/vimrc' >> src/feature.h
+sed --in-place '/call/{s/split/xsplit/;s/303/492/}' src/testdir/test_recover.vim
+
+./configure --prefix=/usr
+make
+make --jobs=1 test &> vim-test.log
+make install
+
+# User friendliness, but needs documentation.
+ln --symbolic --verbose vim /usr/bin/vi
+for no_idea in /usr/share/man/{,*/}man1/vim.1; do
+  no_idea_dirname="$(dirname "$no_idea")"
+  ln --symbolic --verbose vim.1 "$no_idea_dirname"/vi.1
+done
+
+# Put docs in a predictable place.
+ln --symbolic --verbose ../vim/vim80/doc /usr/share/doc/vim-8.0.586

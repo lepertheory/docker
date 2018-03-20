@@ -584,6 +584,23 @@ RUN  buildscripts/build tar-1.29 prepare tar-1.29.tar.xz
 COPY buildscripts/tar-1.29 buildscripts/
 RUN  buildscripts/build tar-1.29
 
+#
+# FROM :LFS
+# REF: Chapter6.68
+#
+RUN  buildscripts/build texinfo-6.4 prepare texinfo-6.4.tar.xz
+COPY buildscripts/texinfo-6.4 buildscripts/
+RUN  buildscripts/build texinfo-6.4
+
+#
+# FROM :LFS
+# REF: Chapter6.69
+# nice.
+#
+RUN  buildscripts/build vim-8.0.586 prepare vim-8.0.586.tar.bz2
+COPY buildscripts/vim-8.0.586 buildscripts/
+RUN  buildscripts/build vim-8.0.586
+
 # FROM scratch
 # COPY --from=staging / /
 #

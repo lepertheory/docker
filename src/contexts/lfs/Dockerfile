@@ -601,6 +601,9 @@ RUN  buildscripts/build vim-8.0.586 prepare vim-8.0.586.tar.bz2
 COPY buildscripts/vim-8.0.586 buildscripts/
 RUN  buildscripts/build vim-8.0.586
 
+# Done building!
+RUN rm -rf build
+
 FROM scratch
 COPY --from=staging / /
 

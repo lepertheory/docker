@@ -611,8 +611,8 @@ RUN rm -rf *                                                                    
 # This might break stuff.
 RUN mkdir /usr/share/locale.new                            \
  && mv /usr/share/locale{,.new}/locale.alias               \
- && rm -rf /usr/lib/locale                                 \
- && mv /usr/lib/locale{.new,}                              \
+ && rm -rf /usr/share/locale                               \
+ && mv /usr/share/locale{.new,}                            \
  && rm /usr/lib/locale/locale-archive                      \
  && localedef --inputfile=en_US --charmap=ISO-8859-1 en_US \
  && localedef --inputfile=en_US --charmap=UTF-8      en_US.UTF-8

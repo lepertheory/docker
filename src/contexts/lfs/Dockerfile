@@ -601,8 +601,21 @@ RUN  buildscripts/build vim-8.0.586 prepare vim-8.0.586.tar.bz2
 COPY buildscripts/vim-8.0.586 buildscripts/
 RUN  buildscripts/build vim-8.0.586
 
-# Done building!
-RUN rm -rf build
+# Done building! Clean up.
+RUN rm -rf *                                                                      \
+           /tmp/*                                                                 \
+           /tools                                                                 \
+           /usr/lib/lib{bfd,bz2,com_err,e2p,ext2fs,fl{,_pic},ltdl,opcodes,ss,z}.a \
+           /usr/src/*
+
+# This might break stuff.
+RUN mkdir /usr/share/locale.new                            \
+ && mv /usr/share/locale{,.new}/locale.alias               \
+ && rm -rf /usr/lib/locale                                 \
+ && mv /usr/lib/locale{.new,}                              \
+ && rm /usr/lib/locale/locale-archive                      \
+ && localedef --inputfile=en_US --charmap=ISO-8859-1 en_US \
+ && localedef --inputfile=en_US --charmap=UTF-8      en_US.UTF-8
 
 FROM scratch
 COPY --from=staging / /

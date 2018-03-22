@@ -620,12 +620,11 @@ RUN mkdir /usr/share/locale.new                            \
 FROM scratch
 COPY --from=staging / /
 
-ENV     HOME=/root
+ENV HOME=/root                                                        \
+    PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+    LANG=en_US.UTF-8                                                  \
+    LC_ALL=en_US.UTF-8                                                \
+    LANGUAGE=en_US.UTF-8
 WORKDIR "$HOME"
 SHELL   ["/bin/bash", "--login", "-c"]
 CMD     ["/bin/bash", "--login"]
-
-ONBUILD ENV     HOME=/root
-ONBUILD WORKDIR "$HOME"
-ONBUILD SHELL   ["/bin/bash", "--login", "-c"]
-ONBUILD CMD     ["/bin/bash", "--login"]

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o errtrace
+set -o nounset
+set -o pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; readonly SCRIPT_DIR
+. "$SCRIPT_DIR"/../../paths
+
+set_context_env_vars
+
+run docker run --rm --interactive --tty --env=TERM --init "$CONTEXT_TAG" "$@"

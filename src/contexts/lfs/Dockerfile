@@ -617,11 +617,16 @@ RUN mkdir /usr/share/locale.new                            \
  && localedef --inputfile=en_US --charmap=ISO-8859-1 en_US \
  && localedef --inputfile=en_US --charmap=UTF-8      en_US.UTF-8
 
+# Better user environment.
+COPY root_home/ ./
+
 FROM scratch
 COPY --from=staging / /
 
 ENV HOME=/root                                                        \
     PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+    PS1="\\u:\\w\\$ "                                                 \
+    SHELL=/bin/bash                                                   \
     LANG=en_US.UTF-8                                                  \
     LC_ALL=en_US.UTF-8                                                \
     LANGUAGE=en_US.UTF-8

@@ -10,4 +10,4 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; readonly SCRIPT_DIR
 
 set_context_env_vars
 
-run docker run --rm --interactive --tty --env=TERM --init "$CONTEXT_TAG" "$@"
+run docker run --rm --interactive --tty --env=TERM --env=COLORTERM --init "$CONTEXT_TAG" "$@"

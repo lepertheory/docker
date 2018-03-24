@@ -1,0 +1,4 @@
+DISTRIB_ID="Linux From Scratch"
+DISTRIB_RELEASE="8.1-systemd"
+DISTRIB_CODENAME="guy that has never farted"
+DISTRIB_DESCRIPTION="Linux From Scratch"

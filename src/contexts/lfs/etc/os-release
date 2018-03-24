@@ -1,0 +1,5 @@
+NAME="Linux From Scratch"
+VERSION="8.1-systemd"
+ID=lfs
+PRETTY_NAME="Linux From Scratch 8.1-systemd"
+VERSION_CODENAME="guy that has never farted"

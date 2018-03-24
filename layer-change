@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o errtrace
+set -o pipefail
+set -o nounset
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; readonly SCRIPT_DIR
+. "$SCRIPT_DIR"/src/paths
+
+readonly IMAGE_TAG="$1"
+readonly LEFT_LAYER_OFFSET="${2:-1}"
+readonly RIGHT_LAYER_OFFSET="${3:-$((LEFT_LAYER_OFFSET - 1))}"
+
+LAYER_IDS=( $(docker history --quiet "$IMAGE_TAG" | tac) ); readonly LAYER_IDS
+
+readonly LEFT_LAYER_ID="${LAYER_IDS[$LEFT_LAYER_OFFSET]}"
+readonly RIGHT_LAYER_ID="${LAYER_IDS[$RIGHT_LAYER_OFFSET]}"
+
+echo "LAYER IDS: ${LAYER_IDS[@]}"
+echo "Diffing: $LEFT_LAYER_ID -> $RIGHT_LAYER_ID"
+
+docker-diff "$LEFT_LAYER_ID" "$RIGHT_LAYER_ID"

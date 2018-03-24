@@ -10,6 +10,9 @@ This follows [Semantic Versioning 2.0.0]
 
 ### 0.2
 * End-to-end LFS book.
+    - DRY this shit up:
+        + `grep -RFI '8.1-systemd'`
+        + `grep -RFI 'guy that has never farted'`
 
 ### 0.5
 * Disable networking during build.

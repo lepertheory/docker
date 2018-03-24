@@ -10,7 +10,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; readonly SCRIPT_DIR
 
 set_context_env_vars
 
-run cp --recursive "$CONTEXT_SOURCE_DIR"/{Dockerfile,buildscripts,root_home} .
+run cp --recursive "$CONTEXT_SOURCE_DIR"/{Dockerfile,buildscripts,etc,root_home} .
 run cp "$CONTEXT_SOURCE_DIR"/{glibc-2.26,binutils-2.29,attr-2.4.47,inetutils-1.9.4,automake-1.15.1,gawk-4.1.4,gzip-1.8}-disable-broken-tests.patch .
 run cp "$CONTEXT_SOURCE_DIR"/perl-5.26.0-upstream-docker-fix.patch .
 run cp "$CONTEXT_SOURCE_DIR"/coreutils-8.27-dunno.patch .

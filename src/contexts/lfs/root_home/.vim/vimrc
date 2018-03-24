@@ -1,4 +1,4 @@
-" When started as "evim", evim.vim will already have done these settings.
+
 if v:progname =~? "evim"
   finish
 endif
@@ -48,6 +48,11 @@ endif
 
 set number
 if &t_Co >= 256
+	if ($COLORTERM == 'truecolor')
+		let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+		let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+		set termguicolors
+	endif
 	colorscheme zenburn
 	au BufRead,BufNewFile * syntax match Tab /\t/
 	hi Search ctermbg=DarkBlue

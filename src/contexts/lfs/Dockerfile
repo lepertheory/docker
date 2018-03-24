@@ -620,6 +620,12 @@ RUN mkdir /usr/share/locale.new                            \
 # Better user environment.
 COPY root_home/ ./
 
+#
+# FROM :LFS
+# REF: Chapter7.9
+#
+COPY etc/ /etc
+
 FROM scratch
 COPY --from=staging / /
 

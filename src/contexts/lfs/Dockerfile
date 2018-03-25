@@ -629,13 +629,28 @@ COPY etc/ /etc
 FROM scratch
 COPY --from=staging / /
 
+# Makes started services much more minimal.
+#RUN find /etc/systemd/system                                      \
+#         /lib/systemd/system -path '*.wants/*'                    \
+#                             -not -name '*journald*'              \
+#                             -not -name '*systemd-tmpfiles*'      \
+#                             -not -name '*systemd-user-sessions*' \
+#                             -delete
+
 ENV HOME=/root                                                        \
     PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     PS1="\\u:\\w\\$ "                                                 \
     SHELL=/bin/bash                                                   \
     LANG=en_US.UTF-8                                                  \
     LC_ALL=en_US.UTF-8                                                \
-    LANGUAGE=en_US.UTF-8
-WORKDIR "$HOME"
+    LANGUAGE=en_US.UTF-8                                              \
+    container=docker
+#WORKDIR "$HOME"
 SHELL   ["/bin/bash", "--login", "-c"]
-CMD     ["/bin/bash", "--login"]
+#CMD     ["/bin/bash", "--login"]
+CMD     ["/sbin/init"]
+WORKDIR "/sys/fs/cgroup"
+
+STOPSIGNAL SIGRTMIN+3
+
+RUN echo 'root:blerg' | chpasswd

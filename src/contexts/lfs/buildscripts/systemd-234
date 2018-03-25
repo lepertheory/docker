@@ -44,6 +44,7 @@ rm --recursive --force --verbose /usr/lib/rpm
 for tool in runlevel reboot shutdown poweroff halt telinit; do
   ln --symbolic --force --verbose ../bin/systemctl /sbin/"${tool}"
 done
-ln --symbolic --force --verbose ../lib/systemd /sbin/init
+ln --symbolic --force --verbose ../lib/systemd/systemd /sbin/init
 
-systemd-machine-id-setup
+#systemd-machine-id-setup
+touch /etc/machine-id

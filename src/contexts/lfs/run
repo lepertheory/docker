@@ -6,8 +6,21 @@ set -o nounset
 set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; readonly SCRIPT_DIR
-. "$SCRIPT_DIR"/../../paths
+source "$SCRIPT_DIR"/../../paths
 
 set_context_env_vars
 
-run docker run --rm --interactive --tty --env=TERM --env=COLORTERM --init "$CONTEXT_TAG" "$@"
+#               --env=container_uuid=
+#               --security-opt=seccomp=unconfined         \
+#               --cap-add=SYS_ADMIN                       \
+run docker run --rm                                      \
+               --tmpfs=/tmp                              \
+               --tmpfs=/run                              \
+               --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro \
+               --interactive                             \
+               --tty                                     \
+               --env=TERM                                \
+               --env=COLORTERM                           \
+               --env=container=docker                    \
+               --stop-signal=SIGRTMIN+3                  \
+               "$CONTEXT_TAG"
